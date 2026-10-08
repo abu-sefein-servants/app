@@ -2103,7 +2103,8 @@ onReady(function(){
     if(/network/.test(c))return 'مفيش نت — اتأكد من الاتصال وجرّب تاني';
     if(/too-many-requests/.test(c))return 'محاولات كتير — استنى شوية وجرّب تاني';
     if(/permission-denied/.test(c))return 'مش عندك صلاحية';
-    return 'حصلت مشكلة، جرّب تاني';}
+    if(/unavailable|offline/.test(c))return 'مش قادر أوصل لقاعدة البيانات — اتأكد من النت وجرّب تاني';
+    return 'حصلت مشكلة، جرّب تاني'+(c?' ('+c+')':'');}
   if(!window.firebase||!CFG){info('مش قادر أوصل للسيرفر — اتأكد من النت وافتح تاني',[['حاول تاني',function(){location.reload()}]]);return;}
 
   firebase.initializeApp(CFG);
