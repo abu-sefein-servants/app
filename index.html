@@ -1065,7 +1065,7 @@ button.sum-i:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
       <div class="ds-head"><h2>Dashboard</h2><span class="ds-yr">سنة الخدمة ٢٠٢٦ – ٢٠٢٧</span></div>
       <div class="py-lock" id="ds-lock">
         <div class="py-lock-ic"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
-        <p class="py-lock-t" id="ds-lock-t">الداشبورد محمي بنفس الرقم السري بتاع الاشتراكات</p>
+        <p class="py-lock-t" id="ds-lock-t" hidden></p>
         <form class="py-pin" id="ds-form" autocomplete="off"><input id="ds-pin" type="password" inputmode="numeric" maxlength="4" dir="ltr" placeholder="••••" aria-label="الرقم السري"><button type="submit" id="ds-go">افتح</button></form>
         <p class="py-err" id="ds-err" role="alert"></p>
       </div>
@@ -1963,7 +1963,7 @@ onReady(function(){
   // ---- lock
   function lockView(){ok=false;var sg=$('att-sug');if(sg)sg.hidden=true;$('ds-lock').hidden=false;$('ds-body').hidden=true;$('ds-pin').value='';
     var has=PS.payHas&&PS.payHas();$('ds-form').hidden=!has;
-    $('ds-lock-t').textContent=has?'الداشبورد محمي بنفس الرقم السري بتاع الاشتراكات':'لسه مفيش رقم سري — اعمله الأول من صفحة الاشتراكات';}
+    $('ds-lock-t').textContent=has?'':'لسه مفيش رقم سري — اعمله الأول من صفحة الاشتراكات';$('ds-lock-t').hidden=has;}
   function open(){ok=true;$('ds-err').textContent='';$('ds-lock').hidden=true;$('ds-body').hidden=false;render();}
   $('ds-form').addEventListener('submit',function(e){e.preventDefault();var p=en($('ds-pin').value),err=$('ds-err'),go=$('ds-go');
     if(!/^\d{4}$/.test(p)){err.textContent='الرقم السري لازم يكون ٤ أرقام';return;}
