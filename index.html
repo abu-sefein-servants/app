@@ -1621,7 +1621,7 @@ window.PS={state:{},ro:false,subs:[]};
     PS.isDone=isDone;
     function chipN(c){return (c.firstChild&&c.firstChild.nodeType===3?c.firstChild.textContent:c.textContent).trim();}
     function canDo(li){if(PS.role==='owner'||PS.role===null)return {ok:true};
-      var me=PS.myTaskName?PS.myTaskName():'';if(!me)return {ok:false,msg:'اختار اسمك في المهام من «حسابي» الأول، وبعدين علّم مهمتك'};
+      var me=PS.myTaskName?PS.myTaskName():'';if(!me)return {ok:false,msg:'اسمك مش متسجل على المهمة دي — يعلّمها المسؤول عنها'};
       var tid=li.dataset.tid,A=PS.state._a||{};var chips=[].slice.call(li.querySelectorAll('.slot-who:not(.assigned) .who-chip'));
       var names=A[tid]?A[tid].slice():chips.map(chipN),leads=A[tid]?[]:chips.filter(function(c){return c.classList.contains('lead')}).map(chipN);
       if(leads.length){return leads.indexOf(me)>-1?{ok:true}:{ok:false,msg:'المهمة دي يعلّمها الليدر: '+leads.join(' و ')};}
@@ -3131,17 +3131,18 @@ onReady(function(){
   var bn=el('button','my-tasks');bn.type='button';bn.hidden=true;var top=document.querySelector('.banner');if(top)top.after(bn);
   function allNames(){var o={};collect().forEach(function(t){t.who.forEach(function(n){if(n&&n!==ALL)o[n]=1;});});return Object.keys(o);}
   PS.myTaskName=function(){return myTaskName()};
-  function myTaskName(){var v='';try{v=localStorage.getItem('me_task')||''}catch(e){}if(v==='-')return '';if(v)return v;
-    var me=(PS.me&&PS.me.name)||'';if(!me)return '';var nm=norm(me),f=nm.split(' ')[0],ns=allNames();
-    for(var i=0;i<ns.length;i++){if(norm(ns[i])===nm)return ns[i];}
-    for(var j=0;j<ns.length;j++){var x=norm(ns[j]);if(x===f||nm.indexOf(x+' ')===0||x.indexOf(f+' ')===0)return ns[j];}return '';}
+  function myTaskName(){var M=PS.me||{},cs=[M.regName,M.name].filter(Boolean),ns=allNames();if(!cs.length)return '';
+    for(var a=0;a<cs.length;a++){var nm=norm(cs[a]);for(var i=0;i<ns.length;i++)if(norm(ns[i])===nm)return ns[i];}
+    for(var b=0;b<cs.length;b++){var nm2=norm(cs[b]),best='';ns.forEach(function(x){var nx=norm(x);if(nm2.indexOf(nx+' ')===0&&nx.length>norm(best).length)best=x;});if(best)return best;}
+    for(var c=0;c<cs.length;c++){var f=norm(cs[c]).split(' ')[0],hit=ns.filter(function(x){return norm(x).split(' ')[0]===f});if(hit.length===1)return hit[0];}
+    return '';}
   function drawBanner(){var n=myTaskName();if(!n){bn.hidden=true;return;}var ts=(byPerson(collect())[n]||[]);
     if(!ts.length){bn.hidden=true;return;}bn.hidden=false;bn.textContent='';
     bn.appendChild(el('b',null,'📌 عندك '+ar(ts.length)+(ts.length>2&&ts.length<11?' مهام':' مهمة')+' لسه مخلصتش'));
     var w=ts.map(whenTxt).filter(Boolean)[0];bn.appendChild(el('span',null,(w?'أقربها: '+w+' · ':'')+'دوس تشوفهم'));bn.dataset.n=n;}
   bn.addEventListener('click',function(){var sel=$('who-sel'),n=bn.dataset.n;if(sel){sel.value=n;sel.dispatchEvent(new Event('change'));}var t=$('tab-tasks');if(t)t.click();});
   // pick "my name in tasks" from the profile page
-  var pf=document.querySelector('#p-profile .section');var pick=null;
+  var pf=null;var pick=null;
   if(pf){var card=el('div','pf-card');card.appendChild(el('b',null,'اسمك في المهام'));card.appendChild(el('small','rem-hint','علشان يظهرلك تنبيه بالمهام اللي عليك'));pick=el('select','rem-pick');card.appendChild(pick);
     var anchor=pf.querySelector('.pf-info');if(anchor)anchor.after(card);else pf.appendChild(card);
     pick.addEventListener('change',function(){try{localStorage.setItem('me_task',pick.value)}catch(e){}drawBanner();PS.note('اتحفظ ✓');});}
@@ -3255,7 +3256,7 @@ onReady(function(){
   function myName(){return myProf.name||PS_name||'';}
   function initials(n,e){n=(n||'').trim();if(n)return n.split(/\s+/).slice(0,2).map(function(x){return x.charAt(0)}).join(' ');return (e||'?').charAt(0).toUpperCase();}
   function paintAv(box,photo,name,email){box.textContent='';if(photo){var i=document.createElement('img');i.src=photo;i.alt='';box.appendChild(i);}else{var sp=document.createElement('span');sp.textContent=initials(name,email);box.appendChild(sp);}}
-  function setWho(){var em=me.email,w=$('who');PS.me={name:myName(),email:em};try{document.dispatchEvent(new Event('me-changed'))}catch(e){}if(!w)return;
+  function setWho(){var em=me.email,w=$('who');PS.me={name:myName(),email:em,regName:PS_name};try{document.dispatchEvent(new Event('me-changed'))}catch(e){}if(!w)return;
     var im=w.querySelector('.me-btn img');if(myProf.photo){im.src=myProf.photo;im.hidden=false;}else{im.hidden=true;im.removeAttribute('src');}
     w.querySelector('.who-a').textContent=myName()||em;w.querySelector('.who-e').textContent=em;w.querySelector('.who-b').textContent=ROLE[role];
     paintAv($('me-av'),myProf.photo,myName(),em);
