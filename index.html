@@ -1055,6 +1055,75 @@ body.ps-open{overflow:hidden}body.ps-open .tabs{display:none!important}
 #p-more .nx-tile .nx-cam{top:10px;left:10px}
 #pf-theme{display:flex;flex-wrap:wrap;border-radius:16px}#pf-theme button{flex:1 1 40%}
 .fm-card.img{background-size:cover;background-position:center;color:#fff}.fm-card.img .fm-t small,.fm-card.img .fm-day{color:rgba(255,255,255,.85)}
+/* ===== unified "big thumbnail" skin for every page */
+.section>h2,.ds-head h2,#p-day .day-head h2{font:400 2.2rem/1.12 var(--poster)!important;letter-spacing:.3px;margin:0}
+.back{background:var(--card);border-radius:999px;padding:6px 14px 6px 10px}
+.seg button[aria-pressed="true"]{background:var(--gold);color:#2a1660;font-weight:700}
+.subtabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;background:none!important;padding:0!important;border:0!important}
+.subtabs button{flex:none;font:500 .9rem var(--display)!important;border:0!important;border-radius:999px!important;padding:8px 16px!important;background:var(--card)!important;color:var(--fg)!important;box-shadow:none!important}
+.subtabs button[aria-selected="true"]{background:var(--gold)!important;color:#2a1660!important;font-weight:700!important}
+.who-filter{background:var(--card);border-radius:999px;padding:4px 6px 4px 14px}
+.add-open,.at-new,.dy-edit,.dy-add{border-radius:14px}
+/* tasks: cover hero per event */
+.task-group{background:transparent!important;padding:0!important;gap:8px!important}
+.task{background:var(--card)!important}
+#p-trip>.section{position:relative}
+#p-trip .tr-head{position:absolute;top:12px;left:12px;z-index:3;margin:0}
+#p-trip .tr-head .day-meta{display:none}
+#p-trip .tr-gear{background:rgba(0,0,0,.5);color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.tr-cover .nx-cam{left:auto;right:10px}
+.task-group-head.nx-tgh{position:relative;overflow:hidden;min-height:170px;border-radius:16px;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:6px;background-size:cover;background-position:center;color:#fff;margin-bottom:10px}
+.nx-tgh[data-k="party"]{background-color:#e0582a}.nx-tgh[data-k="رحلة"]{background-color:#0f8f83}
+.nx-tgh::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 15%,rgba(255,255,255,.18),transparent 45%),linear-gradient(0deg,rgba(10,6,25,.6),transparent 70%)}
+.nx-tgh.img::after{background:linear-gradient(0deg,rgba(10,6,25,.92),rgba(10,6,25,.08) 70%)}
+.nx-tgh>*{position:relative;z-index:1}
+.nx-tgh h3{font:400 1.9rem/1.1 var(--poster)!important;color:#fff!important;margin:0}
+.nx-tgh .task-group-meta{color:rgba(255,255,255,.88)!important}
+.nx-tgh .chip{position:absolute;top:12px;right:12px;background:var(--gold)!important;color:#2a1660!important;font-weight:700}
+.nx-tbar{width:100%;height:6px;border-radius:6px;background:rgba(255,255,255,.25);overflow:hidden}.nx-tbar i{display:block;height:100%;background:var(--gold);transition:width .3s}
+.task{border-radius:14px!important}
+.task .st{width:28px!important;height:28px!important}
+/* visitation */
+#v-mode{display:flex;width:100%}#v-mode button{flex:1}
+/* attendance: sessions become square tiles in a row */
+.at-sess{flex-direction:row!important;overflow-x:auto;scroll-snap-type:x mandatory;margin-inline:-16px;padding:0 16px 4px;scrollbar-width:none}
+.at-sess::-webkit-scrollbar{display:none}
+.at-sc{flex:none!important;width:130px!important;height:130px;flex-direction:column!important;align-items:flex-start!important;justify-content:space-between!important;border-radius:12px!important;padding:12px!important;scroll-snap-align:start;background:linear-gradient(150deg,#7a3df0,#4a2aa8)!important;color:#fff!important}
+.at-sc::after{display:none}
+.at-sc .at-pct{background:rgba(255,255,255,.2)!important;color:#fff!important;font:400 1.5rem var(--poster)!important;min-width:0;height:auto;padding:2px 10px}
+.at-sc .at-sc-t b{font:400 1.2rem/1.2 var(--poster)}.at-sc .at-sc-t span{color:rgba(255,255,255,.85)!important}
+.at-hc{border-radius:14px!important}
+/* trip page cover */
+.tr-cover{position:relative;height:190px;border-radius:16px;overflow:hidden}
+.tr-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,6,25,.9),rgba(10,6,25,.05) 70%)}
+.tr-cover:not(.img)::after{background:radial-gradient(circle at 15% 15%,rgba(255,255,255,.18),transparent 45%),linear-gradient(0deg,rgba(10,6,25,.5),transparent 75%)}
+.tr-cover .nx-ht b{font-size:2.1rem}
+#p-trip .tr-head h2{display:none}
+#p-trip .tr-head{align-items:center}
+/* team: round photos like artists */
+.tm-new{display:flex;flex-direction:column;gap:8px}
+.tm-car{gap:14px}
+.tm-p{flex:none;width:112px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;scroll-snap-align:start}
+.tm-av{width:104px;height:104px;border-radius:50%;background:var(--card) center/cover;display:grid;place-items:center;font:400 2rem var(--poster);color:var(--muted);margin-bottom:6px}
+.tm-p.lead .tm-av{width:110px;height:110px;box-shadow:0 0 0 3px var(--gold)}
+.tm-p b{font:600 .88rem var(--display)}.tm-p span{font-size:.74rem;color:var(--muted)}
+/* families: cover cards */
+.fm-card{min-height:170px;justify-content:flex-end;color:#fff!important;position:relative;overflow:hidden;border-radius:16px!important}
+.fm-card .fm-t b{font:400 1.8rem/1.1 var(--poster)!important}
+.fm-card .fm-t small,.fm-card .fm-day{color:rgba(255,255,255,.85)!important}
+.fm-card .fm-cnt{background:rgba(0,0,0,.3)!important;color:#fff}
+.fm-card .fm-noname{background:rgba(255,255,255,.9)!important}
+.fm-card .fm-avs span{box-shadow:0 0 0 2px rgba(255,255,255,.6)}
+/* profile hero */
+#p-profile .pf-head{flex-direction:column;align-items:center;text-align:center;background:linear-gradient(150deg,#7a3df0,#3b2c86);color:#fff;padding:22px 16px;border-radius:18px}
+#p-profile .pf-head .av-lg{width:112px!important;height:112px!important;font-size:2.2rem;box-shadow:0 0 0 4px var(--gold)}
+#p-profile .pf-nm{font:400 1.8rem/1.2 var(--poster)}
+#p-profile .pf-ph{align-items:center}
+#p-profile .pf-ph .pf-btn{background:#fff;color:#3b2c86}
+#p-profile .pf-ph .pf-link{color:#ffd1d1}
+#p-profile .pf-card{border-radius:14px}
+/* ideas + dashboard cards */
+.ds-card,.ideas .id-card,.idea{border-radius:14px}
 </style>
 
 <script type="application/json" id="done-state">{}</script>
@@ -2581,6 +2650,45 @@ onReady(function(){
   try{var sd=JSON.parse(sessionStorage.getItem('day')||'null');if(sd){cur=sd;if(PS.navOf)PS.navOf.day=sd.from||'program';$('dy-back').dataset.go=sd.from||'program';$('dy-backt').textContent=sd.from==='activities'?'الأنشطة':'البرنامج';}}catch(e){}
   if(!cur)cur={id:'2026-10-11',title:'حفلة الاستقبال',chip:'حفلة',chipCls:'t-party',meta:fmtD('2026-10-11',true)+' · من ٧ لـ ٩ م',from:'program'};
   renderAll();
+});
+</script>
+<script>
+onReady(function(){
+  var $=function(id){return document.getElementById(id)};
+  var ar=function(n){return String(n).replace(/\d/g,function(d){return '٠١٢٣٤٥٦٧٨٩'[d]})};
+  function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
+  // ---------- tasks: each event gets a cover hero with progress
+  var TCOV={'party-tasks':['2026-10-11','party'],'trip-tasks':['a_t1031','رحلة']};
+  function tasksSkin(){[].slice.call(document.querySelectorAll('#p-tasks .task-group')).forEach(function(g){var h=g.querySelector('.task-group-head');if(!h)return;
+    var cv=TCOV[g.id]||[g.id,'party'];h.classList.add('nx-tgh');var keep=[].slice.call(h.querySelectorAll('.nx-tbar,.nx-cam'));keep.forEach(function(x){x.remove()});
+    var img=PS.coverOf&&PS.coverOf([cv[0]]);h.classList.toggle('img',!!img);h.style.backgroundImage=img?'url("'+img+'")':'';h.dataset.k=cv[1];
+    var all=g.querySelectorAll('.task').length,dn=g.querySelectorAll('.task .st[aria-pressed="true"]').length;
+    var bar=el('div','nx-tbar');var i=el('i');i.style.width=(all?dn/all*100:0)+'%';bar.appendChild(i);h.appendChild(bar);});}
+  // ---------- team: org chart -> rows of round photos (like artists)
+  function teamSkin(){var org=document.querySelector('#p-team .org');if(!org)return;var box=$('tm-new');if(!box){box=el('div','tm-new');box.id='tm-new';org.before(box);}box.textContent='';
+    [].slice.call(org.querySelectorAll('.lvl')).forEach(function(lv){var pairs=[].slice.call(lv.querySelectorAll('.pair'));
+      pairs.forEach(function(pr){var lb=(pr.querySelector('.pair-label')||{}).textContent||'';var h=el('div','ac-sec');h.appendChild(el('h3',null,lb));box.appendChild(h);
+        var car=el('div','nx-car tm-car');[].slice.call(pr.querySelectorAll('figure.person')).forEach(function(f){var c=el('div','tm-p');var av=f.querySelector('.ava');var a=el('div','tm-av');
+          if(av&&av.style.backgroundImage)a.style.backgroundImage=av.style.backgroundImage;else a.textContent='؟';if(lv.classList.contains('lvl-1'))c.classList.add('lead');c.appendChild(a);
+          var cap=f.querySelector('figcaption');c.appendChild(el('b',null,cap&&cap.querySelector('b')?cap.querySelector('b').textContent:''));c.appendChild(el('span',null,cap&&cap.querySelector('span')?cap.querySelector('span').textContent:''));car.appendChild(c);});
+        box.appendChild(car);});});
+    org.hidden=true;}
+  // ---------- trip page: cover hero
+  function tripSkin(){var t=$('tr-cover');if(!t){var hd=document.querySelector('#p-trip .tr-head');if(!hd)return;t=el('div','tr-cover');t.id='tr-cover';hd.before(t);}
+    var tl=($('tr-title')||{}).textContent||'',id=null;(PS.acts?PS.acts():[]).forEach(function(a){if(a.title===tl)id=a.id;});t.textContent='';t.className='tr-cover';
+    var a=id&&PS.act(id);PS.coverPaint(t,['a_'+id],'',a&&a.type||'رحلة');var tx=el('div','nx-ht');tx.appendChild(el('b',null,tl));tx.appendChild(el('span',null,($('tr-meta')||{}).textContent||''));t.appendChild(tx);
+    if(id){var cb=PS.coverBtn('a_'+id,tl,true);if(cb)t.appendChild(cb);}}
+  // ---------- profile: centered hero with name
+  function profSkin(){var h=document.querySelector('#p-profile .pf-head');if(!h)return;var n=h.querySelector('.pf-nm');if(!n){n=el('b','pf-nm');var ph=h.querySelector('.pf-ph');h.insertBefore(n,ph);}
+    n.textContent=(PS.me&&(PS.me.name||PS.me.email))||'';}
+  // ---------- families: colored cover cards
+  var FC=['#0f8f83','#7a3df0','#c21cbf','#e0582a'];
+  function famSkin(){[].slice.call(document.querySelectorAll('#fm-list .fm-card')).forEach(function(c,i){if(!c.classList.contains('img'))c.style.backgroundColor=FC[i%FC.length];});}
+  function all(){try{tasksSkin()}catch(e){}try{teamSkin()}catch(e){}try{tripSkin()}catch(e){}try{profSkin()}catch(e){}try{famSkin()}catch(e){}}
+  PS.subs.push(all);document.addEventListener('shared-changed',function(){setTimeout(all,0)});document.addEventListener('me-changed',profSkin);
+  document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('#p-tasks .st'))setTimeout(tasksSkin,50);});
+  var tt=$('tr-title');if(tt&&window.MutationObserver)new MutationObserver(tripSkin).observe(tt,{childList:true,characterData:true,subtree:true});
+  all();
 });
 </script>
 
