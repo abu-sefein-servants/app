@@ -1715,7 +1715,7 @@ onReady(function(){
   });
   [].slice.call(document.querySelectorAll('[data-go]')).forEach(function(b){b.addEventListener('click',function(){show(b.dataset.go,true)})});
   var start=(location.hash||'').slice(1);
-  if(!start){try{start=localStorage.getItem('tab')||''}catch(e){}}
+
   PS.show=show;show(start||'program',false);
 });
 </script>
