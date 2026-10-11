@@ -1109,6 +1109,7 @@ body.ps-open{overflow:hidden}body.ps-open .tabs{display:none!important}
 /* users & roles */
 #p-users .us-row,#p-users li{border-radius:14px}
 .done-by{font-size:.74rem;color:var(--p1);font-weight:600}
+.add-2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}.add-2>label{min-width:0}.add-f input,.add-f select,.add-f textarea{min-width:0;max-width:100%;box-sizing:border-box}.add-f input[type=date]{-webkit-appearance:none;appearance:none;width:100%;min-height:46px;display:block}
 .task-group-head.nx-tgh{position:relative;overflow:hidden;min-height:170px;border-radius:16px;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:6px;background-size:cover;background-position:center;color:#fff;margin-bottom:10px}
 .nx-tgh[data-k="party"]{background-color:#e0582a}.nx-tgh[data-k="رحلة"]{background-color:#0f8f83}
 .nx-tgh::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 15%,rgba(255,255,255,.18),transparent 45%),linear-gradient(0deg,rgba(10,6,25,.6),transparent 70%)}
@@ -1909,8 +1910,8 @@ onReady(function(){
     li.tabIndex=0;li.setAttribute('role','button');li.addEventListener('click',function(){openSheet(p.n);});li.addEventListener('keydown',function(e){if(e.key==='Enter'){openSheet(p.n);}});
     return li;}
   function openSheet(n){sheetN=n;addOpen=false;psW.hidden=false;document.body.classList.add('ps-open');drawSheet();psB.scrollTop=0;}
-  function openAdd(){sheetN=null;addOpen=true;psW.hidden=false;document.body.classList.add('ps-open');drawSheet();}
-  function closeSheet(){sheetN=null;addOpen=false;psW.hidden=true;document.body.classList.remove('ps-open');}
+  function openAdd(){sheetN=null;addOpen=true;psB.textContent='';psW.hidden=false;document.body.classList.add('ps-open');drawSheet();}
+  function closeSheet(){sheetN=null;addOpen=false;psW.hidden=true;psB.textContent='';document.body.classList.remove('ps-open');}
   document.getElementById('ps-x').addEventListener('click',closeSheet);document.getElementById('ps-dim').addEventListener('click',closeSheet);
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!psW.hidden)closeSheet();});
   function drawSheet(){if(psW.hidden)return;
