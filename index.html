@@ -1161,6 +1161,15 @@ body.ps-open{overflow:hidden}body.ps-open .tabs{display:none!important}
 .at-el{min-height:0;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding-bottom:24px!important}
 .ps-body{overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;min-height:0}
 .ps-box{overscroll-behavior:contain}
+.del-zone{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);text-align:center}
+.del-btn{border:0;background:transparent;color:var(--p3);font:600 .88rem var(--display);padding:10px 14px;border-radius:12px;cursor:pointer}
+.del-btn.on{display:block;width:100%;background:var(--p3);color:#fff;margin-top:12px;padding:13px}
+.del-no{display:block;width:100%;border:0;background:var(--card);color:var(--fg);font:600 .9rem var(--display);padding:12px;border-radius:12px;margin-top:8px;cursor:pointer}
+.del-ask{padding-top:6px}.del-ask h3{margin:0 0 6px;font-size:1.15rem}.del-ask p{margin:4px 0;color:var(--muted);font-size:.9rem}.del-q{color:var(--fg)!important}
+.del-sel{width:100%;font:inherit;font-size:.95rem;padding:10px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--fg);margin-top:6px}
+.del-row{display:flex;align-items:center;gap:8px;background:var(--card);border-radius:12px;padding:9px 12px;margin-top:6px}.del-row span{flex:1}.del-row small{color:var(--muted);font-size:.72rem}
+.del-res{border:0;border-radius:10px;padding:6px 12px;background:var(--brand);color:var(--brand-ink);font:600 .8rem var(--display);cursor:pointer}
+.del-open{align-self:flex-start;border:0;border-radius:999px;padding:6px 12px;background:var(--p3-bg);color:var(--p3);font:600 .8rem var(--display);cursor:pointer;margin-bottom:6px}.del-open[hidden]{display:none}
 .task-group-head.nx-tgh{position:relative;overflow:hidden;min-height:170px;border-radius:16px;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:6px;background-size:cover;background-position:center;color:#fff;margin-bottom:10px}
 .nx-tgh[data-k="party"]{background-color:#e0582a}.nx-tgh[data-k="رحلة"]{background-color:#0f8f83}
 .nx-tgh::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 15%,rgba(255,255,255,.18),transparent 45%),linear-gradient(0deg,rgba(10,6,25,.6),transparent 70%)}
@@ -1415,7 +1424,7 @@ body.ps-open{overflow:hidden}body.ps-open .tabs{display:none!important}
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg>
         <input id="v-q" type="search" placeholder="ابحث بالاسم أو الموبايل أو رقم الشخص" autocomplete="off" aria-label="بحث">
       </div><button type="button" class="v-fbtn" id="v-fbtn" aria-expanded="false" aria-label="فلاتر"><svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg><i id="v-fdot" hidden></i></button></div>
-      <div class="v-flt" id="v-flt" hidden><b class="v-flt-t">الأهمية</b>
+      <div class="v-flt" id="v-flt" hidden><button type="button" class="del-open" id="v-deleted" hidden>🗑 المحذوفين</button><b class="v-flt-t">الأهمية</b>
       <div class="v-sum" id="v-sum" aria-label="الأهمية"></div>
 <b class="v-flt-t">فلاتر</b>
       <div class="v-filters" role="group" aria-label="فلاتر">
@@ -1616,7 +1625,7 @@ window.PS={state:{},ro:false,subs:[]};
   var RO_MSG=MSG_OWN;
   PS.role=null;
   function read(){return JSON.parse(JSON.stringify(window.__STATE__||{}));}
-  function fix(s){if(!s._v)s._v={};['p','d','r','e','a','np','sr','z'].forEach(function(k){if(!s._v[k])s._v[k]={};});return s;}
+  function fix(s){if(!s._v)s._v={};['p','d','r','e','a','np','sr','z','x'].forEach(function(k){if(!s._v[k])s._v[k]={};});return s;}
   var lkN=0,lkY=0;PS.lockScroll=function(on){var b=document.body;if(on){if(lkN++>0)return;lkY=window.scrollY||0;b.style.position='fixed';b.style.top=(-lkY)+'px';b.style.left='0';b.style.right='0';b.style.width='100%';}
     else{if(lkN===0)return;if(--lkN>0)return;b.style.position='';b.style.top='';b.style.left='';b.style.right='';b.style.width='';window.scrollTo(0,lkY);}};
   PS.note=function(m){var t=document.getElementById('toast');if(!t)return;t.textContent=m;t.hidden=false;clearTimeout(PS.note._t);PS.note._t=setTimeout(function(){t.hidden=true},2400);};
@@ -1832,6 +1841,7 @@ onReady(function(){
   function syncP(){var np=(PS.state._v&&PS.state._v.np)||{};P.length=0;BASEP.forEach(function(p){P.push(p)});
     Object.keys(np).forEach(function(n){var x=np[n];if(!x||typeof x!=='object')return;P.push({name:x.name,phone:x.phone||'',gender:x.gender==='بنات'?'بنات':'ولاد',age:x.age||'',birth:x.birth||'',address:x.address||'',edu:x.edu||'',work:x.work||'',note:x.note||'',new:!!x.new,n:+n,region:x.region||'',_np:1,since:x.since||'',_f:norm(x.name).charAt(0)});});
     P.forEach(function(p){if(p.name0===undefined)p.name0=p.name;var o=(PS.state._v&&PS.state._v.e&&PS.state._v.e[p.n])||{};p.name=(o.name&&String(o.name).trim())||p.name0;p._f=norm(p.name).charAt(0);});
+    var XX=(PS.state._v&&PS.state._v.x)||{};for(var i=P.length-1;i>=0;i--){if(XX[P[i].n])P.splice(i,1);}
     P.sort(function(a,b){return a.n-b.n});for(var k in byN)delete byN[k];P.forEach(function(p){byN[p.n]=p});}
   syncP();
   function pri(p){return +(V().p[p.n]||0);}
@@ -1994,7 +2004,24 @@ onReady(function(){
     var p=byN[sheetN];if(!p){closeSheet();return;}var a=document.activeElement,keep=a&&psB.contains(a)&&/INPUT|TEXTAREA|SELECT/.test(a.tagName);if(keep)return;
     var y=psB.scrollTop;psB.textContent='';var c=card(p);c.classList.add('in-sheet');psB.appendChild(c);
     var hs=hist(p),yy=hs.filter(function(d){return was(p.n,d)}).length;if(hs.length){var h=el('div','ps-att','الحضور: '+ar(yy)+' من '+ar(hs.length)+' ('+ar(Math.round(yy/hs.length*100))+'٪)');c.insertBefore(h,c.querySelector('.p-more'));}
+    if(isLead()){var dz=el('div','del-zone');var db=el('button','del-btn','🗑 امسح '+p.name.split(' ')[0]+' من القايمة');db.type='button';db.addEventListener('click',function(){delAsk(p);});dz.appendChild(db);psB.appendChild(dz);}
     psB.scrollTop=y;}
+  function isLead(){return PS.role==='owner'||PS.role==='visit'||PS.role===null;}
+  function X(){if(!V().x)V().x={};return V().x;}
+  function similar(p){var a=norm(p.name).split(' ').slice(0,2).join(' ');return P.filter(function(q){return q.n!==p.n&&norm(q.name).split(' ').slice(0,2).join(' ')===a;});}
+  function delAsk(p){psB.textContent='';var w=el('div','del-ask');w.appendChild(el('h3',null,'تمسح «'+p.name+'» (#'+ar(p.n)+')؟'));
+    var hs=hist(p).filter(function(d){return was(p.n,d)});w.appendChild(el('p',null,hs.length?'متسجّل له حضور '+ar(hs.length)+' مرة.':'مالوش حضور متسجّل.'));
+    var sim=similar(p),tgt=null;
+    if(sim.length&&hs.length){w.appendChild(el('p','del-q','لو هو متسجّل مرتين، تقدر تنقل حضوره للاسم التاني:'));var sel=el('select','del-sel');var o0=el('option',null,'متنقلش حضوره');o0.value='';sel.appendChild(o0);
+      sim.forEach(function(q){var o=el('option',null,'انقله لـ '+q.name+' #'+ar(q.n));o.value=q.n;sel.appendChild(o);});sel.value=String(sim[0].n);w.appendChild(sel);tgt=sel;}
+    var ok=el('button','del-btn on','🗑 أيوه امسحه');ok.type='button';ok.addEventListener('click',function(){var to=tgt&&tgt.value?+tgt.value:0;
+      change(function(){if(to)hs.forEach(function(d){A()[d+'#'+to]=1;});X()[p.n]={at:Date.now(),by:(PS.me&&PS.me.name)||'',name:p.name};});closeSheet();PS.note('اتمسح '+p.name+(to?' واتنقل حضوره':'')+' — تقدر ترجّعه من «المحذوفين» في الفلتر');});
+    var no=el('button','del-no','لا، رجوع');no.type='button';no.addEventListener('click',function(){drawSheet();});
+    w.appendChild(ok);w.appendChild(no);psB.appendChild(w);}
+  function openDeleted(){var L=Object.keys(X()).map(function(n){return {n:+n,x:X()[n]}});sheetN=null;addOpen=false;if(psW.hidden)PS.lockScroll(true);psW.hidden=false;document.body.classList.add('ps-open');psB.textContent='';
+    var w=el('div','del-ask');w.appendChild(el('h3',null,'المحذوفين ('+ar(L.length)+')'));if(!L.length)w.appendChild(el('p',null,'مفيش حد اتمسح.'));
+    L.forEach(function(r){var row=el('div','del-row');var t=el('span',null,(r.x&&r.x.name||'#'+r.n)+' #'+ar(r.n));row.appendChild(t);if(r.x&&r.x.by)row.appendChild(el('small',null,'مسحه: '+r.x.by));
+      var b=el('button','del-res','رجّعه');b.type='button';b.addEventListener('click',function(){change(function(){delete X()[r.n];});PS.note('رجع ✓');openDeleted();});row.appendChild(b);w.appendChild(row);});psB.appendChild(w);}
   function addForm(){var f=el('form','add-f'),ins={},g='ولاد',isNew=false;f.appendChild(el('h3',null,'إضافة شخص جديد'));
     function fld(k,lb,type,ph){var l=el('label',null,lb);var i=type==='area'?el('textarea'):el('input');if(type!=='area')i.type=type;if(ph)i.placeholder=ph;i.dir='auto';if(type==='tel')i.inputMode='tel';ins[k]=i;l.appendChild(i);return l;}
     f.appendChild(fld('name','الاسم بالكامل *','text'));
@@ -2012,6 +2039,8 @@ onReady(function(){
       sv.disabled=true;PS.newPersonNo(x).then(function(n){change(function(){if(!V().np)V().np={};V().np[n]=x;});closeSheet();PS.note('اتضاف '+nm+' برقم '+ar(n)+' ✓');},function(){sv.disabled=false;});});
     setTimeout(function(){ins.name.focus()},50);return f;}
   document.getElementById('v-add').addEventListener('click',openAdd);
+  document.getElementById('v-deleted').addEventListener('click',function(){if(!isLead())return;openDeleted();});
+  PS.subs.push(function(){var b=document.getElementById('v-deleted');var n=Object.keys((PS.state._v&&PS.state._v.x)||{}).length;b.hidden=!isLead();b.textContent='🗑 المحذوفين ('+ar(n)+')';});
   // filters panel + chips
   var fbtn=document.getElementById('v-fbtn'),flt=document.getElementById('v-flt');
   fbtn.addEventListener('click',function(){flt.hidden=!flt.hidden;fbtn.setAttribute('aria-expanded',!flt.hidden);});
@@ -3483,7 +3512,7 @@ onReady(function(){
     unsub.push(db.collection('att').onSnapshot(function(q){att={};q.forEach(function(d){att[d.id]=d.data();});got.att=1;tick();},fail));}
   function fail(x){if(!booted)info(msg(x),[['حاول تاني',function(){location.reload()}],['خروج',out]]);else window.PS&&PS.note(msg(x));}
   function assemble(){var S=clone(snaps.main),v=snaps.visit||{};delete S._v;delete S._pe;
-    S._v={};['p','d','r','e','np','sr','z'].forEach(function(k){S._v[k]=clone(v[k]);});
+    S._v={};['p','d','r','e','np','sr','z','x'].forEach(function(k){S._v[k]=clone(v[k]);});
     var a={};Object.keys(att).forEach(function(d){var o=att[d]||{};Object.keys(o).forEach(function(n){if(o[n])a[d+'#'+n]=1;});});S._v.a=a;
     if(snaps.pay&&snaps.pay._pe)S._pe=clone(snaps.pay._pe);return S;}
   var deferred=false;
@@ -3568,7 +3597,7 @@ onReady(function(){
     Object.keys(keys).forEach(function(k){if(J(S[k])!==J(B[k]))mu[k]=S[k]===undefined?FV.delete():S[k];});
     if(Object.keys(mu).length)ops.push(db.collection('app').doc('main').update(mu));
     var vu={},sv=S._v||{},bv=B._v||{};
-    ['p','d','r','e','np','sr','z'].forEach(function(k){var x=bv[k]||{},y=sv[k]||{},ks={};Object.keys(x).concat(Object.keys(y)).forEach(function(n){ks[n]=1});
+    ['p','d','r','e','np','sr','z','x'].forEach(function(k){var x=bv[k]||{},y=sv[k]||{},ks={};Object.keys(x).concat(Object.keys(y)).forEach(function(n){ks[n]=1});
       Object.keys(ks).forEach(function(n){if(J(x[n])!==J(y[n]))vu[k+'.'+n]=y[n]===undefined?FV.delete():y[n];});});
     if(Object.keys(vu).length)ops.push(db.collection('app').doc('visit').update(vu));
     var xa=bv.a||{},ya=sv.a||{},ka={},byD={};Object.keys(xa).concat(Object.keys(ya)).forEach(function(n){ka[n]=1});
@@ -3589,7 +3618,7 @@ onReady(function(){
     .then(function(pt){var o=JSON.parse(new TextDecoder().decode(pt)),st=o.state||{},v=st._v||{},bt=db.batch(),A=db.collection('app');
       var main=clone(st);delete main._v;delete main._pe;
       bt.set(A.doc('people'),{list:o.people||[]});bt.set(A.doc('main'),main);
-      var vis={};['p','d','r','e','np','sr','z'].forEach(function(k){vis[k]=v[k]||{};});bt.set(A.doc('visit'),vis);
+      var vis={};['p','d','r','e','np','sr','z','x'].forEach(function(k){vis[k]=v[k]||{};});bt.set(A.doc('visit'),vis);
       bt.set(A.doc('pay'),{_pe:st._pe||null});
       var byD={};Object.keys(v.a||{}).forEach(function(k){var i=k.indexOf('#');(byD[k.slice(0,i)]||(byD[k.slice(0,i)]={}))[k.slice(i+1)]=1;});
       Object.keys(byD).forEach(function(d){bt.set(db.collection('att').doc(d),byD[d]);});
