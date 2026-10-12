@@ -1791,6 +1791,8 @@ onReady(function(){
   var list=document.getElementById('v-list'),cnt=document.getElementById('v-count'),emp=document.getElementById('v-empty');
   var I={copy:'<svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="3"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>',call:'<svg viewBox="0 0 24 24"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 6 6L15 14l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>',home:'<svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>'};
   function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
+  if(!PS.newPersonNo)PS.newPersonNo=function(){var n=0;P.forEach(function(p){if(p.n>n)n=p.n});return Promise.resolve(n+1);};
+  PS.localNextNo=function(){var n=0;P.forEach(function(p){if(p.n>n)n=p.n});return n+1;};
   function change(fn){if(!PS.guardVisit())return;fn();stash();if(PS.local){PS.syncPend();render();PS.note('اتسجّل — ابعته لأبانوب من الزرار الأخضر فوق');return;}render();PS.save();}
   function card(p){
     var P_=pri(p),vd=vis(p),rg=reg(p),ex=E(p),eo=V().e[p.n]||{};openDet[p.n]=1;
@@ -1932,9 +1934,9 @@ onReady(function(){
     var sv=el('button','add-save','ضيف');sv.type='submit';f.appendChild(sv);
     f.addEventListener('submit',function(e){e.preventDefault();var nm=ins.name.value.trim();if(!nm){ins.name.focus();PS.note('اكتب الاسم');return;}
       var dup=P.filter(function(q){return norm(q.name)===norm(nm)})[0];if(dup&&!f.dataset.ok){f.dataset.ok='1';PS.note('فيه حد بنفس الاسم (#'+ar(dup.n)+') — لو متأكد دوس ضيف تاني');return;}
-      var n=0;P.forEach(function(q){if(q.n>n)n=q.n});n+=1;var ph=ins.phone.value.trim().replace(/[٠-٩]/g,function(c){return D[c]});
+      var ph=ins.phone.value.trim().replace(/[٠-٩]/g,function(c){return D[c]});
       var x={name:nm,phone:ph,gender:g,since:today()};['address','birth','edu','work','note'].forEach(function(k){var v=ins[k].value.trim();if(v)x[k]=v;});if(rs.value)x.region=rs.value;if(isNew)x.new=true;
-      change(function(){if(!V().np)V().np={};V().np[n]=x;});closeSheet();PS.note('اتضاف '+nm+' برقم '+ar(n)+' ✓');});
+      sv.disabled=true;PS.newPersonNo(x).then(function(n){change(function(){if(!V().np)V().np={};V().np[n]=x;});closeSheet();PS.note('اتضاف '+nm+' برقم '+ar(n)+' ✓');},function(){sv.disabled=false;});});
     setTimeout(function(){ins.name.focus()},50);return f;}
   document.getElementById('v-add').addEventListener('click',openAdd);
   // filters panel + chips
@@ -1956,7 +1958,10 @@ onReady(function(){
       if(PS.role!=='servant'){var b=el('button','pp-ok','رجّعه للحسبة');b.type='button';b.addEventListener('click',function(){change(function(){delete V().p[p.n];delete Z()[p.n];});PS.note('رجع '+p.name.split(' ')[0]+' للحسبة ✓');});r.appendChild(b);}
       else{var o=el('button','pp-x','افتح');o.type='button';o.addEventListener('click',function(){openSheet(p.n);});r.appendChild(o);}bx.appendChild(r);});}
   var resetB=document.getElementById('v-reset'),armed=false;
+  var lastPN=0;
   function render(){
+    if(edOpen&&mode==='att'){syncP();_ss=null;if(P.length!==lastPN){lastPN=P.length;renderEd();}else paintEd();return;}
+    lastPN=P.length;
     _ss=null;syncP();renderAtt();
     var b=P.filter(base);
     var need=b.filter(function(p){return !vis(p)}),done=b.filter(function(p){return !!vis(p)});
@@ -2063,6 +2068,12 @@ onReady(function(){
   function openEd(d){attD=d||curS();st.ad=attD;stash();edOpen=true;edF='';ed.hidden=false;document.body.classList.add('ed-open');aq.value='';
     [].slice.call(document.querySelectorAll('#at-f button')).forEach(function(b){b.setAttribute('aria-pressed',b.dataset.f==='')});renderEd();document.getElementById('at-el').scrollTop=0;}
   function closeEd(msg){edOpen=false;ed.hidden=true;document.body.classList.remove('ed-open');if(msg)PS.note(msg);renderAtt();}
+  function edHead(){var el2=eligible(attD),c=el2.filter(function(p){return was(p.n,attD)}).length,all=P.filter(function(p){return was(p.n,attD)}).length,r=el2.length?c/el2.length:0;
+    document.getElementById('at-ecnt').textContent=ar(all)+' من '+ar(el2.length)+' حاضر';document.getElementById('at-ring').innerHTML=ringSvg(r,'var(--gold)');}
+  function paintEd(){if(!edOpen)return;var lis=document.querySelectorAll('#at-el li.at-er');
+    for(var i=0;i<lis.length;i++){var li=lis[i],on=was(+li.dataset.n,attD);if(li.classList.contains('on')!==on){li.classList.toggle('on',on);li.setAttribute('aria-checked',on);li.firstChild.textContent=on?'✓':'';}}
+    edHead();}
+  PS.attEdOpen=function(){return edOpen};
   function renderEd(){if(!edOpen)return;var d=new Date(attD+'T12:00:00');
     document.getElementById('att-dl').textContent=DAYN[d.getDay()]+' '+fmtDate(attD)+' '+ar(d.getFullYear());
     var dd=Math.round((new Date(attD+'T12:00:00')-new Date(today()+'T12:00:00'))/864e5),rl=document.getElementById('att-rel');rl.textContent=dd===0?'النهارده':dd===1?'بكرة':dd===2?'بعد يومين':dd>0?'بعد '+ar(dd)+(dd<=10?' أيام':' يوم'):dd===-1?'امبارح':dd===-2?'من يومين':'من '+ar(-dd)+(-dd<=10?' أيام':' يوم');rl.className='att-rel'+(dd===0?' now':'');
@@ -2072,9 +2083,11 @@ onReady(function(){
     var t=norm(aq.value),list=P.filter(function(p){if(t&&!(/^\d{1,3}$/.test(t)?p.n===+t:key(p).indexOf(t)>-1))return false;if(edF==='on')return was(p.n,attD);if(edF)return p.gender===edF;return true;});
     var ul=document.getElementById('at-el'),top=ul.scrollTop;ul.textContent='';
     if(!list.length)ul.appendChild(el('li','at-hint',t?'مالقيتش حد بالاسم ده — لو جاي لأول مرة دوس «+ حد جاي لأول مرة» تحت':'مفيش حد هنا'));
-    list.forEach(function(p){var on=was(p.n,attD),li=el('li','at-er'+(on?' on':''));li.setAttribute('role','checkbox');li.setAttribute('aria-checked',on);li.tabIndex=0;
+    list.forEach(function(p){var on=was(p.n,attD),li=el('li','at-er'+(on?' on':''));li.dataset.n=p.n;li.setAttribute('role','checkbox');li.setAttribute('aria-checked',on);li.tabIndex=0;
       li.appendChild(el('span','ck',on?'✓':''));var nm=el('span','nm',p.name);nm.appendChild(el('small',null,'#'+ar(p.n)));li.appendChild(nm);li.appendChild(av(p));
-      var tg=function(){setAtt(p.n,!was(p.n,attD));if(t&&was(p.n,attD)){aq.value='';}renderEd();};
+      var tg=function(){if(PS.local){setAtt(p.n,!was(p.n,attD));if(t&&was(p.n,attD))aq.value='';renderEd();return;}if(!PS.guardVisit())return;
+        var now=!was(p.n,attD),k=attD+'#'+p.n;if(now)A()[k]=1;else delete A()[k];PS.save();
+        if(t&&now){aq.value='';renderEd();return;}paintEd();};
       li.addEventListener('click',tg);li.addEventListener('keydown',function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();tg();}});ul.appendChild(li);});
     ul.scrollTop=top;}
   document.getElementById('at-new').addEventListener('click',function(){openEd(curS());});
@@ -2094,9 +2107,9 @@ onReady(function(){
   [].slice.call(document.querySelectorAll('#att-g button')).forEach(function(b,_,all){b.addEventListener('click',function(){gsel=b.dataset.g;all.forEach(function(x){x.setAttribute('aria-pressed',x===b)});});});
   addF.addEventListener('submit',function(e){e.preventDefault();var nm=document.getElementById('att-nm').value.trim(),ph=document.getElementById('att-ph').value.trim().replace(/[٠-٩]/g,function(c){return D[c]});if(!nm)return;
     var dup=P.filter(function(p){return norm(p.name)===norm(nm)})[0];if(dup&&!addF.dataset.ok){addF.dataset.ok='1';PS.note('فيه حد بنفس الاسم (#'+ar(dup.n)+') — لو متأكد إنه شخص تاني دوس ضيفه تاني');return;}delete addF.dataset.ok;
-    var n=0;P.forEach(function(p){if(p.n>n)n=p.n});n+=1;
-    change(function(){if(!V().np)V().np={};V().np[n]={name:nm,phone:ph,gender:gsel,since:attD};A()[attD+'#'+n]=1;});
-    document.getElementById('att-nm').value='';document.getElementById('att-ph').value='';addF.hidden=true;addB.hidden=false;aq.value='';PS.note('اتضاف '+nm+' برقم '+ar(n)+' وعلّمته حاضر');renderAtt();});
+    var x={name:nm,phone:ph,gender:gsel,since:attD},dd=attD,sb=addF.querySelector('button[type=submit]');if(sb)sb.disabled=true;
+    PS.newPersonNo(x).then(function(n){change(function(){if(!V().np)V().np={};V().np[n]=x;A()[dd+'#'+n]=1;});PS.note('اتضاف '+nm+' برقم '+ar(n)+' وعلّمته حاضر');renderEd();}).then(function(){if(sb)sb.disabled=false;},function(){if(sb)sb.disabled=false;});
+    document.getElementById('att-nm').value='';document.getElementById('att-ph').value='';addF.hidden=true;addB.hidden=false;aq.value='';});
   // suggestions (owner only)
   function SR(){if(!V().sr)V().sr={};return V().sr;}
   function sugList(){return P.map(function(p){if(pri(p)===4)return null;var ri=rateInfo(p);if(!ri)return null;var cur=pri(p);if(cur===ri.cat||SR()[p.n]===ri.cat)return null;return {p:p,ri:ri,cur:cur};}).filter(Boolean);}
@@ -3242,7 +3255,8 @@ onReady(function(){
   document.addEventListener('focusout',function(){if(deferred)setTimeout(function(){if(deferred)apply();},300);});
   function tick(){if(!(got.main&&got.visit&&got.pay&&got.people&&got.att))return;
     if(!booted){if(!snaps.people||!snaps.main){if(role==='owner')migrate();else info('أبانوب لسه مجهزش البيانات — جرّب كمان شوية',[['حاول تاني',function(){location.reload()}],['خروج',out]]);return;}boot();}
-    else if(!flushing)apply();}
+    else if(!flushing){clearTimeout(apT);apT=setTimeout(apply,250);}}
+  var apT=null;
   function boot(){booted=true;var S=assemble();window.__STATE__=S;window.__PEOPLE__=snaps.people.list||[];base=clone(S);
     gate.hidden=true;document.body.classList.remove('locked');document.body.dataset.role=role;
     if(role!=='owner'){['p-users','tile-users'].forEach(function(id){var x=$(id);if(x)x.remove();});}
@@ -3293,6 +3307,13 @@ onReady(function(){
   PS.coverSave=function(id,img){return db.collection('covers').doc(id).set({img:img,by:(me.email||'').toLowerCase(),at:Date.now()});};
   PS.coverDel=function(id){return db.collection('covers').doc(id).delete();};
   PS.famSave=function(id,o){o.em=(me.email||'').toLowerCase();return db.collection('fam').doc(id).set(o,{merge:true});};
+
+  // ---------- safe numbers for new people (no two servants get the same number)
+  PS.newPersonNo=function(x){var ref=db.collection('app').doc('visit');var base=0;((snaps.people&&snaps.people.list)||[]).forEach(function(p){if(p.n>base)base=p.n;});
+    var tx=db.runTransaction(function(tr){return tr.get(ref).then(function(d){var np=((d.exists&&d.data())||{}).np||{},mx=base;Object.keys(np).forEach(function(k){if(+k>mx)mx=+k;});
+      var n=mx+1,u={};u['np.'+n]=x;tr.update(ref,u);return n;});});
+    var to=new Promise(function(res){setTimeout(function(){res(null)},7000);});
+    return Promise.race([tx,to]).then(function(n){if(n)return n;var l=PS.localNextNo?PS.localNextNo():0;return l+Math.floor(Math.random()*40)+60;},function(){var l=PS.localNextNo?PS.localNextNo():0;return l+Math.floor(Math.random()*40)+60;});};
 
   // ---------- servant proposals
   var props=[];PS.props=function(){return props};
