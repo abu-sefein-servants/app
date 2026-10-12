@@ -1157,6 +1157,10 @@ body.ps-open{overflow:hidden}body.ps-open .tabs{display:none!important}
 .ex-cg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.ex-cg button{background:var(--card);border:2px solid transparent;border-radius:12px;padding:7px 2px;font:500 .74rem var(--display);color:var(--fg);cursor:pointer}.ex-cg button i{display:block;font-style:normal;font-size:1.25rem}.ex-cg button.on{border-color:#e0582a;background:#fdeee8;color:#7a2a12}
 .ex-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
 .dy-exp{display:block;width:100%;border:1.5px dashed #e0582a;background:transparent;color:#c0461f;border-radius:14px;padding:11px;font:700 .88rem var(--display);cursor:pointer}.dy-exp[hidden]{display:none}
+.at-ed{height:100%;height:100dvh;overscroll-behavior:none}
+.at-el{min-height:0;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding-bottom:24px!important}
+.ps-body{overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;min-height:0}
+.ps-box{overscroll-behavior:contain}
 .task-group-head.nx-tgh{position:relative;overflow:hidden;min-height:170px;border-radius:16px;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:6px;background-size:cover;background-position:center;color:#fff;margin-bottom:10px}
 .nx-tgh[data-k="party"]{background-color:#e0582a}.nx-tgh[data-k="رحلة"]{background-color:#0f8f83}
 .nx-tgh::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 15%,rgba(255,255,255,.18),transparent 45%),linear-gradient(0deg,rgba(10,6,25,.6),transparent 70%)}
@@ -1613,6 +1617,8 @@ window.PS={state:{},ro:false,subs:[]};
   PS.role=null;
   function read(){return JSON.parse(JSON.stringify(window.__STATE__||{}));}
   function fix(s){if(!s._v)s._v={};['p','d','r','e','a','np','sr','z'].forEach(function(k){if(!s._v[k])s._v[k]={};});return s;}
+  var lkN=0,lkY=0;PS.lockScroll=function(on){var b=document.body;if(on){if(lkN++>0)return;lkY=window.scrollY||0;b.style.position='fixed';b.style.top=(-lkY)+'px';b.style.left='0';b.style.right='0';b.style.width='100%';}
+    else{if(lkN===0)return;if(--lkN>0)return;b.style.position='';b.style.top='';b.style.left='';b.style.right='';b.style.width='';window.scrollTo(0,lkY);}};
   PS.note=function(m){var t=document.getElementById('toast');if(!t)return;t.textContent=m;t.hidden=false;clearTimeout(PS.note._t);PS.note._t=setTimeout(function(){t.hidden=true},2400);};
   PS.changed=function(){PS.subs.forEach(function(f){try{f()}catch(e){}});};
   PS.local=false;
@@ -1978,9 +1984,9 @@ onReady(function(){
     else li.appendChild(el('span','vr-miss','مفيش رقم'));
     li.tabIndex=0;li.setAttribute('role','button');li.addEventListener('click',function(){openSheet(p.n);});li.addEventListener('keydown',function(e){if(e.key==='Enter'){openSheet(p.n);}});
     return li;}
-  function openSheet(n){sheetN=n;addOpen=false;psW.hidden=false;document.body.classList.add('ps-open');drawSheet();psB.scrollTop=0;}
-  function openAdd(){sheetN=null;addOpen=true;psB.textContent='';psW.hidden=false;document.body.classList.add('ps-open');drawSheet();}
-  function closeSheet(){sheetN=null;addOpen=false;psW.hidden=true;psB.textContent='';document.body.classList.remove('ps-open');}
+  function openSheet(n){sheetN=n;addOpen=false;if(psW.hidden)PS.lockScroll(true);psW.hidden=false;document.body.classList.add('ps-open');drawSheet();psB.scrollTop=0;}
+  function openAdd(){sheetN=null;addOpen=true;psB.textContent='';if(psW.hidden)PS.lockScroll(true);psW.hidden=false;document.body.classList.add('ps-open');drawSheet();}
+  function closeSheet(){sheetN=null;addOpen=false;if(!psW.hidden)PS.lockScroll(false);psW.hidden=true;psB.textContent='';document.body.classList.remove('ps-open');}
   document.getElementById('ps-x').addEventListener('click',closeSheet);document.getElementById('ps-dim').addEventListener('click',closeSheet);
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!psW.hidden)closeSheet();});
   function drawSheet(){if(psW.hidden)return;
@@ -2132,9 +2138,9 @@ onReady(function(){
 
   // ---- session editor
   var ed=document.getElementById('at-ed');
-  function openEd(d){attD=d||curS();st.ad=attD;stash();edOpen=true;edF='';ed.hidden=false;document.body.classList.add('ed-open');aq.value='';
+  function openEd(d){attD=d||curS();st.ad=attD;stash();edOpen=true;edF='';ed.hidden=false;if(!document.body.classList.contains('ed-open'))PS.lockScroll(true);document.body.classList.add('ed-open');aq.value='';
     [].slice.call(document.querySelectorAll('#at-f button')).forEach(function(b){b.setAttribute('aria-pressed',b.dataset.f==='')});renderEd();document.getElementById('at-el').scrollTop=0;}
-  function closeEd(msg){edOpen=false;ed.hidden=true;document.body.classList.remove('ed-open');if(msg)PS.note(msg);renderAtt();}
+  function closeEd(msg){edOpen=false;ed.hidden=true;if(document.body.classList.contains('ed-open'))PS.lockScroll(false);document.body.classList.remove('ed-open');if(msg)PS.note(msg);renderAtt();}
   function edHead(){var el2=eligible(attD),c=el2.filter(function(p){return was(p.n,attD)}).length,all=P.filter(function(p){return was(p.n,attD)}).length,r=el2.length?c/el2.length:0;
     document.getElementById('at-ecnt').textContent=ar(all)+' من '+ar(el2.length)+' حاضر';document.getElementById('at-ring').innerHTML=ringSvg(r,'var(--gold)');}
   function paintEd(){if(!edOpen)return;var lis=document.querySelectorAll('#at-el li.at-er');
@@ -2294,9 +2300,9 @@ onReady(function(){
   xb.appendChild(el('div','ps-grab'));var xx=btn('ps-x','✕',function(){PS.sheet.close();});xx.setAttribute('aria-label','قفل');xb.appendChild(xx);xb.appendChild(xbody);
   xs.appendChild(xd);xs.appendChild(xb);document.body.appendChild(xs);xd.addEventListener('click',function(){PS.sheet.close();});
   var xdraw=null,xkey=null;
-  PS.sheet={open:function(key,draw){xkey=key;xdraw=draw;xs.hidden=false;document.body.classList.add('ps-open');xbody.textContent='';draw(xbody);xbody.scrollTop=0;},
+  PS.sheet={open:function(key,draw){xkey=key;xdraw=draw;if(xs.hidden)PS.lockScroll(true);xs.hidden=false;document.body.classList.add('ps-open');xbody.textContent='';draw(xbody);xbody.scrollTop=0;},
     redraw:function(){if(xs.hidden||!xdraw)return;var a=document.activeElement;if(a&&xbody.contains(a)&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;var st=xbody.scrollTop;xbody.textContent='';xdraw(xbody);xbody.scrollTop=st;},
-    close:function(){xs.hidden=true;xdraw=null;xkey=null;xbody.textContent='';if(!document.querySelector('.ps:not([hidden])'))document.body.classList.remove('ps-open');},
+    close:function(){if(!xs.hidden)PS.lockScroll(false);xs.hidden=true;xdraw=null;xkey=null;xbody.textContent='';if(!document.querySelector('.ps:not([hidden])'))document.body.classList.remove('ps-open');},
     key:function(){return xs.hidden?null:xkey;}};
 
   // ================= covers (big thumbnails) — owners change them from inside the app
