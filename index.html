@@ -1201,7 +1201,7 @@ main,section,[id^="p-"]{max-width:100vw}@supports (overflow:clip){html,body{over
 .us-nf{display:flex;gap:6px;align-items:center;width:100%}.us-nf input{flex:1;min-width:0;font:600 16px var(--display);border:1.5px solid var(--brand);border-radius:10px;padding:6px 10px;background:var(--bg);color:var(--fg)}
 .us-nf button{border:0;border-radius:10px;padding:7px 12px;font:700 .85rem var(--display);cursor:pointer;background:var(--brand);color:var(--brand-ink)}.us-nf button.x{background:var(--bg);color:var(--fg)}
 .mt-wrap{margin-bottom:12px}.mt-wrap[hidden]{display:none}
-.mt-new{width:100%;border:1.5px dashed var(--line);background:none;color:var(--brand);border-radius:16px;padding:12px;font:600 .9rem var(--display);cursor:pointer}
+.mn-root .mt-new,#mn-root .mt-new{margin-bottom:10px}.mt-new{width:100%;border:0;background:linear-gradient(150deg,#1a73e8,#3b2c86);color:#fff;border-radius:16px;padding:14px;font:700 1rem var(--display);cursor:pointer;box-shadow:0 6px 16px rgba(26,115,232,.25)}
 .mt{border-radius:20px;padding:16px;color:#fff;background:linear-gradient(150deg,#1a73e8,#3b2c86);display:flex;flex-direction:column;gap:4px}
 .mt.st-done{background:linear-gradient(150deg,#0f8f83,#0b5a52)}
 .mt-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -3232,7 +3232,7 @@ onReady(function(){
   function mins(){var o=PS.mins||{};return Object.keys(o).map(function(k){return {id:k,x:o[k]}}).sort(function(a,b){return String(b.x.d).localeCompare(String(a.x.d))||((b.x.at||0)-(a.x.at||0))});}
   var openId=null;
   function render(){var root=$('mn-root');if(!root)return;root.textContent='';
-    if(own())root.appendChild(btn('mn-add','+ محضر جديد',function(){minForm(null,null);}));
+    if(own()){root.appendChild(btn('mt-new','📹 + حدد اجتماع خدام أونلاين',function(){if(PS.meetForm)PS.meetForm(null);}));root.appendChild(btn('mn-add','+ محضر جديد',function(){minForm(null,null);}));}
     var L=mins();if(!L.length){root.appendChild(el('p','mn-empty','لسه مفيش محاضر. بعد أي اجتماع خدام، اكتب المحضر هنا أو ابعت النقط لـ Claude يلخّصهالك وانت تلصقها.'));return;}
     L.forEach(function(r,i){var x=r.x,op=openId?openId===r.id:i===0;var c=el('div','mn-c'+(op?' open':''));
       var h=btn('mn-h',null,function(){openId=op?'-':r.id;render();});var hb=el('b',null,x.title||'اجتماع خدام');if(x.ai)hb.appendChild(el('span','mn-ai','✨ ملخص AI'));h.appendChild(hb);h.appendChild(el('span',null,fmtD(x.d)));c.appendChild(h);
