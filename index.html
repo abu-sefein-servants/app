@@ -3419,11 +3419,17 @@ onReady(function(){
 
   // ---------- public info for the join page (family names, leaders, covers, regions)
   var pubLast=null,pubT=null;
+  var shCache={};
+  function shrink(src){if(!src)return Promise.resolve('');var key=src.length+':'+src.slice(-40);if(shCache[key])return Promise.resolve(shCache[key]);
+    return new Promise(function(res){var im=new Image();im.onload=function(){var W=Math.min(720,im.naturalWidth||720),H=Math.round(W*(im.naturalHeight||1)/(im.naturalWidth||1));
+      var c=document.createElement('canvas');c.width=W;c.height=H;c.getContext('2d').drawImage(im,0,0,W,H);var q=.78,d=c.toDataURL('image/jpeg',q);while(d.length>140000&&q>.3){q-=.08;d=c.toDataURL('image/jpeg',q);}
+      if(d.length>200000)d='';shCache[key]=d;res(d);};im.onerror=function(){res('');};im.src=src;});}
   function syncPub(){if(!own()||PS.local||!PS.pubSet)return;clearTimeout(pubT);pubT=setTimeout(function(){
-    var cv=PS.covers||{},F=fams().map(function(f){var o={id:f.id,name:famName(f.id),srv:f.srv,day:f.day};var c=cv['fam_'+f.id];if(c&&c.img&&c.img.length<300000)o.img=c.img;return o;});
-    var o={f:F,reg:(X()&&X().REG)||[],v:1},js=JSON.stringify(o);
-    var go=function(){if(js===pubLast)return;pubLast=js;o.at=Date.now();PS.pubSet(o).catch(function(){pubLast=null;});};
-    if(pubLast===null)PS.pubGet().then(function(d){if(d){var c=Object.assign({},d);delete c.at;pubLast=JSON.stringify(c);}else pubLast='';go();},function(){});else go();},2500);}
+    var cv=PS.covers||{};
+    Promise.all(fams().map(function(f){var c=cv['fam_'+f.id];return shrink(c&&c.img).then(function(img){var o={id:f.id,name:famName(f.id),srv:f.srv,day:f.day};if(img)o.img=img;return o;});})).then(function(F){
+      var o={f:F,reg:(X()&&X().REG)||[],v:2},js=JSON.stringify(o);
+      var go=function(){if(js===pubLast)return;pubLast=js;o.at=Date.now();PS.pubSet(o).catch(function(){pubLast=null;});};
+      if(pubLast===null)PS.pubGet().then(function(d){if(d){var c=Object.assign({},d);delete c.at;pubLast=JSON.stringify(c);}else pubLast='';go();},function(){pubLast='';go();});else go();});},2500);}
 
   function boot(){if(!$('jr-root'))return;render();syncPub();}
   if(PS.subs)PS.subs.push(function(){render();});
