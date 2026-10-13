@@ -1200,6 +1200,44 @@ main,section,[id^="p-"]{max-width:100vw}@supports (overflow:clip){html,body{over
 .us-nm .us-ed{border:0;background:none;color:var(--muted);font-size:.85rem;cursor:pointer;padding:0 4px;margin-inline-start:4px}
 .us-nf{display:flex;gap:6px;align-items:center;width:100%}.us-nf input{flex:1;min-width:0;font:600 16px var(--display);border:1.5px solid var(--brand);border-radius:10px;padding:6px 10px;background:var(--bg);color:var(--fg)}
 .us-nf button{border:0;border-radius:10px;padding:7px 12px;font:700 .85rem var(--display);cursor:pointer;background:var(--brand);color:var(--brand-ink)}.us-nf button.x{background:var(--bg);color:var(--fg)}
+.mt-wrap{margin-bottom:12px}.mt-wrap[hidden]{display:none}
+.mt-new{width:100%;border:1.5px dashed var(--line);background:none;color:var(--brand);border-radius:16px;padding:12px;font:600 .9rem var(--display);cursor:pointer}
+.mt{border-radius:20px;padding:16px;color:#fff;background:linear-gradient(150deg,#1a73e8,#3b2c86);display:flex;flex-direction:column;gap:4px}
+.mt.st-done{background:linear-gradient(150deg,#0f8f83,#0b5a52)}
+.mt-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mt-tag{background:rgba(255,255,255,.2);border-radius:999px;padding:2px 10px;font-size:.72rem;font-weight:700}
+.mt-ed{border:0;background:rgba(255,255,255,.18);color:#fff;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:.85rem}
+.mt-live{display:inline-flex;align-items:center;gap:6px;background:#e0473f;border-radius:999px;padding:3px 10px;font-size:.72rem;font-weight:700}.mt-live i{width:7px;height:7px;border-radius:50%;background:#fff;animation:mtp 1.2s infinite}
+@keyframes mtp{50%{opacity:.3}}
+.mt-ti{font:400 1.7rem/1.15 var(--poster);margin-top:4px}.mt-when{font-size:.8rem;opacity:.9}
+.mt-cd{display:flex;gap:8px;margin-top:8px}.mt-cd div{flex:1;background:rgba(255,255,255,.14);border-radius:12px;text-align:center;padding:6px 0;display:flex;flex-direction:column}.mt-cd b{font:400 1.5rem/1.1 var(--poster);color:#ffe9a8}.mt-cd span{font-size:.68rem}
+.mt-ag{background:rgba(255,255,255,.12);border-radius:12px;padding:8px 12px;margin-top:8px;font-size:.8rem}.mt-ag b{font-size:.8rem}.mt-ag ol{list-style:arabic-indic;margin:2px 0 0;padding-inline-start:18px;line-height:1.8}
+.mt-go{display:block;width:100%;margin-top:10px;border:0;background:#fff;color:#1a73e8;font:700 1.05rem var(--display);border-radius:16px;padding:14px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.mt-go.sm{font-size:.9rem;padding:11px;margin:0;flex:1;color:#0b5a52}
+.mt-row{display:flex;gap:8px;margin-top:10px}.mt-x{border:0;background:rgba(255,255,255,.18);color:#fff;border-radius:14px;padding:0 14px;font:600 .82rem var(--display);cursor:pointer}
+.mt-j{background:rgba(255,255,255,.12);border-radius:12px;padding:8px 10px;margin-top:8px}.mt-jl{font-size:.72rem;opacity:.85}
+.mt-avs{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}.mt-av{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.9);color:#1d1830;border-radius:999px;padding:2px 9px 2px 3px;font-size:.75rem}
+.mt-av i{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:.7rem;font-weight:700;color:#fff}
+.mt-hint{margin:6px 0 0;font-size:.74rem;opacity:.8}
+.mt-fr{display:flex;gap:8px}.mt-fr .xs-f{flex:1;min-width:0}
+.mt-help{margin:0;font-size:.76rem;color:var(--muted);line-height:1.6}
+.xs-form textarea{width:100%;font:500 16px var(--body);border:1.5px solid var(--line);border-radius:12px;padding:10px;background:var(--card);color:var(--fg);resize:vertical}
+.mn{display:flex;flex-direction:column;gap:8px}
+.mn-add{align-self:flex-start;border:0;background:var(--brand);color:var(--brand-ink);border-radius:999px;padding:9px 18px;font:700 .88rem var(--display);cursor:pointer}
+.mn-empty{color:var(--muted);font-size:.86rem;line-height:1.7}
+.mn-c{background:var(--card);border-radius:16px;padding:4px 14px}.mn-c.open{padding-bottom:14px}
+.mn-h{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;border:0;background:none;color:var(--fg);padding:10px 0;font:inherit;cursor:pointer;text-align:start}
+.mn-h b{font:600 .95rem var(--display)}.mn-h>span{font-size:.75rem;color:var(--muted);flex:none}
+.mn-ai{display:inline-block;background:var(--p3-bg);color:var(--p3);border-radius:999px;padding:0 8px;font-size:.68rem;margin-inline-start:6px;vertical-align:middle}
+.mn-att{margin:0 0 4px;font-size:.78rem;color:var(--muted)}
+.mn-sec{font-weight:700;font-size:.84rem;margin:10px 0 2px}
+.mn-c ul{margin:0;padding-inline-start:18px;font-size:.85rem;line-height:1.8}
+.mn-tk{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding:7px 0;font-size:.85rem}.mn-tk .t{flex:1}.mn-tk .t small{display:block;color:var(--muted);font-size:.72rem}
+.mn-tk .w{background:#e2f6f2;color:#0b6b62;border-radius:999px;padding:2px 10px;font-size:.72rem;font-weight:700}
+.mn-btn{display:block;width:100%;margin-top:8px;border:0;background:var(--brand);color:var(--brand-ink);border-radius:12px;padding:10px;font:700 .88rem var(--display);cursor:pointer}
+.mn-done{margin:8px 0 0;font-size:.8rem;color:#1f8a5b;font-weight:700}
+.mn-edit{margin-top:8px;border:0;background:none;color:var(--muted);font:600 .8rem var(--display);cursor:pointer;padding:0}
+.mn-pv{font-size:.78rem;color:var(--brand);font-weight:600;min-height:1em}.mn-aic{font-size:.82rem;display:flex;align-items:center;gap:6px}
 .task-group-head.nx-tgh{position:relative;overflow:hidden;min-height:170px;border-radius:16px;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:6px;background-size:cover;background-position:center;color:#fff;margin-bottom:10px}
 .nx-tgh[data-k="party"]{background-color:#e0582a}.nx-tgh[data-k="رحلة"]{background-color:#0f8f83}
 .nx-tgh::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 15%,rgba(255,255,255,.18),transparent 45%),linear-gradient(0deg,rgba(10,6,25,.6),transparent 70%)}
@@ -1356,6 +1394,7 @@ main,section,[id^="p-"]{max-width:100vw}@supports (overflow:clip){html,body{over
       <div class="subtabs" role="tablist" aria-label="المهام حسب المناسبة">
         <button type="button" role="tab" data-subtab="party-tasks" aria-selected="true">حفلة الاستقبال</button>
         <button type="button" role="tab" data-subtab="trip-tasks" aria-selected="false">رحلة دمياط</button>
+        <button type="button" role="tab" data-subtab="srv-tasks" aria-selected="false">اجتماعات الخدام</button>
       </div>
       <button type="button" class="add-open" id="add-open">+ إضافة مهمة</button>
       <form class="add-task" id="add-task" hidden>
@@ -1406,6 +1445,11 @@ main,section,[id^="p-"]{max-width:100vw}@supports (overflow:clip){html,body{over
                     <li class="task" data-tid="t09"><button type="button" class="st st-open" data-tid="t09" aria-pressed="false" aria-label="علّم المهمة إنها خلصت"></button><div class="task-body"><div class="task-title">شنطة إسعافات أولية<span class="sug">مقترحة</span></div><div class="task-meta"><span class="who-slot"></span></div></div></li>
           <li class="task" data-tid="t10"><button type="button" class="st st-open" data-tid="t10" aria-pressed="false" aria-label="علّم المهمة إنها خلصت"></button><div class="task-body"><div class="task-title">تقسيم الشباب على الخدام<span class="sug">مقترحة</span></div><div class="task-sub">كل خادم مسؤول عن مجموعة، ويعدّها في كل محطة</div><div class="task-meta"><span class="who-slot"></span></div></div></li>
                           </ol>
+      </div>
+      <div class="task-group" id="srv-tasks" hidden>
+        <div class="task-group-head"><div><h3>اجتماعات الخدام</h3><div class="task-group-meta">من محاضر الاجتماعات · <span class="n-count">٠</span> مهمة</div></div><span class="chip t-course prog" data-total="0">خلص ٠ من ٠</span></div>
+        <ol class="tasks">
+        </ol>
       </div>
     </section>
   </div>
@@ -1497,7 +1541,14 @@ main,section,[id^="p-"]{max-width:100vw}@supports (overflow:clip){html,body{over
   <div class="panel" role="tabpanel" id="p-more" aria-labelledby="tab-more" hidden>
     <section class="section">
       <h2>المزيد</h2>
-      <div class="tiles"><button class="tile" type="button" data-go="users" id="tile-users"><span>الخدام والصلاحيات</span><span class="tile-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.8-3.5 3.2-5.5 6-5.5s5.2 2 6 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.6.8 2.6 2.6 3 5.2"/></svg></span></button><button class="tile" type="button" data-go="ideas"><span>اقتراحات جديدة</span><span class="tile-ico"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg></span></button><button class="tile" type="button" data-go="team"><span>الخدام</span><span class="tile-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2c2.4-.3 4.4 1.2 5 4.3"/></svg></span></button><button class="tile" type="button" data-go="exp"><span>المصاريف</span><span class="tile-ico"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.6"/><path d="M6.5 9.5v5M17.5 9.5v5"/></svg></span></button><button class="tile" type="button" data-go="fam"><span>الأسر</span><span class="tile-ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-6 8 6v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19z"/><circle cx="12" cy="13" r="2.2"/><path d="M8.5 20c.5-2.2 1.8-3.4 3.5-3.4s3 1.2 3.5 3.4"/></svg></span></button><button class="tile ds-tile" type="button" data-go="dash"><span>الإحصائيات</span><span class="tile-ico"><svg viewBox="0 0 24 24"><path d="M4 20h16"/><path d="M7 16v-5M12 16V6M17 16v-8"/></svg></span></button></div>
+      <div class="tiles"><button class="tile" type="button" data-go="users" id="tile-users"><span>الخدام والصلاحيات</span><span class="tile-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.8-3.5 3.2-5.5 6-5.5s5.2 2 6 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.6.8 2.6 2.6 3 5.2"/></svg></span></button><button class="tile" type="button" data-go="ideas"><span>اقتراحات جديدة</span><span class="tile-ico"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg></span></button><button class="tile" type="button" data-go="team"><span>الخدام</span><span class="tile-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2c2.4-.3 4.4 1.2 5 4.3"/></svg></span></button><button class="tile" type="button" data-go="exp"><span>المصاريف</span><span class="tile-ico"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.6"/><path d="M6.5 9.5v5M17.5 9.5v5"/></svg></span></button><button class="tile" type="button" data-go="fam"><span>الأسر</span><span class="tile-ico"><svg viewBox="0 0 24 24"><path d="M4 11l8-6 8 6v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19z"/><circle cx="12" cy="13" r="2.2"/><path d="M8.5 20c.5-2.2 1.8-3.4 3.5-3.4s3 1.2 3.5 3.4"/></svg></span></button><button class="tile" type="button" data-go="mins"><span>محاضر الاجتماعات</span><span class="tile-ico"><svg viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4"/></svg></span></button><button class="tile ds-tile" type="button" data-go="dash"><span>الإحصائيات</span><span class="tile-ico"><svg viewBox="0 0 24 24"><path d="M4 20h16"/><path d="M7 16v-5M12 16V6M17 16v-8"/></svg></span></button></div>
+    </section>
+  </div>
+  <div class="panel" role="tabpanel" id="p-mins" aria-label="محاضر الاجتماعات" hidden>
+    <button class="back" type="button" data-go="more"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg><span>المزيد</span></button>
+    <section class="section">
+      <h2>محاضر اجتماعات الخدام</h2>
+      <div id="mn-root" class="mn"></div>
     </section>
   </div>
   <div class="panel" role="tabpanel" id="p-activities" aria-labelledby="tab-activities" hidden>
@@ -1830,7 +1881,7 @@ window.PS={state:{},ro:false,subs:[]};
 onReady(function(){
   var tabs=[].slice.call(document.querySelectorAll('.tab'));
   var panels=[].slice.call(document.querySelectorAll('.panel'));
-  var sub={ideas:1,dash:1,team:1,fam:1,exp:1,users:1,profile:1};var parent={day:'program',trip:'activities'};PS.navOf={};
+  var sub={ideas:1,dash:1,team:1,fam:1,exp:1,users:1,profile:1,mins:1};var parent={day:'program',trip:'activities'};PS.navOf={};
   function show(k,user){
     if(!document.getElementById('p-'+k))k='program';
     var nav=sub[k]?'more':(PS.navOf[k]||parent[k]||k);
@@ -2869,7 +2920,7 @@ onReady(function(){
     var tx=el('span');tx.appendChild(el('b',null,A.title));tx.appendChild(el('small',null,d===0?'النهارده':d===1?'بكرة':'فاضل '+ar(d)+' يوم'));t.appendChild(tx);return t;}
   function covIds(s){return s[1]==='family'?[s[0],'fam_'+s[2]]:[s[0]];}
   var bnObs=null;function watchBn(){var bn=document.querySelector('.my-tasks');if(bn&&!bnObs&&window.MutationObserver){bnObs=new MutationObserver(function(){renderProg();});bnObs.observe(bn,{attributes:true,childList:true,subtree:true});}}
-  function renderProg(){var root=$('pg-root');if(!root)return;root.textContent='';watchBn();
+  function renderProg(){var root=$('pg-root');if(!root)return;root.textContent='';watchBn();if(PS.meetCard){var mcd=PS.meetCard();if(mcd)root.appendChild(mcd);}
     var pl=el('div','nx-pills');[['','الكل'],['course','كورس'],['family','أسر'],['party','حفلات'],['leaders','أمناء'],['praise','تسبحة']].forEach(function(x){var b=btn('',x[1],function(){pFilter=x[0];renderProg();});b.setAttribute('aria-pressed',pFilter===x[0]);pl.appendChild(b);});root.appendChild(pl);
     var q1=myTasksTile(),q2=nextActTile();if(q1||q2){var qk=el('div','nx-qk'+((q1&&q2)?'':' one'));if(q1)qk.appendChild(q1);if(q2)qk.appendChild(q2);root.appendChild(qk);}
     var L=SCHED.filter(function(s){return !pFilter||s[1]===pFilter});var up=L.filter(function(s){return daysTo(s[0])>=0}),past=L.filter(function(s){return daysTo(s[0])<0});
@@ -2963,7 +3014,7 @@ onReady(function(){
   var ar=function(n){return String(n).replace(/\d/g,function(d){return '٠١٢٣٤٥٦٧٨٩'[d]})};
   function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
   // ---------- tasks: each event gets a cover hero with progress
-  var TCOV={'party-tasks':['2026-10-11','party'],'trip-tasks':['a_t1031','رحلة']};
+  var TCOV={'party-tasks':['2026-10-11','party'],'trip-tasks':['a_t1031','رحلة'],'srv-tasks':['srvmeet','leaders']};
   function tasksSkin(){[].slice.call(document.querySelectorAll('#p-tasks .task-group')).forEach(function(g){var h=g.querySelector('.task-group-head');if(!h)return;
     var cv=TCOV[g.id]||[g.id,'party'];h.classList.add('nx-tgh');var keep=[].slice.call(h.querySelectorAll('.nx-tbar,.nx-cam'));keep.forEach(function(x){x.remove()});
     var img=PS.coverOf&&PS.coverOf([cv[0]]);h.classList.toggle('img',!!img);h.style.backgroundImage=img?'url("'+img+'")':'';h.dataset.k=cv[1];
@@ -3091,6 +3142,139 @@ onReady(function(){
   render();
 });
 </script>
+<script>
+(function(){
+  // ================= servants online meeting + minutes
+  function $(i){return document.getElementById(i);}
+  function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
+  function btn(c,x,f){var b=el('button',c,x);b.type='button';if(f)b.addEventListener('click',f);return b;}
+  function ar(n){return String(n).replace(/\d/g,function(d){return '٠١٢٣٤٥٦٧٨٩'[d]});}
+  function own(){return PS.role==='owner'||PS.role===null;}
+  var MON=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'],DAY=['الأحد','الاتنين','التلات','الأربع','الخميس','الجمعة','السبت'];
+  function pad(n){return (n<10?'0':'')+n;}
+  function ts(at){var m=/^(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d)/.exec(at||'');if(!m)return 0;return new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]).getTime();}
+  function fmtT(h,mi){var p=h<12?'ص':'م',hh=h%12||12;return ar(hh)+':'+ar(pad(mi))+' '+p;}
+  function fmtAt(at){var t=ts(at);if(!t)return '';var d=new Date(t);return DAY[d.getDay()]+' '+ar(d.getDate())+' '+MON[d.getMonth()]+' · '+fmtT(d.getHours(),d.getMinutes());}
+  function fmtD(s){var m=/^(\d{4})-(\d\d)-(\d\d)/.exec(s||'');if(!m)return '';return ar(+m[3])+' '+MON[+m[2]-1];}
+  function today(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+  var DUR=90*60000,EARLY=10*60000;
+  function link(){return ((PS.mcfg||{}).main||{}).link||'';}
+  function list(){var o=PS.smeet||{};return Object.keys(o).map(function(k){var x=o[k];return {id:k,x:x,t:ts(x.at)}}).filter(function(r){return r.t}).sort(function(a,b){return a.t-b.t});}
+  function current(){var now=Date.now(),L=list();
+    var up=L.filter(function(r){return r.t+DUR>now})[0];if(up)return {r:up,st:now<r0(up)?'wait':(now<up.t?'soon':'live')};
+    if(own()){var past=L.filter(function(r){return r.t+DUR<=now&&now-r.t<3*864e5&&!r.x.closed&&!r.x.minId}).pop();if(past)return {r:past,st:'done'};}
+    return null;}
+  function r0(r){return r.t-EARLY;}
+  function joined(x){var j=x.j||{};return Object.keys(j).map(function(k){return j[k]}).sort(function(a,b){return (a.at||0)-(b.at||0)});}
+  var CL=['#7a3df0','#c21cbf','#0f8f83','#e0582a','#1a73e8','#a8650c','#3b2c86'];
+
+  // ---------- program card
+  var card=null,timer=null;
+  PS.meetCard=function(){card=el('div','mt-wrap');card.id='mt-card';drawCard();if(!timer)timer=setInterval(tick,20000);return card;};
+  function tick(){if(!card||!document.body.contains(card))return;var p=$('p-program');if(p&&p.hidden)return;drawCard();}
+  function drawCard(){if(!card)return;var c=current();card.textContent='';
+    if(!c){if(own()){card.appendChild(btn('mt-new','📹 + حدد اجتماع خدام أونلاين',function(){form(null);}));}card.hidden=!own();return;}
+    card.hidden=false;var r=c.r,x=r.x,box=el('div','mt st-'+c.st);card.appendChild(box);
+    var top=el('div','mt-top');
+    if(c.st==='live'||c.st==='soon'){var lv=el('span','mt-live');lv.appendChild(el('i'));lv.appendChild(document.createTextNode(c.st==='live'?'شغال دلوقتي':(function(n){return 'هيبدأ كمان '+ar(n)+(n>2&&n<11?' دقايق':' دقيقة')})(Math.max(1,Math.ceil((r.t-Date.now())/60000)))));top.appendChild(lv);}
+    else top.appendChild(el('small','mt-tag',c.st==='done'?'✅ الاجتماع خلص':'📹 اجتماع خدام أونلاين'));
+    if(own())top.appendChild(btn('mt-ed','✏️',function(){form(r);}));box.appendChild(top);
+    box.appendChild(el('b','mt-ti',x.title||'اجتماع خدام'));
+    var J=joined(x);
+    box.appendChild(el('span','mt-when',c.st==='live'?'بدأ '+fmtAt(x.at).split(' · ')[1]+(J.length?' · '+ar(J.length)+' دخلوا':''):fmtAt(x.at)+' · على Google Meet'));
+    if(c.st==='wait'){var ms=r.t-Date.now(),d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),m=Math.floor(ms%36e5/6e4);var cd=el('div','mt-cd');
+      [[d,'يوم'],[h,'ساعة'],[m,'دقيقة']].forEach(function(z){var q=el('div');q.appendChild(el('b',null,ar(z[0])));q.appendChild(el('span',null,z[1]));cd.appendChild(q);});box.appendChild(cd);}
+    if((c.st==='wait'||c.st==='soon')&&(x.topics||[]).length){var ag=el('div','mt-ag');ag.appendChild(el('b',null,'هنتكلم في:'));var ol=el('ol');x.topics.forEach(function(t){ol.appendChild(el('li',null,t));});ag.appendChild(ol);box.appendChild(ag);}
+    if(c.st==='soon'||c.st==='live'){var L=link();var go=btn('mt-go','📹 ادخل الاجتماع دلوقتي',function(){if(!L){PS.note('لسه مفيش لينك للاجتماع — أمين الاجتماع يحطه');return;}var w=window.open(L,'_blank');if(!w)location.href=L;if(PS.smeetJoin)PS.smeetJoin(r.id).catch(function(){});});box.appendChild(go);
+      if(J.length){var jw=el('div','mt-j');jw.appendChild(el('span','mt-jl','دخلوا ✓'));var av=el('div','mt-avs');J.forEach(function(p,i){var a=el('span','mt-av');var ic=el('i',null,(p.n||'؟').trim().charAt(0));ic.style.background=CL[i%CL.length];a.appendChild(ic);a.appendChild(document.createTextNode((p.n||'').split(' ')[0]));av.appendChild(a);});jw.appendChild(av);box.appendChild(jw);}}
+    if(c.st==='wait')box.appendChild(el('p','mt-hint','زرار الدخول هيظهر هنا قبل الميعاد بـ ١٠ دقايق'));
+    if(c.st==='done'){var rw=el('div','mt-row');rw.appendChild(btn('mt-go sm','📝 اكتب المحضر',function(){minForm(null,r);}));rw.appendChild(btn('mt-x','مش محتاج',function(){PS.smeetSave(r.id,{closed:1});}));box.appendChild(rw);
+      if(J.length)box.appendChild(el('p','mt-hint','حضر: '+J.map(function(p){return p.n}).join('، ')));}
+  }
+  document.addEventListener('shared-changed',function(){if(card&&document.body.contains(card))drawCard();if(PS.minsRender)PS.minsRender();});
+
+  // ---------- schedule form
+  function form(r){if(!own()){PS.note('أمين الاجتماع بس اللي يحدد الاجتماع');return;}var x=r?r.x:{};
+    PS.sheet.open('smf',function(b){b.appendChild(el('h3','xs-title',r?'تعديل الاجتماع':'اجتماع خدام أونلاين'));
+      var f=el('form','xs-form');
+      function fld(lb,inp){var l=el('label','xs-f');l.appendChild(el('span',null,lb));l.appendChild(inp);f.appendChild(l);return inp;}
+      var ti=el('input');ti.maxLength=60;ti.placeholder='مثلًا: اجتماع تخطيط نوفمبر';ti.value=x.title||'';fld('اسم الاجتماع',ti);
+      var rw=el('div','mt-fr');f.appendChild(rw);
+      var dl=el('label','xs-f');dl.appendChild(el('span',null,'اليوم'));var di=el('input');di.type='date';di.value=(x.at||'').slice(0,10)||today();dl.appendChild(di);rw.appendChild(dl);
+      var tl=el('label','xs-f');tl.appendChild(el('span',null,'الساعة'));var tm=el('input');tm.type='time';tm.value=(x.at||'').slice(11,16)||'21:00';tl.appendChild(tm);rw.appendChild(tl);
+      var tp=el('textarea');tp.rows=4;tp.placeholder='كل موضوع في سطر\nمثلًا: رحلة دمياط\nبرنامج أيام الأسر';tp.value=(x.topics||[]).join('\n');fld('هنتكلم في إيه؟ (اختياري)',tp);
+      var lk=el('input');lk.dir='ltr';lk.inputMode='url';lk.autocapitalize='off';lk.placeholder='https://meet.google.com/abc-defg-hij';lk.value=link();var ll=fld('لينك Google Meet (مرة واحدة بس)',lk);
+      var hp=el('p','mt-help',link()?'ده اللينك اللي بيتفتح كل مرة. سيبه زي ما هو، أو غيّره لو عايز.':'افتح أبلكيشن Google Meet ← «اجتماع جديد» ← «احصل على رابط للمشاركة» وانسخه هنا. هتحطه المرة دي بس، وكل الاجتماعات الجاية هتستخدمه.');f.appendChild(hp);
+      var sv=el('button','xs-btn main',r?'حفظ التعديل':'✓ حدد الاجتماع');sv.type='submit';f.appendChild(sv);
+      if(r){var del=btn('xs-btn danger','🗑 الغي الاجتماع',function(){if(!del.dataset.arm){del.dataset.arm='1';del.textContent='متأكد؟ دوس تاني';return;}PS.sheet.close();PS.smeetDel(r.id).then(function(){PS.note('اتلغى الاجتماع');},function(e){PS.note('محصلش — '+(e&&e.code||''));});});f.appendChild(del);}
+      f.addEventListener('submit',function(e){e.preventDefault();var L=lk.value.trim();
+        if(!di.value||!tm.value){PS.note('اختار اليوم والساعة');return;}
+        if(!L){lk.focus();PS.note('حط لينك Google Meet الأول');return;}
+        if(!/^https?:\/\//i.test(L))L='https://'+L;if(!/meet\.google\.com\/|zoom\.us\/|teams\./i.test(L)){lk.focus();PS.note('ده مش شكل لينك Meet — هيبقى زي meet.google.com/abc-defg-hij');return;}
+        var at=di.value+'T'+tm.value;if(!r&&ts(at)+DUR<Date.now()){PS.note('الميعاد ده عدّى');return;}
+        var o={title:ti.value.trim().slice(0,60)||'اجتماع خدام',at:at,topics:tp.value.split('\n').map(function(s){return s.replace(/^\s*([-•*]|\d+[.)\-])\s*/,'').trim()}).filter(Boolean).slice(0,12)};
+        var a=document.activeElement;if(a&&a.blur)a.blur();PS.sheet.close();
+        var ps=[];if(L!==link())ps.push(PS.mcfgSave(L));ps.push(PS.smeetSave(r?r.id:null,o));
+        Promise.all(ps).then(function(){PS.note(r?'اتحفظ ✓':'اتحدد الاجتماع ✓ كل الخدام هيشوفوه في البرنامج');},function(e){PS.note('محصلش حفظ — اتأكد إن قواعد Firebase اتحدثت');});
+        drawCard();});
+      b.appendChild(f);});}
+  PS.meetForm=form;
+
+  // ---------- minutes
+  function parse(txt){var secs=[],tasks=[],cur=null,mode='pt';
+    String(txt||'').split('\n').forEach(function(line){var s=line.trim();if(!s)return;
+      var isItem=/^([-•*▪◦]|\d+[.)\-])\s*/.test(s),clean=s.replace(/^([-•*▪◦]|\d+[.)\-])\s*/,'').replace(/\*\*/g,'').trim();
+      if(!isItem&&/[:：]$/.test(clean)){var h=clean.replace(/[:：]$/,'').trim();mode=/المطلوب|مهام|هيعمل|التكليفات/.test(h)?'task':'pt';if(mode==='pt'){cur={h:h,it:[]};secs.push(cur);}return;}
+      if(mode==='task'){var p=clean.split(/\s*[|｜]\s*|\s+—\s+|\s+-\s+/);tasks.push({t:p[0]||clean,w:(p[1]||'').trim(),due:(p[2]||'').trim()});return;}
+      if(!cur){cur={h:'',it:[]};secs.push(cur);}cur.it.push(clean);});
+    return {secs:secs,tasks:tasks};}
+  PS.minParse=parse;
+  function mins(){var o=PS.mins||{};return Object.keys(o).map(function(k){return {id:k,x:o[k]}}).sort(function(a,b){return String(b.x.d).localeCompare(String(a.x.d))||((b.x.at||0)-(a.x.at||0))});}
+  var openId=null;
+  function render(){var root=$('mn-root');if(!root)return;root.textContent='';
+    if(own())root.appendChild(btn('mn-add','+ محضر جديد',function(){minForm(null,null);}));
+    var L=mins();if(!L.length){root.appendChild(el('p','mn-empty','لسه مفيش محاضر. بعد أي اجتماع خدام، اكتب المحضر هنا أو ابعت النقط لـ Claude يلخّصهالك وانت تلصقها.'));return;}
+    L.forEach(function(r,i){var x=r.x,op=openId?openId===r.id:i===0;var c=el('div','mn-c'+(op?' open':''));
+      var h=btn('mn-h',null,function(){openId=op?'-':r.id;render();});var hb=el('b',null,x.title||'اجتماع خدام');if(x.ai)hb.appendChild(el('span','mn-ai','✨ ملخص AI'));h.appendChild(hb);h.appendChild(el('span',null,fmtD(x.d)));c.appendChild(h);
+      if(op){var P=parse(x.txt);
+        if(x.att&&x.att.length)c.appendChild(el('p','mn-att','حضر: '+x.att.join('، ')));
+        P.secs.forEach(function(s){if(s.h)c.appendChild(el('div','mn-sec',s.h+':'));var ul=el('ul');s.it.forEach(function(t){ul.appendChild(el('li',null,t));});c.appendChild(ul);});
+        if(P.tasks.length){c.appendChild(el('div','mn-sec','المطلوب:'));P.tasks.forEach(function(t){var k=el('div','mn-tk');var tt=el('span','t',t.t);if(t.due)tt.appendChild(el('small',null,t.due));k.appendChild(tt);if(t.w)k.appendChild(el('span','w',t.w));c.appendChild(k);});
+          if(own()){if(x.added)c.appendChild(el('p','mn-done','✓ اتضافوا للمهام'));else c.appendChild(btn('mn-btn','✓ ضيف الـ'+ar(P.tasks.length)+' للمهام',function(){toTasks(r,P);}));}}
+        if(own())c.appendChild(btn('mn-edit','✏️ عدّل',function(){minForm(r,null);}));}
+      root.appendChild(c);});}
+  PS.minsRender=function(){var p=$('p-mins');if(p&&!p.hidden)render();};
+  document.addEventListener('panel-shown',function(){});
+  function toTasks(r,P){if(!PS.guard||!PS.guard())return;if(!PS.state._t)PS.state._t=[];var base=Date.now();
+    P.tasks.forEach(function(t,i){var who=t.w?t.w.split(/\s*(?:،|,|\s+و\s*)\s*/).map(function(s){return s.trim()}).filter(Boolean):[];
+      PS.state._t.push({id:(base+i).toString(36),g:'srv-tasks',title:t.t,sub:[t.due?'لحد '+t.due:'','من '+(r.x.title||'اجتماع الخدام')].filter(Boolean).join(' · '),who:who,due:''});});
+    PS.changed();PS.save();PS.minSave(r.id,{added:1});PS.note('اتضافت '+ar(P.tasks.length)+' مهام في «اجتماعات الخدام» ✓');}
+  function minForm(r,meet){if(!own())return;var x=r?r.x:{};var mx=meet?meet.x:null;
+    PS.sheet.open('mnf',function(b){b.appendChild(el('h3','xs-title',r?'تعديل المحضر':'محضر جديد'));var f=el('form','xs-form');
+      function fld(lb,inp){var l=el('label','xs-f');l.appendChild(el('span',null,lb));l.appendChild(inp);f.appendChild(l);return inp;}
+      var ti=el('input');ti.maxLength=60;ti.value=x.title||(mx&&mx.title)||'';ti.placeholder='اسم الاجتماع';fld('الاجتماع',ti);
+      var di=el('input');di.type='date';di.value=x.d||(mx&&mx.at||'').slice(0,10)||today();fld('اليوم',di);
+      var tx=el('textarea','mn-txt');tx.rows=12;tx.value=x.txt||'';tx.placeholder='اتكلمنا في:\n- الأتوبيس اتحجز\n- كل أسرة تحضّر يومها قبلها بأسبوع\n\nالمطلوب:\n- قايمة الأكل للرحلة | مريم | ٢٥ أكتوبر\n- افتقاد الشباب الغايبين | سيمون و فارس | الأسبوع ده';fld('المحضر',tx);
+      f.appendChild(el('p','mt-help','الصق الملخص اللي Claude عمله زي ما هو. أي سطر تحت «المطلوب:» بيبقى مهمة: المهمة | مين | لحد إمتى.'));
+      var pv=el('div','mn-pv');f.appendChild(pv);function prev(){var P=parse(tx.value);pv.textContent=tx.value.trim()?('هيتحفظ: '+ar(P.secs.reduce(function(a,s){return a+s.it.length},0))+' نقطة و '+ar(P.tasks.length)+' مهمة'):'';}tx.addEventListener('input',prev);prev();
+      var ai=el('label','mn-aic');var cb=el('input');cb.type='checkbox';cb.checked=r?!!x.ai:true;ai.appendChild(cb);ai.appendChild(document.createTextNode(' الملخص ده معمول بـ AI'));f.appendChild(ai);
+      var sv=el('button','xs-btn main',r?'حفظ':'✓ احفظ المحضر');sv.type='submit';f.appendChild(sv);
+      if(r){var del=btn('xs-btn danger','🗑 امسح المحضر',function(){if(!del.dataset.arm){del.dataset.arm='1';del.textContent='متأكد؟ دوس تاني';return;}PS.sheet.close();PS.minDel(r.id).then(function(){PS.note('اتمسح');});});f.appendChild(del);}
+      f.addEventListener('submit',function(e){e.preventDefault();if(!tx.value.trim()){tx.focus();PS.note('الصق المحضر الأول');return;}
+        var o={title:ti.value.trim().slice(0,60)||'اجتماع خدام',d:di.value||today(),txt:tx.value.slice(0,8000),ai:cb.checked?1:0};
+        if(mx){o.mid=meet.id;o.att=joined(mx).map(function(p){return p.n}).filter(Boolean);}
+        var a=document.activeElement;if(a&&a.blur)a.blur();PS.sheet.close();
+        var id=PS.minSave(r?r.id:null,o,function(nid){if(meet)PS.smeetSave(meet.id,{minId:nid});});openId=null;
+        PS.note('اتحفظ المحضر ✓');if(PS.show)PS.show('mins',true);render();});
+      b.appendChild(f);});}
+  PS.minForm=minForm;
+  // render when the panel opens
+  var mo=window.MutationObserver&&new MutationObserver(function(){var p=$('p-mins');if(p&&!p.hidden)render();});
+  function hook(){var p=$('p-mins');if(p&&mo)mo.observe(p,{attributes:true,attributeFilter:['hidden']});}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',hook);else hook();
+})();
+</script>
+
 
 <script>
 onReady(function(){
@@ -3660,7 +3844,7 @@ onReady(function(){
 
   // ---------- shared docs any servant can edit (day programs, families)
   PS.prog=PS.prog||{};PS.fam=PS.fam||{};
-  function sharedListen(){fexpListen();['prog','fam','covers','done','famcfg'].forEach(function(c){unsub.push(db.collection(c).onSnapshot(function(q){var o={};q.forEach(function(d){o[d.id]=d.data();});PS[c]=o;if(c==='done'){try{PS.changed()}catch(e){}}if(c==='famcfg')fexpListen();try{document.dispatchEvent(new Event('shared-changed'))}catch(e){}},function(){}));});}
+  function sharedListen(){fexpListen();['prog','fam','covers','done','famcfg','smeet','mcfg','mins'].forEach(function(c){unsub.push(db.collection(c).onSnapshot(function(q){var o={};q.forEach(function(d){o[d.id]=d.data();});PS[c]=o;if(c==='done'){try{PS.changed()}catch(e){}}if(c==='famcfg')fexpListen();try{document.dispatchEvent(new Event('shared-changed'))}catch(e){}},function(){}));});}
   PS.progSave=function(id,o){o.em=(me.email||'').toLowerCase();return db.collection('prog').doc(id).set(o);};
   PS.doneSet=function(id,d,nm){return db.collection('done').doc(id).set({d:d?1:0,by:(me.email||'').toLowerCase(),byName:nm||myName()||'',at:Date.now()});};
   PS.coverSave=function(id,r){if(typeof r==='string')r={img:r};var o={img:r.img,by:(me.email||'').toLowerCase(),at:Date.now()};if(r.src)o.src=r.src;if(r.c)o.c=r.c;return db.collection('covers').doc(id).set(o);};
@@ -3685,6 +3869,15 @@ onReady(function(){
     var qs=role==='owner'?[db.collection('fexp')]:fs.map(function(f){return db.collection('fexp').where('fam','==',f);}),parts={};
     var uns=qs.map(function(q,i){return q.onSnapshot(function(s){var o={};s.forEach(function(d){o[d.id]=d.data();});parts[i]=o;PS.fexp=Object.assign.apply(null,[{}].concat(Object.keys(parts).map(function(k){return parts[k]})));bumpS();try{PS.changed()}catch(e){}},function(){});});
     fexpUn=function(){uns.forEach(function(u){try{u()}catch(e){}});};}
+  PS.smeetSave=function(id,o){var em=(me.email||'').toLowerCase();if(!id){id='m'+Date.now().toString(36);o.by=em;o.at0=Date.now();PS.smeet=PS.smeet||{};PS.smeet[id]=Object.assign({},o);bumpS();return db.collection('smeet').doc(id).set(o);}
+    PS.smeet=PS.smeet||{};PS.smeet[id]=Object.assign({},PS.smeet[id]||{},o);bumpS();return db.collection('smeet').doc(id).set(o,{merge:true});};
+  PS.smeetDel=function(id){if(PS.smeet)delete PS.smeet[id];bumpS();return db.collection('smeet').doc(id).delete();};
+  PS.smeetJoin=function(id){var em=(me.email||'').toLowerCase(),k=em.replace(/[.#$\/\[\]]/g,','),u={};u['j.'+k]={n:myName()||em,at:Date.now()};
+    var x=(PS.smeet||{})[id];if(x){x.j=x.j||{};x.j[k]=u['j.'+k];}bumpS();return db.collection('smeet').doc(id).update(u);};
+  PS.mcfgSave=function(L){PS.mcfg=PS.mcfg||{};PS.mcfg.main=Object.assign({},PS.mcfg.main||{},{link:L});return db.collection('mcfg').doc('main').set({link:L,by:(me.email||'').toLowerCase(),at:Date.now()},{merge:true});};
+  PS.minSave=function(id,o,cb){var em=(me.email||'').toLowerCase();PS.mins=PS.mins||{};if(!id){id='n'+Date.now().toString(36);o.by=em;o.byName=myName()||em;o.at=Date.now();PS.mins[id]=Object.assign({},o);bumpS();return db.collection('mins').doc(id).set(o).then(function(){if(cb)cb(id);});}
+    PS.mins[id]=Object.assign({},PS.mins[id]||{},o);bumpS();return db.collection('mins').doc(id).set(o,{merge:true}).then(function(){if(cb)cb(id);});};
+  PS.minDel=function(id){if(PS.mins)delete PS.mins[id];bumpS();return db.collection('mins').doc(id).delete();};
   PS.fexpSave=function(id,o){var em=(me.email||'').toLowerCase();if(!id){id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);o.by=em;o.byName=myName()||em;o.at=Date.now();PS.fexp[id]=o;return db.collection('fexp').doc(id).set(o);}
     o.ed=em;o.edAt=Date.now();PS.fexp[id]=Object.assign({},PS.fexp[id]||{},o);return db.collection('fexp').doc(id).set(o,{merge:true});};
   PS.fexpDel=function(id){delete PS.fexp[id];return db.collection('fexp').doc(id).delete();};
