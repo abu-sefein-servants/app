@@ -921,6 +921,20 @@ body.ps-open{overflow:hidden}body.ps-open .tabs{display:none!important}
 .tr-av{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:700 .95rem var(--display);background:var(--c-course-bg,#e6e1fb);color:var(--c-course,#5b3fc4)}
 .tr-av.none{background:var(--p3-bg);color:var(--p3)}.tr-av.part{background:var(--p2-bg);color:var(--p2)}.tr-av.full{background:var(--p1-bg);color:var(--p1)}.tr-av.g{background:var(--c-praise-bg,#fde4ef);color:var(--c-praise,#b8326e)}
 .tr-nm{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.45}.tr-nm b{font-family:var(--display);font-size:.92rem}.tr-nm small{font-size:.75rem;color:var(--muted)}
+.tr-flag{font:600 .66rem var(--display);background:var(--c-praise-bg,#fde4ef);color:var(--c-praise,#b8326e);border-radius:999px;padding:1px 7px;margin-inline-start:6px;vertical-align:middle}
+.tr-chk{display:flex;align-items:center;gap:10px;width:100%;text-align:start;border:0;cursor:pointer;background:linear-gradient(150deg,#e3a326,#a8650c);color:#fff;border-radius:16px;padding:11px 14px;margin:0 0 10px;font-family:var(--display)}
+.tr-chk[hidden]{display:none}.tr-chk div{flex:1;min-width:0}.tr-chk b{display:block;font-size:.95rem}.tr-chk small{display:block;font-size:.74rem;opacity:.92;font-weight:400;line-height:1.5}
+.tr-chkn{flex:none;background:#fff;color:#a8650c;border-radius:999px;padding:3px 12px;font-weight:700;font-size:.85rem}
+.tc-h{font:400 1.35rem var(--display-xl,var(--display));margin:2px 0 4px}.tc-s{font-size:.82rem;color:var(--muted);margin:0 0 8px;line-height:1.6}
+.tc-g{font:700 .84rem var(--display);color:var(--gold-ink,#a8650c);margin:12px 0 6px}
+.tc-c{background:var(--card);border-radius:14px;padding:10px 11px;margin-bottom:8px}
+.tc-pair{display:flex;align-items:center;gap:7px}.tc-n{flex:1;min-width:0;background:var(--bg,rgba(0,0,0,.05));border-radius:10px;padding:7px 9px;line-height:1.45}
+.tc-n b{display:block;font:600 .86rem var(--display)}.tc-n small{display:block;color:var(--muted);font-size:.72rem}
+.tc-arr{flex:none;color:var(--gold-ink,#a8650c);font-size:1.1rem}
+.tc-why{font-size:.76rem;color:var(--muted);margin:7px 2px 0}
+.tc-bt{display:flex;gap:6px;margin-top:8px}.tc-bt button{flex:1;border:0;border-radius:10px;padding:9px 6px;font:700 .8rem var(--display);cursor:pointer}
+.tc-y{background:#2fb675;color:#062a17}.tc-n2{background:var(--chip,rgba(120,110,170,.18));color:var(--ink)}
+.tc-ok{font-size:.76rem;background:rgba(47,182,117,.14);color:#1f8a57;border-radius:12px;padding:8px 11px;margin:8px 0 0;line-height:1.6}
 .tr-guest{font:600 .66rem var(--display);background:var(--gold-soft);color:var(--gold-ink);border-radius:999px;padding:1px 7px;margin-inline-start:6px;vertical-align:middle}
 .tr-st{flex:none;font:700 .76rem var(--display);border-radius:999px;padding:4px 10px;white-space:nowrap}
 .tr-st.none{background:var(--p3-bg);color:var(--p3)}.tr-st.part{background:var(--p2-bg);color:var(--p2)}.tr-st.full{background:var(--p1-bg);color:var(--p1)}
@@ -2808,9 +2822,58 @@ onReady(function(){
       li.appendChild(btn('tr-resb',on?'✓ مشترك':'+ حجز',function(){if(on){openPay(String(p.n));return;}book(String(p.n));}));ul.appendChild(li);});
     var gs=T.g||{},same=Object.keys(gs).filter(function(g){return norm(gs[g].name)===t&&(g in T.b)})[0];
     if(!same&&raw.length>=2){var li=el('li','tr-res guest');li.appendChild(el('span','nm','«'+raw.slice(0,40)+'» — ضيف من برّه الاجتماع'));
-      li.appendChild(btn('tr-resb',' + ضيف',function(){var T2=trip();if(seatsLeft()<=0){PS.note('الأتوبيس كمل');return;}var i=1;T2.g=T2.g||{};while(T2.g['g'+i])i++;var gk='g'+i;
-        edit(function(){T2.g[gk]={name:raw.slice(0,40)};T2.b[gk]=0;});q.value='';renderRes();PS.note('اتضاف كضيف ✓');}));ul.appendChild(li);}
+      var addG=function(){var T2=trip();if(seatsLeft()<=0){PS.note('الأتوبيس كمل');return;}var i=1;T2.g=T2.g||{};while(T2.g['g'+i])i++;var gk='g'+i;
+        edit(function(){T2.g[gk]={name:raw.slice(0,40)};T2.b[gk]=0;});q.value='';renderRes();PS.note('اتضاف كضيف ✓');};
+      li.appendChild(btn('tr-resb',' + ضيف',function(){var C=candFor(raw.slice(0,40),'');if(C.length)askGuest(raw.slice(0,40),C,addG);else addG();}));ul.appendChild(li);}
     if(!r.length&&raw.length<2){var li2=el('li','tr-res');li2.appendChild(el('span','nm','اكتب حرفين على الأقل'));ul.appendChild(li2);}}
+  // ---- name check: guests that exist in the data + duplicate bookings
+  function tk(nm){return norm(nm).replace(/\((ليدر|lead)\)/gi,'').trim().split(' ').filter(Boolean).map(function(w){w=w.replace(/^ال(?=..)/,'');return w.charAt(0)+w.slice(1).replace(/[اويه]/g,'');});}
+  function ph(x){x=String(x||'').replace(/[٠-٩]/g,function(c){return '٠١٢٣٤٥٦٧٨٩'.indexOf(c)}).replace(/\D/g,'');return x.length>=10?x.slice(-10):'';}
+  function nmMatch(a,b,pa,pb){var A=tk(a),B=tk(b);pa=ph(pa);pb=ph(pb);
+    if(pa&&pa===pb)return A[0]===B[0]?'نفس أول اسم ونفس رقم الموبايل':'نفس رقم الموبايل';
+    if(A.length<2||B.length<2)return '';
+    if(norm(a)===norm(b))return 'نفس الاسم بالظبط';
+    var s=Math.min(A.length,B.length),i;for(i=0;i<s;i++)if(A[i]!==B[i])break;
+    if(i===s)return A.join(' ')===B.join(' ')?'نفس الاسم بس مكتوب بشكل تاني':(s>=2?'نفس الاسم بس واحد فيهم أطول':'');
+    return i>=2?'نفس أول اسمين':'';}
+  function pk(a,b){a=String(a);b=String(b);return a<b?a+'|'+b:b+'|'+a;}
+  function candFor(name,phone,skip){var T=trip(),nd=T.nd||{};return people().filter(function(p){return !(skip&&nd[pk(skip,p.n)]);}).map(function(p){return {p:p,why:nmMatch(name,p.name,phone,phoneOf(p))};}).filter(function(x){return x.why;}).slice(0,3);}
+  function checks(){var T=trip(),nd=T.nd||{},ks=keys(),out=[];var G=ks.filter(function(k){return k.charAt(0)==='g'}),Y=ks.filter(function(k){return k.charAt(0)!=='g'});
+    G.forEach(function(g){var e=ent(g);candFor(e.name,e.phone,g).forEach(function(c){out.push({t:'g',a:g,b:String(c.p.n),why:c.why});});});
+    for(var i=0;i<Y.length;i++)for(var j=i+1;j<Y.length;j++){if(nd[pk(Y[i],Y[j])])continue;var a=ent(Y[i]),b=ent(Y[j]);var w=nmMatch(a.name,b.name,a.phone,b.phone);if(w){var lo=+Y[i]<+Y[j]?Y[i]:Y[j],hi=lo===Y[i]?Y[j]:Y[i];out.push({t:'y',a:hi,b:lo,why:w});}}
+    for(i=0;i<G.length;i++)for(j=i+1;j<G.length;j++){if(nd[pk(G[i],G[j])])continue;var c=ent(G[i]),d=ent(G[j]);if(norm(c.name)===norm(d.name)||nmMatch(c.name,d.name,c.phone,d.phone))out.push({t:'gg',a:G[j],b:G[i],why:norm(c.name)===norm(d.name)?'نفس الاسم بالظبط':'اسمين شبه بعض'});}
+    return out;}
+  // move booking `from` onto `to` (money adds up, seat kept, guest removed)
+  function mergeInto(from,to){var T=trip();from=String(from);to=String(to);var S=seats(),sf=seatOf(from),st=seatOf(to);
+    T.b[to]=(to in T.b?(T.b[to]||0):0)+(T.b[from]||0);delete T.b[from];
+    if(sf){if(!st)S[sf]=sv(to);else delete S[sf];}
+    if(T.g&&T.g[from])delete T.g[from];}
+  function notSame(a,b){var T=trip();if(!T.nd)T.nd={};T.nd[pk(a,b)]=1;}
+  function seatTxt(k){var s=seatOf(k);return s?' · كرسي '+ar(s):'';}
+  function paidTxt(k){var T=trip();return 'دفع '+money(T.b[k]||0);}
+  function drawChk(b){if(!data){PS.sheet.close();return;}var T=trip(),L=checks();
+    b.appendChild(el('h3','tc-h','🔍 مراجعة الأسماء'));
+    var bad={};L.forEach(function(x){bad[x.a]=1;bad[x.b]=1;});
+    b.appendChild(el('p','tc-s',L.length?ar(L.length)+(L.length===1?' حاجة محتاجة نظرة':' حاجات محتاجة نظرة')+' · '+ar(Math.max(0,keys().length-Object.keys(bad).length))+' اسم تمام':'كل الأسماء تمام ✓ مفيش تكرار ولا ضيوف ليهم اسم في الداتا.'));
+    var grp=[['g','ضيوف ليهم اسم في الداتا'],['y','أسماء شكلها مكررة'],['gg','ضيوف مكتوبين مرتين']];
+    grp.forEach(function(g){var I=L.filter(function(x){return x.t===g[0]});if(!I.length)return;b.appendChild(el('div','tc-g',g[1]+' ('+ar(I.length)+')'));
+      I.forEach(function(x){var A=ent(x.a),B=ent(x.b),inB=(x.b in T.b);var c=el('div','tc-c'),pr=el('div','tc-pair');
+        var da=el('div','tc-n');da.appendChild(el('b',null,A.name));da.appendChild(el('small',null,(A.guest?'ضيف · ':'#'+ar(A.n)+' · ')+paidTxt(x.a)+seatTxt(x.a)));
+        var db=el('div','tc-n');db.appendChild(el('b',null,B.name));db.appendChild(el('small',null,(B.guest?'ضيف · ':'#'+ar(B.n)+' · ')+(inB?paidTxt(x.b)+seatTxt(x.b):'في الداتا'+(B.phone?' · '+B.phone.slice(0,4)+'•••'+B.phone.slice(-3):'')+' · مش محجوز')));
+        pr.appendChild(da);pr.appendChild(el('span','tc-arr',x.t==='y'?'⇄':'←'));pr.appendChild(db);c.appendChild(pr);
+        c.appendChild(el('p','tc-why','💡 '+x.why));
+        var bt=el('div','tc-bt');
+        bt.appendChild(btn('tc-y',x.t==='g'?'✓ ده هو، حوّله':(x.t==='y'?'✓ نفس الشخص، خلّي #'+ar(B.n):'✓ نفس الشخص، ادمجهم'),function(){edit(function(){mergeInto(x.a,x.b);});PS.note(x.t==='g'?'اتحوّل لـ«'+B.name+'» ✓'+(inB?' والفلوس اتجمعت':''):'اتدمجوا ✓ الفلوس اتجمعت');PS.sheet.redraw();}));
+        bt.appendChild(btn('tc-n2',x.t==='y'?'لأ، دول اتنين':'لأ، ده حد تاني',function(){edit(function(){notSame(x.a,x.b);});PS.sheet.redraw();}));
+        c.appendChild(bt);b.appendChild(c);});});
+    if(L.some(function(x){return x.b in T.b}))b.appendChild(el('p','tc-ok','لو دمجت اتنين محجوزين: الفلوس بتتجمع، ويفضل كرسي واحد والتاني يفضى.'));}
+  function openChk(){PS.sheet.open('chk',drawChk);}
+  // asked before adding a guest whose name looks like someone in the data
+  function askGuest(raw,C,addG){PS.sheet.open('gask',function(b){var T=trip();b.appendChild(el('h3','tc-h','⚠️ استنى، تقصد '+(C.length===1?'«'+C[0].p.name+'»؟':'حد من دول؟')));
+    b.appendChild(el('p','tc-s','«'+raw+'» شبه اسم موجود في الداتا. لو هو، احجزله باسمه علشان حضوره وفلوسه يتحسبوا عليه.'));
+    C.forEach(function(c){var on=(String(c.p.n) in T.b);var r=el('div','tc-c');var n=el('div','tc-n');n.appendChild(el('b',null,c.p.name+' #'+ar(c.p.n)));n.appendChild(el('small',null,'💡 '+c.why+(on?' · محجوز بالفعل':'')));r.appendChild(n);
+      var bt=el('div','tc-bt');bt.appendChild(btn('tc-y',on?'✓ أيوه، ده هو (محجوز)':'✓ أيوه، احجز #'+ar(c.p.n),function(){PS.sheet.close();q.value='';if(on){renderRes();openPay(String(c.p.n));}else book(String(c.p.n));}));r.appendChild(bt);b.appendChild(r);});
+    var no=el('div','tc-bt');no.appendChild(btn('tc-n2','لأ، ضيفه ضيف',function(){PS.sheet.close();addG();}));b.appendChild(no);});}
   function keys(){var T=trip();return Object.keys(T.b).filter(function(k){return ent(k)});}
   function dueList(){var T=trip(),price=T.price||0;if(!price)return [];return keys().filter(function(k){return (T.b[k]||0)<price;}).map(ent).sort(function(a,b){return a.name.localeCompare(b.name,'ar')});}
   function render(){if(!data)return;var T=trip(),price=T.price||0,ro=!isOwner();
@@ -2828,19 +2891,22 @@ onReady(function(){
     var np=$('tr-noprice');np.hidden=!!price||ro;
     var fl=$('py-filters');fl.textContent='';[['','الكل',ns.length],['none',ST.none,cnt.none],['part','جزء',cnt.part],['full','كامل',cnt.full]].forEach(function(x){var b=btn(x[0]?'f-'+x[0]:'',x[1]+' '+ar(x[2]),function(){filter=filter===x[0]?'':x[0];render();});b.setAttribute('aria-pressed',filter===x[0]);fl.appendChild(b);});
     var dl=dueList(),rb=$('tr-remind');rb.hidden=!dl.length;rb.textContent='📲 فكّر اللي عليهم فلوس ('+ar(dl.length)+')';
+    var CK=ro?[]:checks(),flg={};CK.forEach(function(x){flg[x.a]=flg[x.a]||(x.t==='g'?'موجود في الداتا؟':'متكرر؟');if(x.t!=='g')flg[x.b]=flg[x.b]||'متكرر؟';});
+    var cb=$('tr-chk');if(!cb){cb=btn('tr-chk',null,openChk);cb.id='tr-chk';$('py-add').before(cb);}cb.hidden=!CK.length;cb.textContent='';
+    if(CK.length){var cd=el('div');cd.appendChild(el('b',null,'🔍 راجع الأسماء'));cd.appendChild(el('small',null,'فيه أسماء محتاجة نظرة: ضيوف ليهم اسم في الداتا أو أسماء مكررة'));cb.appendChild(cd);cb.appendChild(el('span','tr-chkn',ar(CK.length)));}
     var list=$('py-list');list.textContent='';var S=seats();
     var rows=ns.filter(function(k){return !filter||status(T.b[k],price)===filter}).map(ent).sort(function(a,b){var o={none:0,part:1,full:2};return o[status(T.b[a.k],price)]-o[status(T.b[b.k],price)]||a.name.localeCompare(b.name,'ar');});
     rows.forEach(function(e){var paid=T.b[e.k]||0,s=status(paid,price);
       var li=el('li','tr-row '+s);li.tabIndex=0;li.setAttribute('role','button');
       li.appendChild(el('div','tr-av '+s,first(e.name).charAt(0)));
-      var nm=el('div','tr-nm'),b=el('b',null,e.name);if(e.guest)b.appendChild(el('span','tr-guest','ضيف'));nm.appendChild(b);
+      var nm=el('div','tr-nm'),b=el('b',null,e.name);if(e.guest)b.appendChild(el('span','tr-guest','ضيف'));if(flg[e.k])b.appendChild(el('span','tr-flag',flg[e.k]));nm.appendChild(b);
       var sk=seatOf(e.k);nm.appendChild(el('small',null,(price?'دفع '+money(paid)+' من '+money(price):'دفع '+money(paid))+(sk?' · كرسي '+ar(sk):'')));li.appendChild(nm);
       li.appendChild(el('span','tr-st '+s,!price?(paid?money(paid):'—'):paid>=price?(paid>price?'زيادة '+money(paid-price):'✓ خلّص'):'فاضل '+money(price-paid)));
       li.addEventListener('click',function(){openPay(e.k);});li.addEventListener('keydown',function(ev){if(ev.key==='Enter')openPay(e.k);});
       list.appendChild(li);});
     $('py-empty').hidden=ns.length>0;$('py-empty').textContent=ro?'لسه محدش اشترك.':'لسه محدش اشترك. دوّر بالاسم فوق وضيفه — ولو حد من برّه الاجتماع (زي أبونا) اكتب اسمه وضيفه كضيف.';
     renderRes();renderBus();renderFin();
-    var k=PS.sheet.key();if(k&&/^(pay|rem)/.test(k))PS.sheet.redraw();}
+    var k=PS.sheet.key();if(k&&/^(pay|rem|chk)/.test(k))PS.sheet.redraw();}
   // ---- trip money: expenses vs subscriptions -> church support
   var EXS=['بانفلت','إكرامية','هدايا','أكل','مياه','تذاكر','بنزين'];
   function finCalc(T){var price=T.price||0,sum=0,due=0;keys().forEach(function(k){var p=T.b[k]||0;sum+=p;due+=Math.max(0,price-p);});
