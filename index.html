@@ -1323,6 +1323,7 @@ body.ps-open{overflow:hidden}body.ps-open .tabs{display:none!important}
 .pa-why{font-size:.8rem;line-height:1.8}.pa-why b{color:#f0a432;font-weight:600}.pa-hint{font-size:.74rem;color:var(--muted)}
 .why-ch{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.why-ch button{border:0;border-radius:999px;padding:7px 13px;background:var(--card);color:var(--fg);font:500 .84rem var(--display);cursor:pointer}.why-ch button.on{background:#f0a432;color:#2a1660;font-weight:700}
 .why-in{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;background:var(--bg);color:var(--fg);font:16px var(--body);margin-bottom:6px}.why-in:focus{border-color:#f0a432;outline:none}
+.del-wait{margin:0;text-align:center;font-size:.84rem;color:#c9962a;font-weight:600}.del-dup{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}.del-dup[hidden]{display:none}
 .task-group-head.nx-tgh{position:relative;overflow:hidden;min-height:170px;border-radius:16px;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:6px;background-size:cover;background-position:center;color:#fff;margin-bottom:10px}
 .nx-tgh[data-k="party"]{background-color:#e0582a}.nx-tgh[data-k="رحلة"]{background-color:#0f8f83}
 .nx-tgh::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 15%,rgba(255,255,255,.18),transparent 45%),linear-gradient(0deg,rgba(10,6,25,.6),transparent 70%)}
@@ -2086,11 +2087,13 @@ onReady(function(){
   function key(p){var e=E(p);return norm([p.name,e.phone,e.phone2,e.address,e.edu,e.work,e.note].join(' '));}
   var openDet={},editDet={},propOpen={},zOpen={};PS.people=P;
   function propK(x){return x.k||'p';}
-  function propLabel(x,q){var k=propK(x);if(k==='z'){var zz=x.v||{},zr=ZR[zz.r]?zz.r:'work';return '⛔ '+((zr==='other'&&zz.t)?zz.t:ZR[zr][1])+(zz.u?' — راجع '+fmtMonth(zz.u):'');}if(k==='p')return 'التصنيف: «'+(x.v?PRI[x.v]:'من غير تصنيف')+'»';
+  var DELR={dup:'الاسم متكرر',gone:'مبقاش بييجي خالص',wrong:'الاسم غلط / مش من الاجتماع',other:'سبب تاني'};
+  function propLabel(x,q){var k=propK(x);if(k==='del'){var dv=x.v||{},tq=dv.to&&byN[dv.to];return '🗑 طلب مسح — '+(DELR[dv.r]||'')+(tq?' (المتكرر معاه: '+tq.name+' #'+ar(tq.n)+'، وحضوره هيتنقله)':'');}if(k==='z'){var zz=x.v||{},zr=ZR[zz.r]?zz.r:'work';return '⛔ '+((zr==='other'&&zz.t)?zz.t:ZR[zr][1])+(zz.u?' — راجع '+fmtMonth(zz.u):'');}if(k==='p')return 'التصنيف: «'+(x.v?PRI[x.v]:'من غير تصنيف')+'»';
     if(k==='r')return 'المنطقة: «'+(x.v||'غير محددة')+'»';
     var o=x.v||{},cur=q?E(q):{},parts=[];FIELDS.forEach(function(f){if(f[0] in o&&String(o[f[0]])!==String(cur[f[0]]))parts.push(f[1]+': «'+(o[f[0]]||'—')+'»');});return parts.length?parts.join(' · '):'تعديل البيانات';}
   function propApply(x){var q=byN[x.n];if(!q)return;var k=propK(x);
-    if(k==='z'){V().p[x.n]=4;Z()[x.n]=x.v||{r:'work'};}
+    if(k==='del'){var dv=x.v||{},to=dv.to&&byN[dv.to]?+dv.to:0;if(to)hist(q).filter(function(d){return was(q.n,d)}).forEach(function(d){A()[d+'#'+to]=1;});X()[x.n]={at:Date.now(),by:(x.byName||x.by||'')+' (وافق '+((PS.me&&PS.me.name)||'')+')',name:q.name,why:(DELR[dv.r]||'')+(x.note?': '+x.note:'')};return;}
+     if(k==='z'){V().p[x.n]=4;Z()[x.n]=x.v||{r:'work'};}
     else if(k==='p'){if(x.v)V().p[x.n]=x.v;else delete V().p[x.n];if(x.v!==4)delete Z()[x.n];}
     else if(k==='r'){if((x.v||'')===(q.region||''))delete V().r[x.n];else V().r[x.n]=x.v||'';}
     else{var o=x.v||{},nv={};FIELDS.forEach(function(f){var key=f[0],v=(key in o)?String(o[key]):E(q)[key],og=orig(q,key);if(v!==og)nv[key]=v;});if(Object.keys(nv).length)V().e[x.n]=nv;else delete V().e[x.n];}}
@@ -2261,6 +2264,9 @@ onReady(function(){
     var y=psB.scrollTop;psB.textContent='';var c=card(p);c.classList.add('in-sheet');psB.appendChild(c);
     var h=attCard(p);if(h)c.insertBefore(h,c.querySelector('.p-more'));
     if(isLead()){var dz=el('div','del-zone');var db=el('button','del-btn','🗑 امسح '+p.name.split(' ')[0]+' من القايمة');db.type='button';db.addEventListener('click',function(){delAsk(p);});dz.appendChild(db);psB.appendChild(dz);}
+     else if(PS.propose){var dz2=el('div','del-zone');var mine=(PS.props?PS.props():[]).filter(function(x){return x.n===p.n&&propK(x)==='del';})[0];
+       if(mine)dz2.appendChild(el('p','del-wait','⏳ طلب مسح '+p.name.split(' ')[0]+' مستني موافقة أمناء الاجتماع'));
+       else{var rq=el('button','del-btn','🗑 اطلب مسح '+p.name.split(' ')[0]+' من القايمة');rq.type='button';rq.addEventListener('click',function(){delReq(p);});dz2.appendChild(rq);}psB.appendChild(dz2);}
     psB.scrollTop=y;}
   function isLead(){return PS.role==='owner'||PS.role==='visit'||PS.role===null;}
   function X(){if(!V().x)V().x={};return V().x;}
@@ -2274,9 +2280,20 @@ onReady(function(){
       change(function(){if(to)hs.forEach(function(d){A()[d+'#'+to]=1;});X()[p.n]={at:Date.now(),by:(PS.me&&PS.me.name)||'',name:p.name};});closeSheet();PS.note('اتمسح '+p.name+(to?' واتنقل حضوره':'')+' — تقدر ترجّعه من «المحذوفين» في الفلتر');});
     var no=el('button','del-no','لا، رجوع');no.type='button';no.addEventListener('click',function(){drawSheet();});
     w.appendChild(ok);w.appendChild(no);psB.appendChild(w);}
+  function delReq(p){psB.textContent='';var w=el('div','del-ask'),r='',to=0;w.appendChild(el('h3',null,'تطلب مسح «'+p.name+'» (#'+ar(p.n)+')؟'));w.appendChild(el('p',null,'الطلب هيروح لأمناء الاجتماع يوافقوا عليه. ليه عايز تمسحه؟'));
+    var ch=el('div','why-ch');var dupBox=el('div','del-dup');dupBox.hidden=true;var note=el('input','why-in');note.maxLength=80;note.placeholder='اكتب السبب أو أي ملاحظة (اختياري)';
+    Object.keys(DELR).forEach(function(k){var b=el('button',null,DELR[k]);b.type='button';b.addEventListener('click',function(){r=k;[].forEach.call(ch.children,function(z){z.classList.toggle('on',z===b)});dupBox.hidden=k!=='dup';if(k==='other')note.focus();});ch.appendChild(b);});
+    w.appendChild(ch);
+    var sim=similar(p);dupBox.appendChild(el('p','del-q','مكتوب مرتين مع مين؟ (حضوره هيتنقل للاسم التاني)'));var sel=el('select','del-sel');var o0=el('option',null,'مش عارف / مش موجود هنا');o0.value='';sel.appendChild(o0);
+    var cand=sim.length?sim:P.filter(function(q){return q.n!==p.n&&norm(q.name).split(' ')[0]===norm(p.name).split(' ')[0];}).slice(0,15);
+    cand.forEach(function(q){var o=el('option',null,q.name+' #'+ar(q.n)+(E(q).phone?' · '+E(q).phone:''));o.value=q.n;sel.appendChild(o);});if(sim.length)sel.value=String(sim[0].n);sel.addEventListener('change',function(){to=+sel.value||0;});to=sim.length?sim[0].n:0;dupBox.appendChild(sel);w.appendChild(dupBox);
+    w.appendChild(note);
+    var ok=el('button','del-btn on','📨 ابعت الطلب');ok.type='button';ok.addEventListener('click',function(){if(!r){PS.note('اختار السبب الأول');return;}var v={r:r};if(r==='dup'&&to)v.to=to;
+      PS.propose(p.n,'del',v,note.value.trim().slice(0,80)).then(function(){PS.note('اتبعت الطلب لأمناء الاجتماع ✓');drawSheet();},function(){PS.note('محصلش — جرّب تاني');});});
+    var no=el('button','del-no','لا، رجوع');no.type='button';no.addEventListener('click',function(){drawSheet();});w.appendChild(ok);w.appendChild(no);psB.appendChild(w);}
   function openDeleted(){var L=Object.keys(X()).map(function(n){return {n:+n,x:X()[n]}});sheetN=null;addOpen=false;if(psW.hidden)PS.lockScroll(true);psW.hidden=false;document.body.classList.add('ps-open');psB.textContent='';
     var w=el('div','del-ask');w.appendChild(el('h3',null,'المحذوفين ('+ar(L.length)+')'));if(!L.length)w.appendChild(el('p',null,'مفيش حد اتمسح.'));
-    L.forEach(function(r){var row=el('div','del-row');var t=el('span',null,(r.x&&r.x.name||'#'+r.n)+' #'+ar(r.n));row.appendChild(t);if(r.x&&r.x.by)row.appendChild(el('small',null,'مسحه: '+r.x.by));
+    L.forEach(function(r){var row=el('div','del-row');var t=el('span',null,(r.x&&r.x.name||'#'+r.n)+' #'+ar(r.n));row.appendChild(t);if(r.x&&r.x.by)row.appendChild(el('small',null,'مسحه: '+r.x.by+(r.x.why?' · '+r.x.why:'')));
       var b=el('button','del-res','رجّعه');b.type='button';b.addEventListener('click',function(){change(function(){delete X()[r.n];});PS.note('رجع ✓');openDeleted();});row.appendChild(b);w.appendChild(row);});psB.appendChild(w);}
   function addForm(){var f=el('form','add-f'),ins={},g='ولاد',isNew=false;f.appendChild(el('h3',null,'إضافة شخص جديد'));
     function fld(k,lb,type,ph){var l=el('label',null,lb);var i=type==='area'?el('textarea'):el('input');if(type!=='area')i.type=type;if(ph)i.placeholder=ph;i.dir='auto';if(type==='tel')i.inputMode='tel';ins[k]=i;l.appendChild(i);return l;}
@@ -3678,9 +3695,9 @@ onReady(function(){
   function me(){return ((PS.me&&PS.me.email)||'').toLowerCase();}
   function isBoss(){return !!me()&&me()===String(window.FB_OWNER||'').toLowerCase();}
   var CAT={v:'الافتقاد',f:'الأسر',t:'المهام',m:'الفلوس',s:'الخدام'};
-  var ICON={v_add:'➕',v_visit:'📞',v_edit:'✏️',v_phone:'📱',v_pri:'⭐',v_del:'🗑',v_unvisit:'↩︎',v_z:'⛔',v_why:'💬',att:'🙋',prop:'💬',f_add:'👨‍👩‍👧',f_rm:'➖',f_name:'🏷️',j_ok:'✅',j_no:'✖️',t_done:'☑️',t_undo:'↩︎',t_add:'📝',t_del:'🗑',t_who:'👤',acts:'🎯',prog:'📋',meet:'📹',min:'🗒️',fexp:'💸',pay:'💰',pph:'📷',user:'🔑'};
+  var ICON={v_add:'➕',v_visit:'📞',v_edit:'✏️',v_phone:'📱',v_pri:'⭐',v_del:'🗑',v_unvisit:'↩︎',v_z:'⛔',v_why:'💬',v_delreq:'🗑',att:'🙋',prop:'💬',f_add:'👨‍👩‍👧',f_rm:'➖',f_name:'🏷️',j_ok:'✅',j_no:'✖️',t_done:'☑️',t_undo:'↩︎',t_add:'📝',t_del:'🗑',t_who:'👤',acts:'🎯',prog:'📋',meet:'📹',min:'🗒️',fexp:'💸',pay:'💰',pph:'📷',user:'🔑'};
   var SUM={v_add:function(n){return 'ضاف '+ar(n)+' للافتقاد'},v_visit:function(n){return 'عمل '+ar(n)+' زيارة'},v_edit:function(n){return ar(n)+' تعديل بيانات'},v_phone:function(n){return 'غيّر '+ar(n)+' رقم'},v_pri:function(n){return 'قيّم '+ar(n)+' شاب'},
-    v_del:function(n){return 'مسح '+ar(n)},v_z:function(n){return ar(n)+' ظرف مانع'},v_why:function(n){return 'كتب '+ar(n)+' سبب غياب'},att:function(){return 'سجّل الحضور'},prop:function(n){return ar(n)+' اقتراح'},f_add:function(n){return 'ضاف '+ar(n)+' للأسر'},f_rm:function(n){return 'شال '+ar(n)+' من الأسر'},
+    v_del:function(n){return 'مسح '+ar(n)},v_z:function(n){return ar(n)+' ظرف مانع'},v_why:function(n){return 'كتب '+ar(n)+' سبب غياب'},v_delreq:function(n){return 'طلب مسح '+ar(n)},att:function(){return 'سجّل الحضور'},prop:function(n){return ar(n)+' اقتراح'},f_add:function(n){return 'ضاف '+ar(n)+' للأسر'},f_rm:function(n){return 'شال '+ar(n)+' من الأسر'},
     j_ok:function(n){return 'وافق على '+ar(n)+' طلب'},j_no:function(n){return 'رفض '+ar(n)+' طلب'},t_done:function(n){return 'خلّص '+ar(n)+' مهمة'},t_add:function(n){return 'ضاف '+ar(n)+' مهمة'},prog:function(){return 'عدّل البرنامج'},
     meet:function(){return 'اجتماع خدام'},min:function(){return 'كتب محضر'},fexp:function(n){return ar(n)+' مصروف'},pay:function(){return 'عدّل الفلوس'},pph:function(n){return ar(n)+' صورة'},user:function(n){return ar(n)+' تعديل في الخدام'}};
   var COLS=['#0f8f83','#7a3df0','#c21cbf','#e0582a','#1a73e8','#a8650c','#3b8f3e','#b8326e'];
@@ -4409,10 +4426,10 @@ onReady(function(){
 
   // ---------- servant proposals
   var props=[];PS.props=function(){return props};
-  PS.propose=function(n,k,v,note){LOG('v','prop','اقترح تعديل على «'+pName(n)+'»');var em=(me.email||'').toLowerCase();return db.collection('props').doc(n+'_'+k+'_'+em).set({n:n,k:k,v:(v===undefined?null:v),note:note||'',by:em,byName:myName()||em,at:Date.now()});};
+  PS.propose=function(n,k,v,note){if(k==='del')LOG('v','v_delreq','طلب مسح «'+pName(n)+'»'+(note?' ('+note+')':''));else LOG('v','prop','اقترح تعديل على «'+pName(n)+'»');var em=(me.email||'').toLowerCase();return db.collection('props').doc(n+'_'+k+'_'+em).set({n:n,k:k,v:(v===undefined?null:v),note:note||'',by:em,byName:myName()||em,at:Date.now()});};
   PS.propDel=function(id){return db.collection('props').doc(id).delete().catch(function(x){PS.note(msg(x))});};
   function propsListen(){var em=(me.email||'').toLowerCase(),q=role==='servant'?db.collection('props').where('by','==',em):db.collection('props');
-    unsub.push(q.onSnapshot(function(qs){props=[];qs.forEach(function(d){var x=d.data();x.id=d.id;props.push(x);});if(booted)apply();},function(){}));}
+    unsub.push(q.onSnapshot(function(qs){props=[];qs.forEach(function(d){var x=d.data();x.id=d.id;props.push(x);});if(booted)changedSoon();},function(){}));}
 
   // ---------- save (diff → Firestore)
   var flushing=false,queued=false;
