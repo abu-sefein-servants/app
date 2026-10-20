@@ -1932,7 +1932,8 @@ window.PS={state:{},ro:false,subs:[]};
       var cs=subs.querySelector('button[aria-selected="true"]');if(((sel&&!document.getElementById(sel))||!cs||cs.hidden)&&PS.pickSub){var f=subs.querySelector('button:not([hidden])');if(f)PS.pickSub(f.dataset.subtab);}
       if(PS.whoApply)PS.whoApply();}
     PS.pgToggle=function(tid,names){var own=PS.role==='owner'||PS.role===null;
-      if(!own){var me=PS.myTaskName?PS.myTaskName():'';if(!me||!names.some(function(n){return pgNm(n)===pgNm(me)})){PS.note(names.length?'دي على '+names.join(' و ')+' — هما أو أمناء الاجتماع يعلّموا عليها':'مفيش اسم على الفقرة دي — أمناء الاجتماع يعلّموا عليها');return;}}
+      var fm=PS.famOfTid?PS.famOfTid(tid):'';if(fm&&PS.isFamLead&&PS.isFamLead(fm))own=true;
+      if(!own){var me=PS.myTaskName?PS.myTaskName():'';if(!me||!names.some(function(n){return pgNm(n)===pgNm(me)})){var who=fm?'أمناء '+(PS.famName?PS.famName(fm):'الأسرة')+' أو أمناء الاجتماع':'أمناء الاجتماع';PS.note(names.length?'دي على '+names.join(' و ')+' — هما أو '+who+' يعلّموا عليها':'مفيش اسم على الفقرة دي — '+who+' يعلّموا عليها');return;}}
       var d=!isDone(tid),nm=(PS.me&&PS.me.name)||'';PS.done[tid]={d:d?1:0,byName:nm,at:Date.now()};paint();
       if(PS.doneSet)PS.doneSet(tid,d,nm).then(function(){PS.note(d?'اتعلّمت إنها خلصت ✓':'رجعت مفتوحة');},function(x){PS.note(/permission/.test(x&&x.code||'')?'مش عندك صلاحية — اتأكد إن قواعد Firebase اتحدثت':'محصلش حفظ، جرّب تاني');});
       try{PS.changed()}catch(e){}};
@@ -3172,7 +3173,8 @@ onReady(function(){
   PS.whoJoin=function(L){return L.map(function(z){return z.n+(z.lead?' (ليدر)':'')}).join('، ');};
   PS.slotTime=function(x){if(x.side)return 'طول اليوم';var a=t12(x.s);if(!a[0])return '';var b=x.e?t12(x.e):null;return a[0]+(b&&b[0]?' – '+b[0]:'')+' '+((b&&b[1])||a[1]);};
   function pgToday(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
-  PS.progDays=function(){var t=pgToday(),out=[];Object.keys(PS.prog||{}).forEach(function(id){var d=PS.prog[id];if(!d||!d.items||!d.items.length)return;
+  PS.famOfTid=function(tid){var m=/^pg_([0-9a-zA-Z]+)_/.exec(String(tid||''));if(!m)return '';var s=SCHED.filter(function(y){return y[1]==='family'&&String(y[0]).replace(/[^0-9a-zA-Z]/g,'')===m[1];})[0];return s?s[2]:'';};
+    PS.progDays=function(){var t=pgToday(),out=[];Object.keys(PS.prog||{}).forEach(function(id){var d=PS.prog[id];if(!d||!d.items||!d.items.length)return;
       var s=SCHED.filter(function(y){return y[0]===id})[0],a=null,dt='';if(s)dt=s[0];else if(/^\d{4}-\d\d-\d\d$/.test(id))dt=id;else if(id.indexOf('a_')===0&&PS.act){a=PS.act(id.slice(2));dt=a&&a.date||'';}
       if(!dt||dt<t)return;var L=d.items.filter(function(x){return x&&String(x.t||'').trim();});if(!L.length)return;
       out.push({id:id,date:dt,title:s?sTitle(s):(a?a.title:(PS.schedTitle&&PS.schedTitle(id))||id),cov:s&&s[1]==='family'?id+'|fam_'+s[2]:id,k:s?s[1]:'party',items:L});});
