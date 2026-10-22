@@ -393,6 +393,12 @@ select.fchip{padding-inline:12px;border-inline-end:8px solid transparent}
 .ds-pch b{display:block;font:600 .9rem var(--display)}.ds-pch small{font-size:.72rem;color:var(--muted)}
 .ds-q3{display:flex;gap:5px;margin-top:6px}.ds-q3 button{flex:1;border:0;cursor:pointer;background:rgba(120,110,170,.12);color:var(--fg);border-radius:8px;padding:6px 2px;font:600 .72rem var(--display)}
 .ds-q3 .on{background:rgba(47,182,117,.2);color:#1f8a57;box-shadow:inset 0 0 0 1.5px #2fb675}.ds-q3 .on.cn,.ds-q3 .on.cw,.ds-q3 .on.jn{background:rgba(210,65,75,.14);color:#d2414b;box-shadow:inset 0 0 0 1.5px #d2414b}.ds-q3 .on.jm{background:rgba(240,164,50,.18);color:#a8650c;box-shadow:inset 0 0 0 1.5px #f0a432}
+.ds-acts .ed{background:var(--gold,#e3a326);color:#2a1660}
+.ds-pch{display:flex;align-items:flex-start;gap:8px}.ds-pch>div{flex:1;min-width:0}
+.ds-rx{flex:none;border:0;cursor:pointer;background:rgba(210,65,75,.1);color:#d2414b;border-radius:8px;padding:5px 9px;font:600 .72rem var(--display)}
+.ds-edh{font-size:.8rem;line-height:1.6;background:rgba(227,163,38,.14);color:var(--gold-ink,#a8650c);border-radius:12px;padding:9px 11px;margin:0 0 10px}
+.ds-chg{font-size:.84rem;line-height:1.7;border-radius:12px;padding:9px 11px;margin:6px 0}.ds-chg.add{background:rgba(47,182,117,.12);color:#1f8a57}.ds-chg.rm{background:rgba(210,65,75,.1);color:#d2414b}
+.ds-later{display:block;width:100%;border:0;cursor:pointer;background:var(--card);color:var(--fg);border-radius:14px;padding:11px;font:600 .9rem var(--display);margin-top:8px}
 .ds-nt{font-size:.78rem;margin:6px 2px 0;color:var(--fg)}
 .dist-mode>:not(#vdist):not(#v-mode):not(.v-head){display:none!important}
 .att{display:flex;flex-direction:column;gap:12px}
@@ -3915,7 +3921,7 @@ onReady(function(){
   var WAY={link:['🔗','لينك'],xl:['📊','إكسل'],txt:['💬','رسالة']};
 
   // ---------- state
-  var view='home',sel={},flt='',fq='',rF='',rT='';
+  var view='home',sel={},flt='',fq='',rF='',rT='',editId=null;
   function selN(){return Object.keys(sel).length;}
 
   // ---------- home
@@ -3924,7 +3930,7 @@ onReady(function(){
     box.textContent='';box.className='vdist';
     var L=docs(),own=owners(),tot=P().length,asg=0,talk=0;P().forEach(function(p){if(own[p.n]){asg++;var s=(own[p.n].st||{})[p.n]||{};if(s.c==='y'||s.v==='y')talk++;}});
     var h=el('div','ds-hero');[[asg,'متوزعين','y'],[talk,'اتكلموا','g'],[Math.max(0,tot-asg),'مع محدش','r']].forEach(function(x){var d=el('div',x[2]);d.appendChild(el('b',null,ar(x[0])));d.appendChild(el('span',null,x[1]));h.appendChild(d);});box.appendChild(h);
-    box.appendChild(btn('ds-big','+ وزّع شباب على حد',function(){view='pick';sel={};flt='';fq='';rF='';rT='';render();window.scrollTo(0,0);}));
+    box.appendChild(btn('ds-big','+ وزّع شباب على حد',function(){view='pick';sel={};flt='';fq='';rF='';rT='';editId=null;render();window.scrollTo(0,0);}));
     if(!L.length){box.appendChild(el('p','ds-empty','لسه موزعتش حد. دوس فوق، علّم على الشباب (أو اكتب من رقم لرقم)، وابعتهم لحد يفتقدهم على الواتساب.'));return;}
     box.appendChild(el('div','ds-lb','مع مين؟'));
     L.forEach(function(d){var s=stats(d),c=btn('ds-v',null,function(){openDoc(d.id);});
@@ -3942,9 +3948,9 @@ onReady(function(){
       if(q&&norm(p.name).indexOf(q)<0&&String(p.n)!==en(fq).trim())return false;
       if(!flt)return true;if(flt==='abs')return V().abs&&V().abs(p)>=3;if(flt==='none')return !own[p.n];if(flt==='pri')return V().pri&&V().pri(p)==='ضروري';
       if(flt.indexOf('f:')===0)return PS.famOf&&PS.famOf(p.n)===flt.slice(2);if(flt.indexOf('r:')===0)return String(p.region||'').trim()===flt.slice(2);return true;});}
-  function foot(){var f=$('ds-foot');if(!f)return;var n=selN();f.disabled=!n;f.textContent=n?'ابعت الـ'+ar(n)+' لحد ‹':'علّم على الشباب الأول';var c=$('ds-cnt');if(c)c.textContent='متعلّم '+ar(n);}
+  function foot(){var f=$('ds-foot');if(!f)return;var n=selN();f.disabled=!n;f.textContent=editId?(n?'✓ احفظ التعديل ('+ar(n)+' شاب)':'علّم واحد على الأقل'):(n?'ابعت الـ'+ar(n)+' لحد ‹':'علّم على الشباب الأول');var c=$('ds-cnt');if(c)c.textContent='متعلّم '+ar(n);}
   function renderPick(box){var y=window.scrollY;box.textContent='';box.className='vdist pick';
-    var top=el('div','ds-top');top.appendChild(btn('ds-back','‹ رجوع',function(){view='home';render();}));top.appendChild(el('b',null,'اختار الشباب'));box.appendChild(top);
+    var top=el('div','ds-top');top.appendChild(btn('ds-back','‹ رجوع',function(){var e=editId;view='home';editId=null;sel={};render();if(e&&D()[e])openDoc(e);}));var ed=editId&&D()[editId];top.appendChild(el('b',null,ed?'بتعدّل لستة '+first(ed.to):'اختار الشباب'));box.appendChild(top);
     var rg=el('div','ds-rng');rg.appendChild(el('div','t','بالأرقام'));var rr=el('div','r');var a=el('input');a.inputMode='numeric';a.placeholder='من';a.id='ds-from';var b=el('input');b.inputMode='numeric';b.placeholder='لـ';b.id='ds-to';a.value=rF;b.value=rT;a.oninput=function(){rF=a.value};b.oninput=function(){rT=a.value===''?b.value:b.value};
     rr.appendChild(el('span',null,'من'));rr.appendChild(a);rr.appendChild(el('span',null,'لـ'));rr.appendChild(b);
     rr.appendChild(btn('ds-rok','علّمهم',function(){var x=parseInt(en(a.value),10),z=parseInt(en(b.value),10);if(!x){note('اكتب الرقم الأول');return;}if(!z)z=x;if(z<x){var t=x;x=z;z=t;}var k=0;P().forEach(function(p){if(p.n>=x&&p.n<=z&&!sel[p.n]){sel[p.n]=1;k++;}});note(k?'اتعلّم '+ar(k)+' شاب (من #'+ar(x)+' لـ #'+ar(z)+')':'مفيش حد جديد في الأرقام دي');renderPick(box);}));
@@ -3955,12 +3961,12 @@ onReady(function(){
     var ln=el('div','ds-ln');var sc=el('span');sc.id='ds-sc';ln.appendChild(sc);var cn=el('b');cn.id='ds-cnt';ln.appendChild(cn);
     ln.appendChild(btn('ds-lk','علّم اللي ظاهرين',function(){shown().forEach(function(p){sel[p.n]=1;});drawList();}));ln.appendChild(btn('ds-lk','شيل العلامات',function(){sel={};drawList();}));box.appendChild(ln);
     var ul=el('div','ds-list');ul.id='ds-list';box.appendChild(ul);
-    var f=btn('ds-foot',null,openSend);f.id='ds-foot';box.appendChild(f);
+    if(ed)box.insertBefore(el('p','ds-edh','✏️ علّم اللي عايزه يفضل معاه وشيل العلامة من اللي عايز تشيله. نفس اللينك هيفضل شغال.'),rg);var f=btn('ds-foot',null,function(){if(editId)saveEdit();else openSend();});f.id='ds-foot';box.appendChild(f);
     drawList();window.scrollTo(0,y);}
   function drawList(){var ul=$('ds-list');if(!ul)return;ul.textContent='';var own=owners(),L=shown();var sc=$('ds-sc');if(sc)sc.textContent=ar(L.length)+' شاب · ';
     L.forEach(function(p){var r=btn('ds-p'+(sel[p.n]?' on':''),null,function(){if(sel[p.n])delete sel[p.n];else sel[p.n]=1;r.classList.toggle('on',!!sel[p.n]);ck.textContent=sel[p.n]?'✓':'';foot();});
       var ck=el('span','ds-cb',sel[p.n]?'✓':'');r.appendChild(ck);var m=el('div','ds-pm');m.appendChild(el('b',null,p.name));m.appendChild(el('small',null,'#'+ar(p.n)+(p.region?' · '+p.region:'')));
-      var dt=V().dots?V().dots(p):null;if(dt)m.appendChild(dt);r.appendChild(m);if(own[p.n])r.appendChild(el('span','ds-tag','مع '+first(own[p.n].to)));ul.appendChild(r);});
+      var dt=V().dots?V().dots(p):null;if(dt)m.appendChild(dt);r.appendChild(m);if(own[p.n]&&own[p.n].id!==editId)r.appendChild(el('span','ds-tag','مع '+first(own[p.n].to)));ul.appendChild(r);});
     if(!L.length)ul.appendChild(el('p','ds-empty','مفيش حد بالفلتر ده'));foot();}
 
   // ---------- send
@@ -3969,6 +3975,26 @@ onReady(function(){
   function line(x,i){return ar(i+1)+'. '+x.name+(x.phone?' · '+x.phone:'')+((x.addr||x.region)?' · '+[x.region,x.addr].filter(Boolean).join('، '):'');}
   function msgOf(way,to,ps,id){var g=greet(to);if(way==='link')return g+'\n\n👈 افتح اللينك ده، فيه كل التفاصيل، وعلّم على كل واحد لما تكلّمه:\n'+linkOf(id);
     if(way==='xl')return g+'\n\nبعتلك ملف إكسل فيه أسماءهم وتليفوناتهم وعناوينهم 📊';return g+'\n\n'+ps.map(line).join('\n');}
+  function startEdit(id){var d=D()[id];if(!d)return;PS.sheet.close();editId=id;sel={};Object.keys(d.p||{}).forEach(function(n){sel[n]=1;});view='pick';flt='';fq='';rF='';rT='';render();window.scrollTo(0,0);}
+  function saveEdit(){var id=editId,d=D()[id];if(!d){editId=null;view='home';render();return;}var np={},ns={},add=[],rm=[],st=d.st||{};
+    Object.keys(sel).sort(function(a,b){return a-b}).forEach(function(n){if(d.p&&d.p[n])np[n]=d.p[n];else{var p=byN(n);if(!p)return;np[n]=snap(p);add.push(np[n].name);}if(st[n])ns[n]=st[n];});
+    Object.keys(d.p||{}).forEach(function(n){if(!np[n])rm.push(d.p[n].name);});
+    editId=null;view='home';sel={};
+    if(!add.length&&!rm.length){render();note('مفيش تغيير');openDoc(id);return;}
+    PS.distSet(id,{p:np,st:ns}).catch(saveErr);if(PS.log)PS.log('v','dist','عدّل لستة «'+(d.to||'')+'»: '+(add.length?'زوّد '+add.length:'')+(add.length&&rm.length?' و':'')+(rm.length?'شال '+rm.length:''));
+    render();window.scrollTo(0,0);PS.sheet.open('dedit',function(b){drawEdited(b,id,add,rm);});}
+  function drawEdited(b,id,add,rm){var d=D()[id];if(!d){PS.sheet.close();return;}b.appendChild(el('h3','ds-h','اتعدّلت لستة '+first(d.to)+' ✓'));
+    if(add.length)b.appendChild(el('p','ds-chg add','➕ زوّدت '+ar(add.length)+': '+add.join('، ')));if(rm.length)b.appendChild(el('p','ds-chg rm','➖ شلت '+ar(rm.length)+': '+rm.join('، ')));
+    b.appendChild(el('p','ds-hint',d.way==='link'?'🔗 نفس اللينك اتحدّث لوحده: اللي اتشالوا اختفوا منه، والجداد ظهروا. وعلاماته على الباقيين زي ما هي.':(d.way==='xl'?'📊 ابعتله الملف الجديد علشان يبقى عنده اللستة الصح.':'💬 ابعتله الرسالة الجديدة باللستة الصح.')));
+    var ps=Object.keys(d.p||{}).sort(function(a,b){return a-b}).map(function(n){return d.p[n];});
+    b.appendChild(btn('ds-send',d.way==='xl'?'📊 ابعتله الملف الجديد':'قوله على واتساب ‹',function(){var ch=(add.length?'زوّدت '+ar(add.length):'')+(add.length&&rm.length?' و':'')+(rm.length?'شلت '+ar(rm.length):'');
+      if(d.way==='link')openWa(d.toPh,'سلام يا '+first(d.to)+' 🙏 عدّلت لستة الافتقاد ('+ch+'). نفس اللينك، افتحه تاني:\n'+linkOf(id));
+      else if(d.way==='xl'){var ns=Object.keys(d.p||{}).sort(function(a,b){return a-b});shareFile(xlsx([{name:'الافتقاد',rows:distRows(ns.map(function(n){return d.p[n]}),ns,d.st||{}),w:[5,24,15,26,14,6,12,12,10,9,10,26]}]),'iftiqad-'+ymd(new Date())+'.xlsx','سلام يا '+first(d.to)+' 🙏 دي لستة الافتقاد بعد التعديل ('+ch+')',d.toPh);}
+      else openWa(d.toPh,'سلام يا '+first(d.to)+' 🙏 دي لستة الافتقاد بعد التعديل ('+ch+'):\n\n'+ps.map(line).join('\n'));
+      PS.sheet.close();}));
+    b.appendChild(btn('ds-later','بعدين',function(){PS.sheet.close();}));}
+  function rmOne(id,n){var d=D()[id];if(!d||!d.p||!d.p[n])return;var np=Object.assign({},d.p),ns=Object.assign({},d.st||{}),nm=np[n].name;delete np[n];delete ns[n];
+    if(!Object.keys(np).length){note('ده آخر واحد — لو عايز تلغيها كلها دوس «امسح»');return;}PS.distSet(id,{p:np,st:ns}).catch(saveErr);note('اتشال «'+nm+'» من لستة '+first(d.to));PS.sheet.redraw();}
   function openSend(){if(!selN())return;PS.sheet.open('dsend',drawSend);}
   function drawSend(b){var n=selN();b.appendChild(el('h3','ds-h','تبعت الـ'+ar(n)+' دول لمين؟'));
     var rec={},rl=[];docs().forEach(function(d){var k=norm(d.to);if(d.to&&!rec[k]){rec[k]=1;rl.push({to:d.to,ph:d.toPh||''});}});
@@ -4007,10 +4033,10 @@ onReady(function(){
     if(d.way==='link')ac.appendChild(btn(null,'📋 نسخ اللينك',function(){var u=linkOf(id);(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){note('اتنسخ ✓');},function(){prompt('انسخ اللينك',u);});}));
     ac.appendChild(btn(null,'📊 إكسل',function(){var ns=Object.keys(d.p||{}).sort(function(a,b){return a-b});shareFile(xlsx([{name:'الافتقاد',rows:distRows(ns.map(function(n){return d.p[n]}),ns,d.st||{}),w:[5,24,15,26,14,6,12,12,10,9,10,26]}]),'iftiqad-'+ymd(new Date(d.at||Date.now()))+'.xlsx','',null);}));
     if(d.way==='link')ac.appendChild(btn(null,d.open?'🔒 اقفل اللينك':'🔓 افتح اللينك',function(){PS.distSet(id,{open:!d.open}).then(function(){note(d.open?'اتفتح':'اتقفل — محدش هيقدر يفتحه');},saveErr);}));
-    var del=btn('del','🗑 امسح',function(){if(!del.dataset.arm){del.dataset.arm='1';del.textContent='متأكد؟ دوس تاني';return;}PS.sheet.close();PS.distDel(id).catch(saveErr);note('اتمسح');});ac.appendChild(del);b.appendChild(ac);
+    ac.insertBefore(btn('ed','✏️ عدّل الناس',function(){startEdit(id);}),ac.firstChild);var del=btn('del','🗑 امسح',function(){if(!del.dataset.arm){del.dataset.arm='1';del.textContent='متأكد؟ دوس تاني';return;}PS.sheet.close();PS.distDel(id).catch(saveErr);note('اتمسح');});ac.appendChild(del);b.appendChild(ac);
     if(d.sa&&d.way==='link'){var t=d.sa.toMillis?d.sa.toMillis():(d.sa.seconds?d.sa.seconds*1000:+d.sa);if(t)b.appendChild(el('p','ds-hint','آخر مرة علّم: '+ago(t)));}
     Object.keys(d.p||{}).sort(function(a,b){return a-b}).forEach(function(n){var x=d.p[n],st=(d.st||{})[n]||{};var c=el('div','ds-pc'+((st.c==='y'||st.v==='y')?' done':''));
-      var hd=el('div','ds-pch');hd.appendChild(el('b',null,x.name));hd.appendChild(el('small',null,'#'+ar(n)+(x.phone?' · '+x.phone:'')));c.appendChild(hd);
+      var hd=el('div','ds-pch');var hb=el('div');hb.appendChild(el('b',null,x.name));hb.appendChild(el('small',null,'#'+ar(n)+(x.phone?' · '+x.phone:'')));hd.appendChild(hb);var rx=btn('ds-rx','✕ شيله',function(){if(!rx.dataset.arm){rx.dataset.arm='1';rx.textContent='متأكد؟';return;}rmOne(id,n);});hd.appendChild(rx);c.appendChild(hd);
       ['c','v','j'].forEach(function(k){var row=el('div','ds-q3');STC[k].forEach(function(o){var on=st[k]===o[0];row.appendChild(btn(on?'on '+k+o[0]:'',o[1],function(){var nv=Object.assign({},st);if(on)delete nv[k];else nv[k]=o[0];nv.at=Date.now();nv.by='app';PS.distSt(id,n,nv).catch(saveErr);PS.sheet.redraw();}));});c.appendChild(row);});
       if(st.t)c.appendChild(el('p','ds-nt','📝 '+st.t));b.appendChild(c);});}
 
