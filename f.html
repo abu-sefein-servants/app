@@ -73,6 +73,12 @@ textarea{width:100%;margin-top:8px;border:1.5px solid #3a3366;background:#15112b
   if(!id||id.length<12){fail();return;}
   var D=null,flt='',pend={};
   var Q=[['c','كلّمته؟',[['y','✓ أيوه',''],['n','مردّش','mid'],['w','الرقم غلط','bad']]],['v','زُرته؟',[['y','✓ أيوه',''],['n','لسه','mid']]],['j','هييجي؟',[['y','✓ أيوه',''],['m','مش عارف','mid'],['n','لأ','bad']]]];
+  function stNext(st,k,val){var ns=Object.assign({},st),now=Date.now(),h=Array.isArray(st.h)?st.h.slice():[];
+    if(!h.length){var a0=st.at||now;if(st.c){var e0={k:'c',r:st.c,at:a0};if(st.j)e0.j=st.j;h.push(e0);}if(st.v==='y')h.push({k:'v',r:'y',at:a0});}
+    if(val==null)delete ns[k];else ns[k]=val;var last=h.length?Object.assign({},h[h.length-1]):null,fresh=!!(last&&now-last.at<6e5);
+    if(k==='c'||k==='v'){if(val==null){if(fresh&&last.k===k)h.pop();}else if(k==='c'||val==='y'){if(fresh&&last.k===k){last.r=val;last.at=now;h[h.length-1]=last;}else h.push({k:k,r:val,at:now});}}
+    else if(k==='j'){if(last&&now-last.at<432e5){if(val==null)delete last.j;else last.j=val;h[h.length-1]=last;}else if(val!=null)h.push({k:'c',r:'y',j:val,at:now});}
+    if(h.length>30)h=h.slice(-30);ns.h=h;ns.at=now;return ns;}
   function st(n){return Object.assign({},(D.st||{})[n]||{},pend[n]||{});}
   function done(s){return s.c==='y'||s.v==='y';}
   function save(n,s){pend[n]=s;var u={};u['st.'+n]=s;u.sa=firebase.firestore.FieldValue.serverTimestamp();
@@ -91,7 +97,7 @@ textarea{width:100%;margin-top:8px;border:1.5px solid #3a3366;background:#15112b
       if(x.addr||x.region){var m=el('a','m','📍 العنوان');m.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent([x.addr,x.region].filter(Boolean).join(' '));m.target='_blank';m.rel='noopener';ac.appendChild(m);}
       if(ac.children.length)c.appendChild(ac);
       Q.forEach(function(q){var r=el('div','q');r.appendChild(el('b',null,q[1]));q[2].forEach(function(o){var on=s[q[0]]===o[0];var b=el('button',(on?'on ':'')+o[2],o[1]);b.type='button';
-        b.onclick=function(){var ns2=Object.assign({},st(n));if(on)delete ns2[q[0]];else ns2[q[0]]=o[0];ns2.at=Date.now();save(n,ns2);render();};r.appendChild(b);});c.appendChild(r);});
+        b.onclick=function(){save(n,stNext(st(n),q[0],on?null:o[0]));render();};r.appendChild(b);});c.appendChild(r);});
       var ta=el('textarea');ta.placeholder='ملاحظة (اختياري) — مثلاً: عنده امتحانات، هييجي الأسبوع الجاي…';ta.maxLength=300;ta.value=s.t||'';var sv=el('div','sv');var tm=null;
       function keep(){var ns3=Object.assign({},st(n));var v=ta.value.trim().slice(0,300);if((ns3.t||'')===v)return;if(v)ns3.t=v;else delete ns3.t;ns3.at=Date.now();save(n,ns3).then(function(){sv.textContent='✓ اتحفظت';});}
       ta.oninput=function(){clearTimeout(tm);sv.textContent='';tm=setTimeout(keep,1200);};ta.onblur=function(){clearTimeout(tm);keep();setTimeout(render,50);};
