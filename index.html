@@ -421,6 +421,7 @@ select.fchip{padding-inline:12px;border-inline-end:8px solid transparent}
 .cx-k3{display:flex;gap:8px;margin-bottom:10px}.cx-k3>div{flex:1;border-radius:18px;padding:10px 6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);text-align:center;min-width:0}
 .cx-k3 b{display:block;font:400 1.55rem var(--display-xl,'Lalezar',sans-serif);color:#fff}.cx-k3 span{font-size:.66rem;color:#a9a2c8}.cx-k3 i{display:block;font-style:normal;font-size:.64rem;margin-top:2px;font-weight:700;color:#7be0ab}
 .cx-k3 .kh b{color:#ffab7a}.cx-k3 .kz b{color:#ff8fa3}
+.cx-exp{font-size:.68rem;line-height:1.7;color:#c9c2e6;background:rgba(255,255,255,.05);border-radius:12px;padding:8px 10px;margin:-2px 0 10px}
 .cx-card{border-radius:20px;padding:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);margin-bottom:10px}
 .cx-card h4{margin:0 0 8px;font:600 .88rem var(--display);display:flex;justify-content:space-between;align-items:center;gap:8px;color:#fff}.cx-card h4 span{font-weight:400;font-size:.68rem;color:#a9a2c8}
 .cx-card.sleep{border-color:rgba(255,77,109,.35);background:rgba(255,77,109,.08)}
@@ -4163,7 +4164,7 @@ onReady(function(){
     L.forEach(function(p){var e=E(p),age=V().age?V().age(p):'',ab=V().abs?V().abs(p):'';A.push([p.n,p.name,p.gender||'',e.phone||'',e.phone2||'',e.address||'',p.region||'',e.birth||'',(age>0&&age<100)?age:'',e.edu||'',e.work||'',famOf(p.n),V().pri?V().pri(p):'',V().vis&&V().vis(p)?dm(V().vis(p)):'',attTxt(p),lastSeen(p)?dm(lastSeen(p)):'',ab||ab===0?ab:'',own[p.n]?own[p.n].to:'',e.note||'']);});
     var B=[['#','الاسم'].concat(ss.map(dm)).concat(['حضر'])];
     L.forEach(function(p){var r=[p.n,p.name],a=0;ss.forEach(function(d){if(p.since&&d<p.since){r.push('—');return;}if(V().was(p.n,d)){r.push('✓');a++;}else{var w=V().why?V().why(p.n,d):'';r.push(w?'✕ '+w:'✕');}});r.push(a);B.push(r);});
-    var C=[['الافتقادي','رقمه','اتبعت','بعته','الطريقة','#','الشاب','التليفون','كلّمه؟','زاره؟','هييجي؟','ملاحظة']];
+    var C=[['خادم الافتقاد','رقمه','اتبعت','بعته','الطريقة','#','الشاب','التليفون','كلّمه؟','زاره؟','هييجي؟','ملاحظة']];
     docs().forEach(function(d){Object.keys(d.p||{}).sort(function(a,b){return a-b}).forEach(function(n){var x=d.p[n],s=(d.st||{})[n]||{};var dt=new Date(d.at||0);C.push([d.to||'',d.toPh||'',dt.getFullYear()+'-'+('0'+(dt.getMonth()+1)).slice(-2)+'-'+('0'+dt.getDate()).slice(-2),d.byName||'',(WAY[d.way]||WAY.txt)[1],+n,x.name,x.phone||'',CL[s.c]||'',s.v==='y'?'✓':'',JL[s.j]||'',s.t||'']);});});
     var nm='abu-sefein-youth-'+ymd(new Date())+'.xlsx';
     var bw=[5,24].concat(ss.map(function(){return 7})).concat([6]);
@@ -4276,15 +4277,15 @@ onReady(function(){
     var hero=el('div','cx-hero');hero.appendChild(el('i','cx-glow'));var g=el('div','cx-g');var pm=Z.Pm.length;
     var gp=Z.rec&&pm?Z.came.length/pm:null;g.appendChild(html(el('div'),gauge(gp,gp==null?(Z.rec?'—':'⏳'):ar(Math.round(gp*100))+'٪',gp==null?(Z.rec?'مفيش وعود':'مستنيين الأحد'):'وفّوا بوعدهم')));
     var gt=el('div','gt');
-    if(!Z.C.length){gt.appendChild(el('b',null,'لسه مفيش مكالمات متسجّلة في الأسبوع ده'));gt.appendChild(el('span',null,'أول ما الافتقاديين يعلّموا في لينكات التوزيع، أو حد يسجّل من كارت الشاب، الأرقام هتظهر هنا.'));}
+    if(!Z.C.length){gt.appendChild(el('b',null,'لسه مفيش مكالمات متسجّلة في الأسبوع ده'));gt.appendChild(el('span',null,'أول ما خدام الافتقاد يعلّموا في لينكات التوزيع، أو حد يسجّل من كارت الشاب، الأرقام هتظهر هنا.'));}
     else if(!Z.rec){gt.appendChild(el('b',null,ar(pm)+' قالوا «هييجي» لحد دلوقتي'));gt.appendChild(el('span',null,'بعد ما تسجّلوا حضور الأحد '+dm(cur)+'، هيبان مين منهم جه فعلاً.'));}
     else{gt.appendChild(el('b',null,pm?ar(pm)+' قالوا «هييجي» و'+ar(Z.came.length)+' جم فعلاً':'محدش قال «هييجي» الأسبوع ده'));var sp=el('span');sp.innerHTML=(pm?ar(pm-Z.came.length)+' وعدوا ومجوش':'')+(Z.extra.length?(pm?' · ':'')+'<em>'+ar(Z.extra.length)+' جم من غير ما يوعدوا 😄</em>':'');gt.appendChild(sp);}
     g.appendChild(gt);hero.appendChild(g);
-    var C=Z.C.length,fn=el('div','cx-fun');[[C,'📞 اتكلّمنا معاهم','b1'],[Z.A.length,'ردّوا','b2'],[pm,'قالوا هييجوا','b3'],[Z.rec?Z.came.length:null,'✓ جم','b4']].forEach(function(x,k,arr){
+    var C=Z.C.length,fn=el('div','cx-fun');[[C,'👥 شاب اتواصلنا معاه','b1'],[Z.A.length,'ردّوا','b2'],[pm,'قالوا هييجوا','b3'],[Z.rec?Z.came.length:null,'✓ جم','b4']].forEach(function(x,k,arr){
       var r=el('div','fs'),bb=el('div','fb '+x[2]),v=x[0];bb.style.width=(C?Math.max(18,(v==null?0:v)/C*100):18)+'%';bb.appendChild(el('span','fv',v==null?'؟':ar(v)));bb.appendChild(el('small',null,x[1]));r.appendChild(bb);
       var prev=k?arr[k-1][0]:C;r.appendChild(el('span','fp',v==null||!prev?'':ar(Math.round(v/prev*100))+'٪'));fn.appendChild(r);});
     hero.appendChild(fn);box.appendChild(hero);
-    var k3=el('div','cx-k3');[[Z.calls,'مكالمة',''],[Z.visits,'زيارة بيت',''],[Z.rec?Z.back.length:Z.C.length,Z.rec?'رجعوا بعد غياب':'شاب اتكلّمنا معاه',Z.rec&&Z.back.length?'🔥 من الافتقاد':'']].forEach(function(x){var d=el('div');d.appendChild(el('b',null,ar(x[0])));d.appendChild(el('span',null,x[1]));if(x[2])d.appendChild(el('i',null,x[2]));k3.appendChild(d);});box.appendChild(k3);
+    var k3=el('div','cx-k3 k3a');[[Z.calls,'📞 مكالمة',''],[Z.visits,'🏠 زيارة بيت',''],[Z.rec?Z.back.length:Z.C.length-Z.A.length,Z.rec?'رجعوا بعد غياب':'شاب لسه موصلناش له',Z.rec&&Z.back.length?'🔥 من الافتقاد':'']].forEach(function(x){var d=el('div');d.appendChild(el('b',null,ar(x[0])));d.appendChild(el('span',null,x[1]));if(x[2])d.appendChild(el('i',null,x[2]));k3.appendChild(d);});box.appendChild(k3);if(Z.C.length)box.appendChild(el('p','cx-exp','💡 المكالمات بتتعد كل مرة، والشباب بيتعدّوا مرة واحدة: شاب اتكلّم مرتين = مكالمتين وشاب واحد. ولو اتزار بس من غير مكالمة بيتعد شاب من غير مكالمة.'));
     if(Z.rec&&Z.C.length){var vs=card('اتكلّمنا معاهم vs محدش كلّمهم','جم الأحد');var cr=Z.cRate||0,orr=Z.oRate||0,mx=Math.max(cr,orr,0.01);
       var bars=el('div','cx-vs');[[cr,'g','اتكلّمنا معاهم ('+ar(Z.C.length)+')'],[orr,'o','محدش كلّمهم ('+ar(Z.oN)+')']].forEach(function(x){var c2=el('div');var bar=el('i',x[1]);bar.style.height=Math.max(6,x[0]/mx*80)+'px';c2.appendChild(bar);c2.appendChild(el('b',null,ar(Math.round(x[0]*100))+'٪'));c2.appendChild(el('span',null,x[2]));bars.appendChild(c2);});vs.appendChild(bars);
       if(cr>orr&&orr>=0)vs.appendChild(el('p','cx-tip','💡 اللي اتكلّمنا معاهم جم أكتر بـ '+ar(Math.round((cr-orr)*100))+'٪'));box.appendChild(vs);}
@@ -4302,10 +4303,10 @@ onReady(function(){
     ['الصبح','العصر','بالليل'].forEach(function(lb,sl){grid.appendChild(el('span',null,lb));for(var d=0;d<7;d++){var v=cnt[sl+'_'+d]||0,c3=el('i');c3.style.background=v?'rgba(155,107,255,'+(0.18+0.82*v/mxh).toFixed(2)+')':'rgba(255,255,255,.05)';if(v)c3.textContent=ar(v);grid.appendChild(c3);}});
     hm.appendChild(grid);if(mxh){var best='',bv=0;Object.keys(cnt).forEach(function(k){if(cnt[k]>bv){bv=cnt[k];best=k;}});var q=best.split('_');hm.appendChild(el('p','cx-tip','💡 أكتر وقت: '+['الأحد','الاتنين','التلات','الأربع','الخميس','الجمعة','السبت'][+q[1]]+' '+['الصبح','العصر','بالليل'][+q[0]]));}box.appendChild(hm);
     // servants
-    var SV=servants(E,rng,cur);var sh=el('div','cx-hd s2');sh.appendChild(el('h3',null,'🏃 الافتقاديين'));var pl=el('div','cx-pills');[['cyc','الأسبوع'],['30','الشهر'],['all','الكل']].forEach(function(x){pl.appendChild(btn(rng===x[0]?'on':'',x[1],function(){rng=x[0];render();}));});sh.appendChild(pl);box.appendChild(sh);
+    var SV=servants(E,rng,cur);var sh=el('div','cx-hd s2');sh.appendChild(el('h3',null,'🏃 خدام الافتقاد'));var pl=el('div','cx-pills');[['cyc','الأسبوع'],['30','الشهر'],['all','الكل']].forEach(function(x){pl.appendChild(btn(rng===x[0]?'on':'',x[1],function(){rng=x[0];render();}));});sh.appendChild(pl);box.appendChild(sh);
     var hot=SV.filter(function(s){return s.st==='hot'}).length,zz=SV.filter(function(s){return s.st==='zz'}).length;
-    var k4=el('div','cx-k3');[[SV.length,'افتقادي',''],[hot,'🔥 شغالين','kh'],[zz,'😴 نايمين','kz']].forEach(function(x){var d=el('div',x[2]);d.appendChild(el('b',null,ar(x[0])));d.appendChild(el('span',null,x[1]));k4.appendChild(d);});box.appendChild(k4);
-    if(!SV.length)box.appendChild(el('p','cx-empty','لسه مفيش افتقاديين. وزّع شباب من الافتقاد ← «📤 التوزيع».'));
+    var k4=el('div','cx-k3');[[SV.length,'خادم افتقاد',''],[hot,'🔥 شغالين','kh'],[zz,'😴 نايمين','kz']].forEach(function(x){var d=el('div',x[2]);d.appendChild(el('b',null,ar(x[0])));d.appendChild(el('span',null,x[1]));k4.appendChild(d);});box.appendChild(k4);
+    if(!SV.length)box.appendChild(el('p','cx-empty','لسه مفيش خدام افتقاد. وزّع شباب من الافتقاد ← «📤 التوزيع».'));
     else{var rk=card('عدد المكالمات',rng==='cyc'?'الأسبوع ده':(rng==='30'?'آخر ٣٠ يوم':'من الأول'));var mxc=Math.max(1,SV[0].calls+SV[0].visits);
       (showAll?SV:SV.slice(0,8)).forEach(function(s,ix){var r=btn('cx-rk',null,function(){openSrv(s.k);});r.appendChild(el('span','rn',ar(ix+1)));var av=el('i','av',first(s.name).charAt(0));av.style.background=col(s.k);r.appendChild(av);
         var mm=el('div','m');var nb=el('b',null,s.name+' ');nb.appendChild(el('span','sb '+s.st,s.st==='hot'?'🔥 شغال':(s.st==='fine'?'✓ ماشي':'😴 نايم')));mm.appendChild(nb);
