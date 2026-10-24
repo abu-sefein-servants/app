@@ -344,7 +344,7 @@ select.fchip{padding-inline:12px;border-inline-end:8px solid transparent}
 .pc-det dd{margin:0;min-width:0;overflow-wrap:anywhere}
 .pc-det dd.ed{color:var(--fg)}
 .v-mode{margin-top:-4px}
-.att-mode>:not(#att):not(#v-mode):not(.v-head):not(#pend):not(#imp){display:none!important}
+.att-mode>:not(#att):not(#v-mode):not(.v-head):not(#pend):not(#imp):not(#ps){display:none!important}
 .vdist{padding-bottom:12px}
 #v-mode button{white-space:nowrap}#v-mode.three button{font-size:.8rem;padding-inline:4px}
 .dz-hero{display:flex;gap:8px;margin:2px 0 12px}.dz-hero div{flex:1;background:var(--card);border-radius:14px;padding:10px 4px;text-align:center}.dz-hero b{display:block;font:400 1.6rem var(--display-xl,var(--display))}.dz-hero span{font-size:.72rem;color:var(--muted)}
@@ -490,7 +490,7 @@ button.cx-pp{width:100%;border:0;background:none;color:inherit;text-align:start;
 .cx-pa{display:flex;gap:8px;margin:10px 0}.cx-pa a{flex:1;text-align:center;text-decoration:none;border-radius:12px;padding:10px;font:700 .86rem var(--display);background:#8b7cf6;color:#140c38}.cx-pa a.wa{background:#25c26a;color:#062a17}
 .cx-pd{display:flex;align-items:center;gap:8px;font-size:.76rem;color:var(--muted);margin:4px 0}
 .cx-full{display:block;width:100%;border:0;cursor:pointer;background:var(--card);color:var(--fg);border-radius:12px;padding:11px;font:600 .84rem var(--display);margin-top:8px}
-.dist-mode>:not(#vdist):not(#v-mode):not(.v-head){display:none!important}
+.dist-mode>:not(#vdist):not(#v-mode):not(.v-head):not(#ps){display:none!important}
 .att{display:flex;flex-direction:column;gap:12px}
 .att[hidden],.att-add[hidden],.att-sug[hidden]{display:none}
 .att-date{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--card);border-radius:16px;padding:8px}
@@ -922,7 +922,7 @@ button.sum-i:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .at-pl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .at-pr{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:16px;padding:10px 12px;cursor:pointer}
 .at-pr .nm{flex:1;min-width:0;font-family:var(--display);font-weight:600;font-size:.92rem;line-height:1.45}.at-pr .nm small{display:block;font-family:var(--body);font-weight:400;color:var(--muted);font-size:.76rem;direction:ltr;text-align:right}
-.at-ps{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:.74rem;color:var(--muted);white-space:nowrap}
+.at-ps{max-width:48%;flex:none;min-width:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:.74rem;color:var(--muted);white-space:nowrap}
 .at-ps .at-pct{min-width:44px;height:26px;border-radius:8px;font-size:.78rem}
 .at-ps .st{color:var(--p3);font-weight:700}
 .at-more{align-self:center;font:600 .85rem var(--display);border:0;border-radius:999px;padding:8px 18px;background:var(--card);color:var(--brand);cursor:pointer}.at-more[hidden]{display:none}
@@ -1983,7 +1983,8 @@ window.PS={state:{},ro:false,subs:[]};
   var lkN=0,lkY=0;PS.lockScroll=function(on){var b=document.body;if(on){if(lkN++>0)return;lkY=window.scrollY||0;b.style.position='fixed';b.style.top=(-lkY)+'px';b.style.left='0';b.style.right='0';b.style.width='100%';}
     else{if(lkN===0)return;if(--lkN>0)return;b.style.position='';b.style.top='';b.style.left='';b.style.right='';b.style.width='';window.scrollTo(0,lkY);}};
   // safety net: page locked but nothing open → unlock on the next touch
-  function lkHeal(){var b=document.body;if(b.style.position!=='fixed')return;if(document.querySelector('.ps:not([hidden]),.lbx')||document.body.classList.contains('ed-open'))return;var y=lkY;lkN=0;b.style.position='';b.style.top='';b.style.left='';b.style.right='';b.style.width='';window.scrollTo(0,y);}
+  function lkVis(e){return !!(e&&e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden');}
+  function lkHeal(){var b=document.body;if(b.style.position!=='fixed')return;var open=[].slice.call(document.querySelectorAll('.ps:not([hidden]),.lbx,.pick-sheet')).some(function(e){return lkVis(e)&&lkVis(e.querySelector('.ps-box')||e);});if(open)return;if(b.classList.contains('ed-open')&&lkVis(document.getElementById('at-ed')))return;b.classList.remove('ed-open');var y=lkY;lkN=0;b.style.position='';b.style.top='';b.style.left='';b.style.right='';b.style.width='';window.scrollTo(0,y);}
   document.addEventListener('touchstart',lkHeal,{capture:true,passive:true});document.addEventListener('wheel',lkHeal,{capture:true,passive:true});
   PS.note=function(m){var t=document.getElementById('toast');if(!t)return;t.textContent=m;t.hidden=false;clearTimeout(PS.note._t);PS.note._t=setTimeout(function(){t.hidden=true},2400);};
   PS.changed=function(){PS.subs.forEach(function(f){try{f()}catch(e){}});};
@@ -2217,7 +2218,7 @@ onReady(function(){
   var PRI={3:'ضروري',2:'متوسط',1:'ملتزم',4:'ظروف مانعة'};
   var ZR={army:['🎖️','في الجيش'],work:['💼','ظروف شغل'],away:['🏙️','مسافر أو بره المنطقة'],study:['📚','دراسة أو امتحانات'],other:['✏️','سبب تاني']};
   function Z(){if(!V().z)V().z={};return V().z;}
-  function zInfo(p){var z=Z()[p.n]||{},r=ZR[z.r]?z.r:'work';return {r:r,ic:ZR[r][0],lb:(r==='other'&&z.t)?z.t:ZR[r][1],u:z.u||''};}
+  function zInfo(p){var z=Z()[p.n]||{},r=ZR[z.r]?z.r:'work',lb=(r==='other'&&z.t)?z.t:ZR[r][1];return {r:r,ic:ZR[r][0],lb:lb,sh:lb.length>22?lb.slice(0,21).trim()+'…':lb,u:z.u||''};}
   function fmtMonth(m){if(!/^\d{4}-\d\d$/.test(m||''))return '';return MON[+m.slice(5)-1]+' '+ar(m.slice(0,4));}
   function norm(t){return (t||'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/[ًٌٍَُِّْ]/g,'').replace(/[٠-٩]/g,function(c){return D[c]}).replace(/\s+/g,' ').trim().toLowerCase();}
   var ar=function(n){return String(n).replace(/\d/g,function(d){return '٠١٢٣٤٥٦٧٨٩'[d]})};
@@ -2300,7 +2301,7 @@ onReady(function(){
     var row=el('div','pc-row');
     var grp=el('div','pri');grp.setAttribute('role','group');grp.setAttribute('aria-label','أهمية الزيارة');
     [3,2,1,4].forEach(function(v){var b=el('button','pri-b pri-'+v,PRI[v]);b.type='button';b.setAttribute('aria-pressed',P_===v);
-      if(v===4&&P_===4){var zi=zInfo(p);b.textContent=zi.ic+' '+zi.lb;}
+      if(v===4&&P_===4){var zi=zInfo(p);b.textContent=zi.ic+' '+zi.sh;}
       b.addEventListener('click',function(){if(v===4&&P_!==4){zOpen[p.n]=1;render();return;}if(PS.role==='servant'&&PS.propose){propOpen[p.n]=(P_===v?0:v);render();return;}if(!PS.lead())return;change(function(){if(P_===v){delete V().p[p.n];delete Z()[p.n];}else{V().p[p.n]=v;delete Z()[p.n];}});});grp.appendChild(b);});
     row.appendChild(grp);
     var vb=el('button','visit-b'+(vd?' on':''));vb.type='button';vb.setAttribute('aria-pressed',!!vd);
@@ -2406,7 +2407,7 @@ onReady(function(){
   function row(p){var P_=pri(p),vd=vis(p),rg=reg(p),ex=E(p),li=el('li','vr');li.dataset.pri=P_||0;
     var av=el('div','vr-av'+(p.gender==='بنات'?' g':''),(p.name||'?').trim().charAt(0));if(PS.pphPaint)PS.pphPaint(av,p.n);li.appendChild(av);
     var m=el('div','vr-m');m.appendChild(el('b',null,p.name));var sub=[ '#'+ar(p.n)];var ag0=ageOf(p);if(ag0!==null)sub.push(ar(ag0)+' سنة');if(rg)sub.push(rg);
-    if(P_===4){var zi=zInfo(p);sub.push(zi.ic+' '+zi.lb);}else if(P_)sub.push(PRI[P_]);else sub.push('لسه متقيّمش');
+    if(P_===4){var zi=zInfo(p);sub.push(zi.ic+' '+zi.sh);}else if(P_)sub.push(PRI[P_]);else sub.push('لسه متقيّمش');
     var sm=el('small',vd?'v':null,sub.join(' · ')+(vd?' · ✓ اتزار '+fmtDate(vd):''));m.appendChild(sm);var dr=dotsRow(p);if(dr)m.appendChild(dr);
     if(PS.props&&PS.props().some(function(x){return x.n===p.n}))m.appendChild(el('span','vr-pp',PS.role==='servant'?'⏳ اقتراح':'💬 اقتراح'));
     if(p.new)m.appendChild(el('span','vr-new','جديد'));
@@ -2603,7 +2604,7 @@ onReady(function(){
     document.getElementById('at-pn').textContent='('+ar(rows.length)+')';
     var pl=document.getElementById('at-pl');pl.textContent='';
     rows.slice(0,pLim).forEach(function(x){var li=el('li','at-pr');li.appendChild(av(x.p));var nm=el('div','nm',x.p.name);var ph=E(x.p).phone;nm.appendChild(el('small',null,ph?ph:'#'+x.p.n));li.appendChild(nm);
-      var st2=el('div','at-ps');if(pri(x.p)===4){var zi=zInfo(x.p);st2.appendChild(el('span','tag tag-reg',zi.ic+' '+zi.lb));}else{st2.appendChild(el('span','at-pct '+pctCls(x.s.r),pctTxt(x.s.r)));
+      var st2=el('div','at-ps');if(pri(x.p)===4){var zi=zInfo(x.p);var zt=el('span','tag tag-reg',zi.ic+' '+zi.sh);zt.title=zi.lb;st2.appendChild(zt);}else{st2.appendChild(el('span','at-pct '+pctCls(x.s.r),pctTxt(x.s.r)));
         if(x.s.t){st2.appendChild(el('span',null,'غاب '+ar(x.s.t-x.s.y)));if(x.s.stk>=2)st2.appendChild(el('span','st',ar(x.s.stk)+' متتالية'));}}
       li.appendChild(st2);li.addEventListener('click',function(){goCard(x.p);});pl.appendChild(li);});
     var mb=document.getElementById('at-pmore');mb.hidden=rows.length<=pLim;mb.textContent='اعرض أكتر ('+ar(rows.length-pLim)+')';}
@@ -4713,10 +4714,10 @@ onReady(function(){
 
     // busy people (separate)
     if(c.bz.length){var bzc=card(out,'⛔ الظروف المانعة','مش داخلين في أي رقم فوق — ظروفهم مانعاهم ييجوا');
-      var zc={};c.bz.forEach(function(x){var zi=PS.afq.z(x.p);zc[zi.ic+' '+zi.lb]=(zc[zi.ic+' '+zi.lb]||0)+1;});var zrw=el('div','ds-leg');Object.keys(zc).forEach(function(k){zrw.appendChild(el('span',null,k+' · '+ar(zc[k])));});bzc.appendChild(zrw);
+      var zc={};c.bz.forEach(function(x){var zi=PS.afq.z(x.p);var zk=zi.ic+' '+(zi.r==='other'?'سبب تاني':zi.lb);zc[zk]=(zc[zk]||0)+1;});var zrw=el('div','ds-leg');Object.keys(zc).forEach(function(k){zrw.appendChild(el('span',null,k+' · '+ar(zc[k])));});bzc.appendChild(zrw);
       var bb=c.bz.filter(function(x){return x.p.gender!=='بنات'}).length,bc=c.bz.filter(function(x){return x.y>0}).length,bt=0;c.bz.forEach(function(x){bt+=x.y;});
       var t3=el('div','ds-trio');[[ar(c.bz.length),ar(bb)+' ولد · '+ar(c.bz.length-bb)+' بنت'],[ar(bc),'جم ولو مرة'],[ar(bt),'مرة حضور في السنة']].forEach(function(t){var d=el('div');d.appendChild(el('b',null,t[0]));d.appendChild(el('span',null,t[1]));t3.appendChild(d);});bzc.appendChild(t3);
-      var bl=el('ul','ds-ppl');c.bz.slice().sort(function(a,b){return b.y-a.y||a.p.n-b.p.n}).forEach(function(x){var li=el('li','ds-p'),r=el('div','ds-bz');var nm=el('span','nm',x.p.name);var zi=PS.afq.z(x.p);nm.appendChild(el('small',null,zi.ic+' '+zi.lb+(zi.u?' · راجع '+PS.afq.fmtMonth(zi.u):'')));r.appendChild(nm);
+      var bl=el('ul','ds-ppl');c.bz.slice().sort(function(a,b){return b.y-a.y||a.p.n-b.p.n}).forEach(function(x){var li=el('li','ds-p'),r=el('div','ds-bz');var nm=el('span','nm',x.p.name);var zi=PS.afq.z(x.p);nm.appendChild(el('small',null,zi.ic+' '+(zi.sh||zi.lb)+(zi.u?' · راجع '+PS.afq.fmtMonth(zi.u):'')));r.appendChild(nm);
         var vd=(c.V.d||{})[x.p.n];r.appendChild(el('span','rt',(x.y?'حضر '+ar(x.y)+' مرة':'محضرش السنة دي')+(vd?' · اتزار '+fmt(vd):'')));li.appendChild(r);bl.appendChild(li);});bzc.appendChild(bl);}
     // gender
     var gd=card(out,'ولاد وبنات','حضروا ولو مرة من كل مجموعة');
