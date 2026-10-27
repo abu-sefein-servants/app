@@ -2082,7 +2082,7 @@ window.PS={state:{},ro:false,subs:[]};
       if(PS.whoApply)PS.whoApply();}
     PS.pgToggle=function(tid,names){var own=PS.role==='owner'||PS.role===null;
       var fm=PS.famOfTid?PS.famOfTid(tid):'';if(fm&&PS.isFamLead&&PS.isFamLead(fm))own=true;
-      if(!own){var me=PS.myTaskName?PS.myTaskName():'';if(!me||!names.some(function(n){return pgNm(n)===pgNm(me)})){var who=fm?'أمناء '+(PS.famName?PS.famName(fm):'الأسرة')+' أو أمناء الاجتماع':'أمناء الاجتماع';PS.note(names.length?'دي على '+names.join(' و ')+' — هما أو '+who+' يعلّموا عليها':'مفيش اسم على الفقرة دي — '+who+' يعلّموا عليها');return;}}
+      if(!own){if(!(PS.isMine&&PS.isMine(names))){var who=fm?'أمناء '+(PS.famName?PS.famName(fm):'الأسرة')+' أو أمناء الاجتماع':'أمناء الاجتماع';PS.note(names.length?'دي على '+names.join(' و ')+' — أي حد فيهم أو '+who+' يعلّموا عليها':'مفيش اسم على الفقرة دي — '+who+' يعلّموا عليها');return;}}
       var d=!isDone(tid),nm=(PS.me&&PS.me.name)||'';PS.done[tid]={d:d?1:0,byName:nm,at:Date.now()};paint();
       if(PS.doneSet)PS.doneSet(tid,d,nm).then(function(){PS.note(d?'اتعلّمت إنها خلصت ✓':'رجعت مفتوحة');},function(x){PS.note(/permission/.test(x&&x.code||'')?'مش عندك صلاحية — اتأكد إن قواعد Firebase اتحدثت':'محصلش حفظ، جرّب تاني');});
       try{PS.changed()}catch(e){}};
@@ -2092,12 +2092,11 @@ window.PS={state:{},ro:false,subs:[]};
     PS.isDone=isDone;
     function chipN(c){return (c.firstChild&&c.firstChild.nodeType===3?c.firstChild.textContent:c.textContent).trim();}
     function canDo(li){if(PS.role==='owner'||PS.role===null)return {ok:true};
-      var me=PS.myTaskName?PS.myTaskName():'';if(!me)return {ok:false,msg:'اسمك مش متسجل على المهمة دي — يعلّمها المسؤول عنها'};
       var tid=li.dataset.tid,A=PS.state._a||{};var chips=[].slice.call(li.querySelectorAll('.slot-who:not(.assigned) .who-chip'));
-      var names=A[tid]?A[tid].slice():chips.map(chipN),leads=A[tid]?[]:chips.filter(function(c){return c.classList.contains('lead')}).map(chipN);
-      if(leads.length){return leads.indexOf(me)>-1?{ok:true}:{ok:false,msg:'المهمة دي يعلّمها الليدر: '+leads.join(' و ')};}
-      if(names.indexOf(me)>-1||names.indexOf('كل الخدام')>-1)return {ok:true};
-      return {ok:false,msg:'دي مش مهمتك — يعلّمها '+(names.join(' و ')||'أمين الاجتماع')};}
+      var names=A[tid]?A[tid].slice():chips.map(chipN);
+      if(names.indexOf('كل الخدام')>-1||!names.length)return {ok:true};
+      if(PS.isMine&&PS.isMine(names))return {ok:true};
+      return {ok:false,msg:'دي على '+names.join(' و ')+' — أي حد فيهم أو أمناء الاجتماع يعلّموا عليها'};}
     function onToggle(){
       var id=this.dataset.tid,li=this.closest('.task'),c=canDo(li);if(!c.ok){PS.note(c.msg);return;}
       var d=!isDone(id),nm=(PS.me&&PS.me.name)||'';PS.done[id]={d:d?1:0,byName:nm,at:Date.now()};
@@ -4869,6 +4868,13 @@ onReady(function(){
   var bn=el('button','my-tasks');bn.type='button';bn.hidden=true;var top=document.querySelector('.banner');if(top)top.after(bn);
   function allNames(){var o={};collect(true).forEach(function(t){t.who.forEach(function(n){if(n&&n!==ALL)o[n]=1;});});return Object.keys(o);}
   PS.myTaskName=function(){return myTaskName()};
+  // is the signed-in servant one of these names? (any of them may tick the task — leader or not; tolerant to spelling: إسحق/إسحاق, first name only, (ليدر))
+  function skN(t){return norm(String(t||'').replace(/\((ليدر|lead)\)/gi,'')).split(' ').filter(Boolean).map(function(w){w=w.replace(/^ال(?=..)/,'');return w.charAt(0)+w.slice(1).replace(/[اويه]/g,'');});}
+  function sameNm(a,b){var A=skN(a),B=skN(b);if(!A.length||!B.length)return false;if(A.join(' ')===B.join(' '))return true;
+    if(PS.canonName){var ca=PS.canonName(a),cb=PS.canonName(b);if(ca&&cb&&norm(ca)===norm(cb))return true;}
+    if(A.length>=2&&B.length>=2)return A[0]===B[0]&&A[1]===B[1];return A[0]===B[0];}
+  PS.isMine=function(names){var M=PS.me||{},me=[myTaskName(),M.regName,M.name].filter(Boolean);if(!me.length)return false;
+    return (names||[]).some(function(n){n=String(n||'').replace(/\((ليدر|lead)\)/gi,'').trim();return n&&me.some(function(m){return sameNm(m,n);});});};
   PS.myTaskStats=function(){var n=myTaskName();if(!n)return null;var L=collect().filter(function(t){return t.who.indexOf(n)>-1});return {name:n,total:L.length,open:L.filter(function(t){return !t.done}).length};};
   function myTaskName(){var M=PS.me||{},cs=[M.regName,M.name].filter(Boolean),ns=allNames();if(!cs.length)return '';
     for(var a=0;a<cs.length;a++){var nm=norm(cs[a]);for(var i=0;i<ns.length;i++)if(norm(ns[i])===nm)return ns[i];}
