@@ -2962,7 +2962,7 @@ onReady(function(){
     var bl=blob();
     if(!bl){salt=crypto.getRandomValues(new Uint8Array(16));return deriveKey(p,salt).then(function(k){key=k;data={trips:{}};trip();persist();done(p,remember);});}
     salt=unb64(bl.s);return deriveKey(p,salt).then(function(k){return C.decrypt({name:'AES-GCM',iv:unb64(bl.i)},k,unb64(bl.c)).then(function(pt){key=k;lastIv=bl.i;data=JSON.parse(new TextDecoder().decode(pt));trip();done(p,remember);});});}
-  function done(p,remember){try{if(remember!==false)sessionStorage.setItem('py_pin',p)}catch(e){}$('py-lock').hidden=true;$('py-body').hidden=false;$('tr-view').hidden=true;$('tv-key').hidden=true;render();syncView();if(PS.onPay)PS.onPay();}
+  function done(p,remember){try{if(remember!==false)sessionStorage.setItem('py_pin',p)}catch(e){}$('py-lock').hidden=true;$('py-body').hidden=false;$('tr-view').hidden=true;$('tv-key').hidden=true;try{render();}catch(e){console.error(e);}syncView();try{if(PS.onPay)PS.onPay();}catch(e){}}
   PS.payData=function(){return data};PS.payHas=function(){return !!blob()&&!!C};
   PS.payTry=function(p){if(!blob()||!C)return Promise.reject();return unlockWith(p);};
   function relock(){key=null;data=null;delete $('py-lock').dataset.open;try{sessionStorage.removeItem('py_pin')}catch(e){}lockView();if(PS.sheet.key()&&/^(pay|rem)/.test(PS.sheet.key()))PS.sheet.close();}
@@ -3200,7 +3200,7 @@ onReady(function(){
   $('bl-open').addEventListener('click',openBlList);
   // ---- servants' view (no money): who's going + the bus once published — kept in tripv/{trip}, readable by every servant
   function viewObj(){var T=trip(),S=seats(),pub=!!T.pubS,by={};Object.keys(S).forEach(function(x){by[String(S[x])]=+x;});
-    var ppl=keys().map(ent).filter(Boolean).map(function(e){return [e.name,e.gender==='بنات'?'g':'b',pub?(by[e.k]||0):0];}).sort(function(a,b){return a[0].localeCompare(b[0],'ar')});
+    var ppl=keys().map(ent).filter(Boolean).map(function(e){return {n:e.name,g:e.gender==='بنات'?'g':'b',s:pub?(by[e.k]||0):0};}).sort(function(a,b){return a.n.localeCompare(b.n,'ar')});
     return {t:curAct().title,cap:T.cap||0,pub:pub?1:0,ppl:ppl};}
   function syncView(){try{syncView0();}catch(e){}}
   function syncView0(){if(!data||!isOwner()||!PS.tripvSet)return;var o=viewObj(),js=JSON.stringify(o),cur=(PS.tripv||{})[TRIP];if(cur){var c2=Object.assign({},cur);delete c2.at;if(JSON.stringify({t:c2.t,cap:c2.cap,pub:c2.pub,ppl:c2.ppl})===js)return;}
@@ -3211,12 +3211,12 @@ onReady(function(){
     if(!blob()&&!isOwner()){$('py-lock').hidden=true;}
     if(!v||!v.ppl||!v.ppl.length){box.appendChild(el('p','tv-empty','لسه محدش اشترك. أول ما الحجز يبدأ، المشتركين هيظهروا هنا.'));return;}
     var sg=el('div','seg tv-seg');[['ppl','👥 المشتركين'],['bus','🚌 الأتوبيس']].forEach(function(x){var b=btn('',x[1],function(){tvSeg=x[0];renderView();});b.setAttribute('aria-pressed',tvSeg===x[0]);sg.appendChild(b);});box.appendChild(sg);
-    var g=v.ppl.filter(function(x){return x[1]==='g'}).length;
-    if(tvSeg==='ppl'){var k3=el('div','tv-k3');[[v.ppl.length,'مشترك'],[v.ppl.length-g,'ولاد'],[g,'بنات']].forEach(function(x){var d=el('div');d.appendChild(el('b',null,ar(x[0])));d.appendChild(el('span',null,x[1]));k3.appendChild(d);});box.appendChild(k3);
-      var ul=el('ul','tv-list');v.ppl.forEach(function(x){var li=el('li',x[1]==='g'?'g':'');li.appendChild(el('i',null,first(x[0]).charAt(0)));li.appendChild(el('span',null,x[0]));if(v.pub&&x[2])li.appendChild(el('small',null,'كرسي '+ar(x[2])));ul.appendChild(li);});box.appendChild(ul);return;}
+    var P0=v.ppl.map(function(x){return Array.isArray(x)?{n:x[0],g:x[1],s:x[2]}:x;});var g=P0.filter(function(x){return x.g==='g'}).length;
+    if(tvSeg==='ppl'){var k3=el('div','tv-k3');[[P0.length,'مشترك'],[P0.length-g,'ولاد'],[g,'بنات']].forEach(function(x){var d=el('div');d.appendChild(el('b',null,ar(x[0])));d.appendChild(el('span',null,x[1]));k3.appendChild(d);});box.appendChild(k3);
+      var ul=el('ul','tv-list');P0.forEach(function(x){var li=el('li',x.g==='g'?'g':'');li.appendChild(el('i',null,first(x.n).charAt(0)));li.appendChild(el('span',null,x.n));if(v.pub&&x.s)li.appendChild(el('small',null,'كرسي '+ar(x.s)));ul.appendChild(li);});box.appendChild(ul);return;}
     if(!v.pub||!v.cap){box.appendChild(el('p','tv-empty','🚌 توزيعة الأتوبيس لسه بتتعمل — هتظهر هنا أول ما تخلص.'));return;}
-    var map={};v.ppl.forEach(function(x){if(x[2])map[x[2]]=x;});var bus=el('div','py-bus tv-bus');box.appendChild(bus);
-    busRows(bus,v.cap,function(k){var d=el('div','py-seat'),x=map[k];if(x){d.classList.add('full');if(x[1]==='g')d.classList.add('g');d.appendChild(el('span',null,shortName(x[0])));}d.appendChild(el('b',null,ar(k)));return d;});}
+    var map={};P0.forEach(function(x){if(x.s)map[x.s]=x;});var bus=el('div','py-bus tv-bus');box.appendChild(bus);
+    busRows(bus,v.cap,function(k){var d=el('div','py-seat'),x=map[k];if(x){d.classList.add('full');if(x.g==='g')d.classList.add('g');d.appendChild(el('span',null,shortName(x.n)));}d.appendChild(el('b',null,ar(k)));return d;});}
   $('tv-key').addEventListener('click',function(){$('py-lock').dataset.open='1';$('py-lock').hidden=false;$('tv-key').hidden=true;setTimeout(function(){$('py-pin').focus();},50);});
   document.addEventListener('shared-changed',function(){if(!data){try{renderView();}catch(e){}}});
   // ---- WhatsApp reminder queue
