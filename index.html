@@ -2957,7 +2957,7 @@ onReady(function(){
     $('py-body').hidden=true;$('tr-gear').hidden=true;err.textContent='';pin.value='';pin2.value='';
     pin2mode=!has;pin2.hidden=has;
     $('py-lock-t').textContent=has?'اكتب الرقم السري':(isOwner()?'اختار رقم سري من ٤ أرقام للاشتراكات (هتديه بس للي عايزه يشوف)':'الاشتراكات لسه متعملتش');
-    form.hidden=!has&&!isOwner();gob.textContent=has?'افتح':'احفظ الرقم';renderView();}
+    form.hidden=!has&&!isOwner();gob.textContent=has?'افتح':'احفظ الرقم';try{renderView();}catch(e){$('tr-view').hidden=true;$('tv-key').hidden=true;$('py-lock').hidden=false;}}
   function unlockWith(p,remember){
     var bl=blob();
     if(!bl){salt=crypto.getRandomValues(new Uint8Array(16));return deriveKey(p,salt).then(function(k){key=k;data={trips:{}};trip();persist();done(p,remember);});}
@@ -3064,7 +3064,7 @@ onReady(function(){
     var no=el('div','tc-bt');no.appendChild(btn('tc-n2','لأ، ضيفه ضيف',function(){PS.sheet.close();addG();}));b.appendChild(no);});}
   function keys(){var T=trip();return Object.keys(T.b).filter(function(k){return ent(k)});}
   function dueList(){var T=trip(),price=T.price||0;if(!price)return [];return keys().filter(function(k){return (T.b[k]||0)<price;}).map(ent).sort(function(a,b){return a.name.localeCompare(b.name,'ar')});}
-  function render(){if(!data)return;var T=trip(),price=T.price||0,ro=!isOwner();
+  function render(){if(!data)return;$('py-body').hidden=false;$('py-lock').hidden=true;$('tr-view').hidden=true;$('tv-key').hidden=true;var T=trip(),price=T.price||0,ro=!isOwner();
     byN={};people().forEach(function(p){byN[p.n]=p});
     $('tr-gear').hidden=false;
     if(document.activeElement!==priceIn)priceIn.value=price?String(price):'';
@@ -3202,7 +3202,8 @@ onReady(function(){
   function viewObj(){var T=trip(),S=seats(),pub=!!T.pubS,by={};Object.keys(S).forEach(function(x){by[String(S[x])]=+x;});
     var ppl=keys().map(ent).filter(Boolean).map(function(e){return [e.name,e.gender==='بنات'?'g':'b',pub?(by[e.k]||0):0];}).sort(function(a,b){return a[0].localeCompare(b[0],'ar')});
     return {t:curAct().title,cap:T.cap||0,pub:pub?1:0,ppl:ppl};}
-  function syncView(){if(!data||!isOwner()||!PS.tripvSet)return;var o=viewObj(),js=JSON.stringify(o),cur=(PS.tripv||{})[TRIP];if(cur){var c2=Object.assign({},cur);delete c2.at;if(JSON.stringify({t:c2.t,cap:c2.cap,pub:c2.pub,ppl:c2.ppl})===js)return;}
+  function syncView(){try{syncView0();}catch(e){}}
+  function syncView0(){if(!data||!isOwner()||!PS.tripvSet)return;var o=viewObj(),js=JSON.stringify(o),cur=(PS.tripv||{})[TRIP];if(cur){var c2=Object.assign({},cur);delete c2.at;if(JSON.stringify({t:c2.t,cap:c2.cap,pub:c2.pub,ppl:c2.ppl})===js)return;}
     o.at=Date.now();PS.tripvSet(TRIP,o).catch(function(){});}
   var tvSeg='ppl';
   function renderView(){var box=$('tr-view'),kb=$('tv-key');if(!box)return;curAct();if(data){box.hidden=true;kb.hidden=true;return;}
@@ -3217,7 +3218,7 @@ onReady(function(){
     var map={};v.ppl.forEach(function(x){if(x[2])map[x[2]]=x;});var bus=el('div','py-bus tv-bus');box.appendChild(bus);
     busRows(bus,v.cap,function(k){var d=el('div','py-seat'),x=map[k];if(x){d.classList.add('full');if(x[1]==='g')d.classList.add('g');d.appendChild(el('span',null,shortName(x[0])));}d.appendChild(el('b',null,ar(k)));return d;});}
   $('tv-key').addEventListener('click',function(){$('py-lock').dataset.open='1';$('py-lock').hidden=false;$('tv-key').hidden=true;setTimeout(function(){$('py-pin').focus();},50);});
-  document.addEventListener('shared-changed',function(){if(!data)renderView();});
+  document.addEventListener('shared-changed',function(){if(!data){try{renderView();}catch(e){}}});
   // ---- WhatsApp reminder queue
   var remSent={},remI=0;
   $('tr-remind').addEventListener('click',function(){remI=0;PS.sheet.open('rem',drawRem);});
@@ -3325,7 +3326,7 @@ onReady(function(){
   function renderMore(){[].slice.call(document.querySelectorAll('#p-more .tile')).forEach(function(t,i){var id='tile_'+t.dataset.go,img=coverOf(id);t.classList.add('nx-tile');t.classList.toggle('img',!!img);t.style.backgroundImage=img?'url("'+img+'")':'';t.dataset.c=String(i%6);
     var old=t.querySelector('.nx-cam');if(old)old.remove();if(PS.canCover()){var lb=t.textContent.trim(),cb=el('span','nx-cam sm','🖼️');cb.setAttribute('role','button');cb.setAttribute('aria-label','صورة '+lb);cb.addEventListener('click',function(e){e.stopPropagation();PS.editCover(id,lb);});t.appendChild(cb);}});}
   renderMore();PS.subs.push(renderMore);
-  renderActs();lockView();
+  try{renderActs();}catch(e){}try{lockView();}catch(e){}
   (function(){var a=curAct();$('tr-title').textContent=a.title;$('tr-meta').textContent=[a.date?fmtD(a.date,true):'',a.place].filter(Boolean).join(' · ');})();
   try{var sp=sessionStorage.getItem('py_pin');if(sp&&blob()&&C)unlockWith(sp,false).catch(function(){try{sessionStorage.removeItem('py_pin')}catch(e){}lockView();});}catch(e){}
 });
