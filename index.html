@@ -949,7 +949,7 @@ body.ed-open .tabs{display:none!important}
 /* compact visitation */
 .v-head{display:flex;align-items:center;gap:10px}.v-head h2{flex:1}
 .v-add{font:600 .9rem var(--display);border:0;border-radius:999px;padding:9px 16px;background:var(--brand);color:var(--brand-ink);cursor:pointer;white-space:nowrap}
-.v-sr{display:flex;gap:8px;align-items:center}.v-sr .v-search{flex:1;margin:0}
+.v-sr{display:flex;gap:8px;align-items:center;min-width:0}.v-sr .v-search{flex:1 1 0;min-width:0;margin:0}.v-sr .v-search input{min-width:0;width:100%;text-overflow:ellipsis}
 .v-fbtn{position:relative;flex:none;width:46px;height:46px;border-radius:50%;border:0;background:var(--card);color:var(--fg);cursor:pointer;display:grid;place-items:center}
 .v-fbtn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
 .v-fbtn[aria-expanded="true"]{background:var(--brand);color:var(--brand-ink)}
@@ -1890,6 +1890,7 @@ body.ps-open{overflow:hidden}body.ps-open .tabs{display:none!important}
     <button class="back" type="button" data-go="more"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg><span>المزيد</span></button>
     <section class="section">
       <div class="ds-head"><h2>الإحصائيات</h2><span class="ds-yr">سنة الخدمة ٢٠٢٦ – ٢٠٢٧</span></div>
+      <div id="ds-flt" class="ds-flt"></div>
       <div class="cxs" id="cxs" hidden></div>
       <div class="py-lock" id="ds-lock">
         <div class="py-lock-ic"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
@@ -1899,8 +1900,7 @@ body.ps-open{overflow:hidden}body.ps-open .tabs{display:none!important}
       </div>
       <div class="ds-body" id="ds-body" hidden>
         <details class="att-box att-sug" id="att-sug" hidden><summary id="att-sugs"></summary><p class="att-hint">ده اقتراح حسب نسبة الحضور في آخر ٨ اجتماعات (أكتر من ٥٠٪ ملتزم، من ٣٠ لـ ٥٠٪ متوسط، أقل من ٣٠٪ محتاج زيارة). محدش بيتغيّر غير لما توافق.</p><div class="att-sugacts"><button type="button" class="py-mini" id="att-sugall">وافق على الكل</button></div><ul class="att-suglist" id="att-suglist"></ul></details>
-        <div id="ds-flt" class="ds-flt"></div>
-        <div id="ds-out" class="ds-out"></div>
+                <div id="ds-out" class="ds-out"></div>
         <section class="ds-card">
           <h3>كل الشباب</h3><p class="ds-sub">دوس على أي اسم تشوف السنة بتاعته كلها</p>
           <div class="ds-tools"><input id="ds-q" type="search" placeholder="دوّر باسم…" aria-label="دوّر"><select id="ds-sort" aria-label="الترتيب"><option value="hi">الأعلى حضورًا</option><option value="lo">الأقل حضورًا</option><option value="never">اللي عمرهم ما جم</option><option value="name">بالاسم</option></select></div>
@@ -4445,19 +4445,20 @@ onReady(function(){
   function sess(){return V().sessions?V().sessions():[];}
   function rec(S){return sess().indexOf(S)>-1;}
   function was(n,S){return !!(V().was&&V().was(n,S));}
-  function P(){return V().P?V().P():(PS.people||[]);}
+  function P(){var L=V().P?V().P():(PS.people||[]);return (PS.dsfOn&&PS.dsfOn()&&PS.dsfPass)?L.filter(PS.dsfPass):L;}
   function pName(n,fb){var p=V().byN&&V().byN(+n);return p?p.name:(fb||('#'+ar(n)));}
   var COLS=['#7a3df0','#c21cbf','#1a73e8','#0f8f83','#e0582a','#a8650c','#3b8f3e','#b8326e'];
   function col(s){var h=0;s=String(s);for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return COLS[h%COLS.length];}
 
   // ---------- events: link marks (st[n].h, or the old single mark) + app logs (visit.cx)
   function legacy(s,d){var out=[],at=s.at||d.at;if(s.c)out.push({k:'c',r:s.c,j:s.j,at:at});if(s.v==='y')out.push({k:'v',r:'y',j:s.c?'':s.j,at:at});if(!out.length&&s.j)out.push({k:'c',r:'y',j:s.j,at:at});return out;}
-  function events(){var E=[],D=PS.dist||{};
+  function events0(){var E=[],D=PS.dist||{};
     Object.keys(D).forEach(function(id){var d=D[id];Object.keys(d.p||{}).forEach(function(n){var s=(d.st||{})[n];if(!s)return;var h=(Array.isArray(s.h)&&s.h.length)?s.h:legacy(s,d);
       h.forEach(function(e,i){if(!e||!e.at)return;E.push({n:+n,at:+e.at,k:e.k==='v'?'v':'c',r:e.r||'',j:e.j||'',t:i===h.length-1?(s.t||''):'',who:d.to||'',src:'link',did:id,nm:(d.p[n]||{}).name});});});});
     var cx=((PS.state||{})._v||{}).cx||{};Object.keys(cx).forEach(function(n){(Array.isArray(cx[n])?cx[n]:[]).forEach(function(e){if(!e||!e.at)return;E.push({n:+n,at:+e.at,k:e.k==='v'?'v':'c',r:e.r||'',j:e.j||'',t:e.t||'',who:e.by||'',src:'app'});});});
     E.forEach(function(e){e.day=iso(new Date(e.at));e.cyc=cycOf(e.day);});return E.sort(function(a,b){return a.at-b.at});}
-  PS.cxEvents=events;
+  function events(){var L=events0();if(!PS.dsfOn||!PS.dsfOn())return L;return L.filter(function(e){var p=V().byN&&V().byN(e.n);return p?PS.dsfPass(p):false;});}
+  PS.cxEvents=events0;
 
   // ---------- one cycle (the week up to a Sunday meeting)
   function cyc(S,E){var L=E.filter(function(e){return e.cyc===S}),per={};
@@ -4633,7 +4634,7 @@ onReady(function(){
 
   // ---------- per-youth story + quick log (inside the visit card)
   var logOpen={};
-  PS.cxCard=function(p){var E=events().filter(function(e){return e.n===p.n});var c=el('div','cx-pc');var h=el('div','cx-pch');h.appendChild(el('b',null,'📞 الافتقاد'));
+  PS.cxCard=function(p){var E=events0().filter(function(e){return e.n===p.n});var c=el('div','cx-pc');var h=el('div','cx-pch');h.appendChild(el('b',null,'📞 الافتقاد'));
     var prom={},pn=0,kept=0;E.forEach(function(e){if(e.j==='y'&&!prom[e.cyc]){prom[e.cyc]=1;pn++;if(rec(e.cyc)&&was(p.n,e.cyc))kept++;}});
     h.appendChild(el('span',null,'اتكلّم '+ar(E.filter(function(e){return e.k==='c'}).length)+(E.some(function(e){return e.k==='v'})?' · زيارة '+ar(E.filter(function(e){return e.k==='v'}).length):'')+' · قال هييجي '+ar(pn)+' · جه '+ar(kept)));c.appendChild(h);
     var tl=el('div','cx-tl');E.slice(-6).reverse().forEach(function(e){var ok=e.j==='y'&&rec(e.cyc)?was(p.n,e.cyc):null;var r=el('div','ev'+(ok===true?' eok':(ok===false?' eno':'')));var hh=el('div','h');hh.appendChild(el('b',null,(e.k==='v'?'🏠 ':'📞 ')+(e.who||'—')));hh.appendChild(el('span',null,dm(e.day)));r.appendChild(hh);
@@ -4815,7 +4816,7 @@ onReady(function(){
   // ---- lock
   function lockView(){ok=false;var sg=$('att-sug');if(sg)sg.hidden=true;$('ds-lock').hidden=false;$('ds-body').hidden=true;$('ds-pin').value='';
     var has=PS.payHas&&PS.payHas();$('ds-form').hidden=!has;
-    $('ds-lock-t').textContent=has?'':'لسه مفيش رقم سري — اعمله الأول من صفحة الاشتراكات';$('ds-lock-t').hidden=has;}
+    $('ds-lock-t').textContent=has?'':'لسه مفيش رقم سري — اعمله الأول من صفحة الاشتراكات';$('ds-lock-t').hidden=has;try{drawFlt();}catch(e){}}
   function open(){ok=true;$('ds-err').textContent='';$('ds-lock').hidden=true;$('ds-body').hidden=false;render();}
   $('ds-form').addEventListener('submit',function(e){e.preventDefault();var p=en($('ds-pin').value),err=$('ds-err'),go=$('ds-go');
     if(!/^\d{4}$/.test(p)){err.textContent='الرقم السري لازم يكون ٤ أرقام';return;}
@@ -4831,7 +4832,8 @@ onReady(function(){
   var DF=(function(){try{return JSON.parse(localStorage.getItem('dsf')||'null')||{unk:true}}catch(e){return {unk:true}}})();
   function dfPass(p){var X=PS.afq,a=X.age(p);if((DF.min||DF.max)&&a===null)return !!DF.unk;if(DF.min&&a<DF.min)return false;if(DF.max&&a>DF.max)return false;if(DF.g&&p.gender!==DF.g)return false;if(DF.rg&&X.reg(p)!==(DF.rg==='-'?'':DF.rg))return false;return true;}
   function dfSave(){try{localStorage.setItem('dsf',JSON.stringify(DF))}catch(e){}}
-  var dsOpen=false;function drawFlt(){var box=$('ds-flt');if(!box||!PS.afq)return;var X=PS.afq,all=X.P(),inc=all.filter(dfPass).length,unk=all.filter(function(p){return X.age(p)===null}).length;box.textContent='';var any=DF.min||DF.max||DF.g||DF.rg;
+  PS.dsfPass=function(p){return PS.afq?dfPass(p):true;};PS.dsfOn=function(){return !!(DF.min||DF.max||DF.g||DF.rg);};
+  var dsOpen=false;function drawFlt(){var box=$('ds-flt');if(!box||!PS.afq)return;if(!(PS.role==='owner'||PS.role==='visit'||PS.role===null)){box.textContent='';return;}var X=PS.afq,all=X.P(),inc=all.filter(dfPass).length,unk=all.filter(function(p){return X.age(p)===null}).length;box.textContent='';var any=DF.min||DF.max||DF.g||DF.rg;
     var bar=el('div','dsf-bar');var sm=el('p','dsf-s',any?'🔎 بيتحسب '+ar(inc)+' من '+ar(all.length)+' شاب':'كل الشباب ('+ar(all.length)+')'+(unk?' · '+ar(unk)+' سنهم مش متسجّل':''));bar.appendChild(sm);
     if(any){var cx=el('button','dsf-clr','✕ امسح');cx.type='button';cx.addEventListener('click',function(){DF={unk:true};dfSave();render();});bar.appendChild(cx);}
     var fb=el('button','v-fbtn dsf-fb');fb.type='button';fb.setAttribute('aria-label','فلاتر');fb.setAttribute('aria-expanded',dsOpen?'true':'false');fb.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>'+(any?'<i></i>':'');fb.addEventListener('click',function(){dsOpen=!dsOpen;drawFlt();});bar.appendChild(fb);box.appendChild(bar);
@@ -4871,7 +4873,7 @@ onReady(function(){
   function ring(p){var C=2*Math.PI*42;return '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,.18)" stroke-width="11" fill="none"/><circle cx="50" cy="50" r="42" stroke="#f2b257" stroke-width="11" fill="none" stroke-linecap="round" stroke-dasharray="'+(C*p/100).toFixed(1)+' '+C.toFixed(1)+'" transform="rotate(-90 50 50)"/><text x="50" y="58" text-anchor="middle" font-size="23" font-weight="700" fill="#fff" font-family="Readex Pro,sans-serif">'+ar(p)+'٪</text></svg>';}
 
   PS.dashR=function(){render();};
-  function render(){if(!ok||panel.hidden||!PS.afq)return;if(PS.renderSug)PS.renderSug();drawFlt();var c=calc(),out=$('ds-out');out.textContent='';
+  function render(){try{drawFlt();}catch(e){}if(PS.cxRender)try{PS.cxRender();}catch(e){}if(!ok||panel.hidden||!PS.afq)return;if(PS.renderSug)PS.renderSug();var c=calc(),out=$('ds-out');out.textContent='';
     var N=c.P.length,ns=c.ss.length,reached=c.per.filter(function(x){return x.y>0}).length;
     var boys=c.per.filter(function(x){return x.p.gender!=='بنات'}),girls=c.per.filter(function(x){return x.p.gender==='بنات'});
     if(!ns)out.appendChild(el('div','ds-empty','📅 أول اجتماع في السنة دي الأحد ١١ أكتوبر. أول ما الحضور يتسجل، الأرقام والرسومات هتبدأ تظهر هنا لوحدها.'));
