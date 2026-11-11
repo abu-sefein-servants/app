@@ -5314,8 +5314,8 @@ onReady(function(){
   PS.newPersonNo=function(x){var ref=db.collection('app').doc('visit');var base=0;((snaps.people&&snaps.people.list)||[]).forEach(function(p){if(p.n>base)base=p.n;});
     var tx=db.runTransaction(function(tr){return tr.get(ref).then(function(d){var np=((d.exists&&d.data())||{}).np||{},mx=base;Object.keys(np).forEach(function(k){if(+k>mx)mx=+k;});
       var n=mx+1,u={};u['np.'+n]=x;tr.update(ref,u);return n;});});
-    var to=new Promise(function(res){setTimeout(function(){res(null)},7000);});
-    return Promise.race([tx,to]).then(function(n){if(n)return n;var l=PS.localNextNo?PS.localNextNo():0;return l+Math.floor(Math.random()*40)+60;},function(){var l=PS.localNextNo?PS.localNextNo():0;return l+Math.floor(Math.random()*40)+60;});};
+    if(PS.note)PS.note('لحظة… بنحجز رقم جديد');
+    return tx.then(function(n){if(!n)throw new Error('no-n');return n;},function(e){if(PS.note)PS.note('مااتضافش — النت مش كويس. جرّب تاني لما النت يرجع');throw e;});};
 
   // ---------- family leaders (by email) + family-day expenses (only that family's leaders + meeting leaders can read)
   PS.famcfg={};PS.fexp={};var fexpUn=null,fexpKey=null;
