@@ -2293,7 +2293,8 @@ onReady(function(){
     Object.keys(np).forEach(function(n){var x=np[n];if(!x||typeof x!=='object')return;P.push({name:x.name,phone:x.phone||'',gender:x.gender==='بنات'?'بنات':'ولاد',age:x.age||'',birth:x.birth||'',address:x.address||'',edu:x.edu||'',work:x.work||'',note:x.note||'',new:!!x.new,n:+n,region:x.region||'',_np:1,since:x.since||'',_f:norm(x.name).charAt(0)});});
     P.forEach(function(p){if(p.name0===undefined)p.name0=p.name;var o=(PS.state._v&&PS.state._v.e&&PS.state._v.e[p.n])||{};p.name=(o.name&&String(o.name).trim())||p.name0;p._f=norm(p.name).charAt(0);});
     var XX=(PS.state._v&&PS.state._v.x)||{};for(var i=P.length-1;i>=0;i--){if(XX[P[i].n])P.splice(i,1);}
-    P.sort(function(a,b){return a.n-b.n});for(var k in byN)delete byN[k];P.forEach(function(p){byN[p.n]=p});}
+    P.sort(function(a,b){return a.n-b.n});for(var k in byN)delete byN[k];var DNM={};P.forEach(function(p,i){byN[p.n]=p;DNM[p.n]=i+1;});PS._dnm=DNM;}
+  PS.dn=function(n){n=+n;var m=PS._dnm||{};if(m[n])return m[n];var c=0;P.forEach(function(p){if(p.n<n)c++;});return c+1;};
   syncP();
   function pri(p){return +(V().p[p.n]||0);}
   function vis(p){return V().d[p.n]||'';}
@@ -2313,7 +2314,7 @@ onReady(function(){
   var openDet={},editDet={},propOpen={},zOpen={};PS.people=P;
   function propK(x){return x.k||'p';}
   var DELR={dup:'الاسم متكرر',gone:'مبقاش بييجي خالص',wrong:'الاسم غلط / مش من الاجتماع',other:'سبب تاني'};
-  function propLabel(x,q){var k=propK(x);if(k==='del'){var dv=x.v||{},tq=dv.to&&byN[dv.to];return '🗑 طلب مسح — '+(DELR[dv.r]||'')+(tq?' (المتكرر معاه: '+tq.name+' #'+ar(tq.n)+'، وحضوره هيتنقله)':'');}if(k==='z'){var zz=x.v||{},zr=ZR[zz.r]?zz.r:'work';return '⛔ '+((zr==='other'&&zz.t)?zz.t:ZR[zr][1])+(zz.u?' — راجع '+fmtMonth(zz.u):'');}if(k==='p')return 'التصنيف: «'+(x.v?PRI[x.v]:'من غير تصنيف')+'»';
+  function propLabel(x,q){var k=propK(x);if(k==='del'){var dv=x.v||{},tq=dv.to&&byN[dv.to];return '🗑 طلب مسح — '+(DELR[dv.r]||'')+(tq?' (المتكرر معاه: '+tq.name+' #'+ar((PS.dn?PS.dn(tq.n):tq.n))+'، وحضوره هيتنقله)':'');}if(k==='z'){var zz=x.v||{},zr=ZR[zz.r]?zz.r:'work';return '⛔ '+((zr==='other'&&zz.t)?zz.t:ZR[zr][1])+(zz.u?' — راجع '+fmtMonth(zz.u):'');}if(k==='p')return 'التصنيف: «'+(x.v?PRI[x.v]:'من غير تصنيف')+'»';
     if(k==='r')return 'المنطقة: «'+(x.v||'غير محددة')+'»';
     var o=x.v||{},cur=q?E(q):{},parts=[];FIELDS.forEach(function(f){if(f[0] in o&&String(o[f[0]])!==String(cur[f[0]]))parts.push(f[1]+': «'+(o[f[0]]||'—')+'»');});return parts.length?parts.join(' · '):'تعديل البيانات';}
   function propApply(x){var q=byN[x.n];if(!q)return;var k=propK(x);
@@ -2343,7 +2344,7 @@ onReady(function(){
     var P_=pri(p),vd=vis(p),rg=reg(p),ex=E(p),eo=V().e[p.n]||{};openDet[p.n]=1;
     var li=el('li','pc');li.dataset.pri=P_;if(vd)li.classList.add('visited');
     var top=el('div','pc-top');
-    var av=el('div','pc-av'+(p.gender==='بنات'?' g':''),ar(p.n));av.setAttribute('aria-label','رقم '+p.n);if(PS.pphPaint)PS.pphPaint(av,p.n);av.addEventListener('click',function(ev){ev.stopPropagation();if(PS.pphEdit)PS.pphEdit(p);});
+    var av=el('div','pc-av'+(p.gender==='بنات'?' g':''),ar((PS.dn?PS.dn(p.n):p.n)));av.setAttribute('aria-label','رقم '+p.n);if(PS.pphPaint)PS.pphPaint(av,p.n);av.addEventListener('click',function(ev){ev.stopPropagation();if(PS.pphEdit)PS.pphEdit(p);});
     var m=el('div','pc-main');var nm=el('div','pc-name');nm.appendChild(el('span',null,p.name));if(p.name!==p.name0)nm.title='الاسم الأصلي: '+p.name0;
     if(p.new)nm.appendChild(el('span','tag tag-new','الدفعة الجديدة'));
     if(rg)nm.appendChild(el('span','tag tag-reg',rg));
@@ -2432,7 +2433,7 @@ onReady(function(){
   function sel(node){try{var r=document.createRange();r.selectNodeContents(node);var s=getSelection();s.removeAllRanges();s.addRange(r);PS.note('الرقم متحدد، انسخه');}catch(e){}}
   function base(p){
     var q=norm(st.q);
-    return (st.pr===''||pri(p)===+st.pr)&&(!st.l||p._f===st.l)&&(!st.a||p.n>=st.a)&&(!st.b||p.n<=st.b)&&(!st.g||p.gender===st.g)&&(!st.n||p.new)&&(!st.na||ageOf(p)===null)&&(!st.rg||reg(p)===(st.rg==='-'?'':st.rg))&&(!q||(/^\d{1,3}$/.test(q)?p.n===+q:key(p).indexOf(q)>-1));
+    return (st.pr===''||pri(p)===+st.pr)&&(!st.l||p._f===st.l)&&(!st.a||p.n>=st.a)&&(!st.b||p.n<=st.b)&&(!st.g||p.gender===st.g)&&(!st.n||p.new)&&(!st.na||ageOf(p)===null)&&(!st.rg||reg(p)===(st.rg==='-'?'':st.rg))&&(!q||(/^\d{1,3}$/.test(q)?(PS.dn?PS.dn(p.n):p.n)===+q:key(p).indexOf(q)>-1));
   }
   var vbtn=[].slice.call(document.querySelectorAll('#v-views button'));
   var regSel=document.getElementById('v-reg');
@@ -2467,7 +2468,7 @@ onReady(function(){
     if(L.some(function(x){return x.st==='r'}))c.appendChild(el('div','pa-hint','👆 دوس على أي نقطة حمرا تكتب سبب الغياب'));return c;}
   function row(p){var P_=pri(p),vd=vis(p),rg=reg(p),ex=E(p),li=el('li','vr');li.dataset.pri=P_||0;
     var av=el('div','vr-av'+(p.gender==='بنات'?' g':''),(p.name||'?').trim().charAt(0));if(PS.pphPaint)PS.pphPaint(av,p.n);li.appendChild(av);
-    var m=el('div','vr-m');m.appendChild(el('b',null,p.name));var sub=[ '#'+ar(p.n)];var ag0=ageOf(p);if(ag0!==null)sub.push(ar(ag0)+' سنة');if(rg)sub.push(rg);
+    var m=el('div','vr-m');m.appendChild(el('b',null,p.name));var sub=[ '#'+ar((PS.dn?PS.dn(p.n):p.n))];var ag0=ageOf(p);if(ag0!==null)sub.push(ar(ag0)+' سنة');if(rg)sub.push(rg);
     if(P_===4){var zi=zInfo(p);sub.push(zi.ic+' '+zi.sh);}else if(P_)sub.push(PRI[P_]);else sub.push('لسه متقيّمش');
     var sm=el('small',vd?'v':null,sub.join(' · ')+(vd?' · ✓ اتزار '+fmtDate(vd):''));m.appendChild(sm);var dr=dotsRow(p);if(dr)m.appendChild(dr);
     if(PS.props&&PS.props().some(function(x){return x.n===p.n}))m.appendChild(el('span','vr-pp',PS.role==='servant'?'⏳ اقتراح':'💬 اقتراح'));
@@ -2497,22 +2498,22 @@ onReady(function(){
   function isLead(){return PS.role==='owner'||PS.role==='visit'||PS.role===null;}
   function X(){if(!V().x)V().x={};return V().x;}
   function similar(p){var a=norm(p.name).split(' ').slice(0,2).join(' ');return P.filter(function(q){return q.n!==p.n&&norm(q.name).split(' ').slice(0,2).join(' ')===a;});}
-  function delAsk(p){psB.textContent='';var w=el('div','del-ask');w.appendChild(el('h3',null,'تمسح «'+p.name+'» (#'+ar(p.n)+')؟'));
+  function delAsk(p){psB.textContent='';var w=el('div','del-ask');w.appendChild(el('h3',null,'تمسح «'+p.name+'» (#'+ar((PS.dn?PS.dn(p.n):p.n))+')؟'));
     var hs=hist(p).filter(function(d){return was(p.n,d)});w.appendChild(el('p',null,hs.length?'متسجّل له حضور '+ar(hs.length)+' مرة.':'مالوش حضور متسجّل.'));
     var sim=similar(p),tgt=null;
     if(sim.length&&hs.length){w.appendChild(el('p','del-q','لو هو متسجّل مرتين، تقدر تنقل حضوره للاسم التاني:'));var sel=el('select','del-sel');var o0=el('option',null,'متنقلش حضوره');o0.value='';sel.appendChild(o0);
-      sim.forEach(function(q){var o=el('option',null,'انقله لـ '+q.name+' #'+ar(q.n));o.value=q.n;sel.appendChild(o);});sel.value=String(sim[0].n);w.appendChild(sel);tgt=sel;}
+      sim.forEach(function(q){var o=el('option',null,'انقله لـ '+q.name+' #'+ar((PS.dn?PS.dn(q.n):q.n)));o.value=q.n;sel.appendChild(o);});sel.value=String(sim[0].n);w.appendChild(sel);tgt=sel;}
     var ok=el('button','del-btn on','🗑 أيوه امسحه');ok.type='button';ok.addEventListener('click',function(){var to=tgt&&tgt.value?+tgt.value:0;
       change(function(){if(to)hs.forEach(function(d){A()[d+'#'+to]=1;});X()[p.n]={at:Date.now(),by:(PS.me&&PS.me.name)||'',name:p.name};});closeSheet();PS.note('اتمسح '+p.name+(to?' واتنقل حضوره':'')+' — تقدر ترجّعه من «المحذوفين» في الفلتر');});
     var no=el('button','del-no','لا، رجوع');no.type='button';no.addEventListener('click',function(){drawSheet();});
     w.appendChild(ok);w.appendChild(no);psB.appendChild(w);}
-  function delReq(p){psB.textContent='';var w=el('div','del-ask'),r='',to=0;w.appendChild(el('h3',null,'تطلب مسح «'+p.name+'» (#'+ar(p.n)+')؟'));w.appendChild(el('p',null,'الطلب هيروح لأمناء الاجتماع يوافقوا عليه. ليه عايز تمسحه؟'));
+  function delReq(p){psB.textContent='';var w=el('div','del-ask'),r='',to=0;w.appendChild(el('h3',null,'تطلب مسح «'+p.name+'» (#'+ar((PS.dn?PS.dn(p.n):p.n))+')؟'));w.appendChild(el('p',null,'الطلب هيروح لأمناء الاجتماع يوافقوا عليه. ليه عايز تمسحه؟'));
     var ch=el('div','why-ch');var dupBox=el('div','del-dup');dupBox.hidden=true;var note=el('input','why-in');note.maxLength=80;note.placeholder='اكتب السبب أو أي ملاحظة (اختياري)';
     Object.keys(DELR).forEach(function(k){var b=el('button',null,DELR[k]);b.type='button';b.addEventListener('click',function(){r=k;[].forEach.call(ch.children,function(z){z.classList.toggle('on',z===b)});dupBox.hidden=k!=='dup';if(k==='other')note.focus();});ch.appendChild(b);});
     w.appendChild(ch);
     var sim=similar(p);dupBox.appendChild(el('p','del-q','مكتوب مرتين مع مين؟ (حضوره هيتنقل للاسم التاني)'));var sel=el('select','del-sel');var o0=el('option',null,'مش عارف / مش موجود هنا');o0.value='';sel.appendChild(o0);
     var cand=sim.length?sim:P.filter(function(q){return q.n!==p.n&&norm(q.name).split(' ')[0]===norm(p.name).split(' ')[0];}).slice(0,15);
-    cand.forEach(function(q){var o=el('option',null,q.name+' #'+ar(q.n)+(E(q).phone?' · '+E(q).phone:''));o.value=q.n;sel.appendChild(o);});if(sim.length)sel.value=String(sim[0].n);sel.addEventListener('change',function(){to=+sel.value||0;});to=sim.length?sim[0].n:0;dupBox.appendChild(sel);w.appendChild(dupBox);
+    cand.forEach(function(q){var o=el('option',null,q.name+' #'+ar((PS.dn?PS.dn(q.n):q.n))+(E(q).phone?' · '+E(q).phone:''));o.value=q.n;sel.appendChild(o);});if(sim.length)sel.value=String(sim[0].n);sel.addEventListener('change',function(){to=+sel.value||0;});to=sim.length?sim[0].n:0;dupBox.appendChild(sel);w.appendChild(dupBox);
     w.appendChild(note);
     var ok=el('button','del-btn on','📨 ابعت الطلب');ok.type='button';ok.addEventListener('click',function(){if(!r){PS.note('اختار السبب الأول');return;}var v={r:r};if(r==='dup'&&to)v.to=to;
       PS.propose(p.n,'del',v,note.value.trim().slice(0,80)).then(function(){PS.note('اتبعت الطلب لأمناء الاجتماع ✓');drawSheet();},function(){PS.note('محصلش — جرّب تاني');});});
@@ -2532,10 +2533,10 @@ onReady(function(){
     var nb=el('button','fchip add-new','☐ من الدفعة الجديدة');nb.type='button';nb.setAttribute('aria-pressed','false');nb.addEventListener('click',function(){isNew=!isNew;nb.setAttribute('aria-pressed',isNew);nb.textContent=(isNew?'☑':'☐')+' من الدفعة الجديدة';});f.appendChild(nb);
     var sv=el('button','add-save','ضيف');sv.type='submit';f.appendChild(sv);
     f.addEventListener('submit',function(e){e.preventDefault();var nm=ins.name.value.trim();if(!nm){ins.name.focus();PS.note('اكتب الاسم');return;}
-      var dup=P.filter(function(q){return norm(q.name)===norm(nm)})[0];if(dup&&!f.dataset.ok){f.dataset.ok='1';PS.note('فيه حد بنفس الاسم (#'+ar(dup.n)+') — لو متأكد دوس ضيف تاني');return;}
+      var dup=P.filter(function(q){return norm(q.name)===norm(nm)})[0];if(dup&&!f.dataset.ok){f.dataset.ok='1';PS.note('فيه حد بنفس الاسم (#'+ar((PS.dn?PS.dn(dup.n):dup.n))+') — لو متأكد دوس ضيف تاني');return;}
       var ph=ins.phone.value.trim().replace(/[٠-٩]/g,function(c){return D[c]});
       var x={name:nm,phone:ph,gender:g,since:today()};var pb=parseBirth(ins.birth.value);if(pb===null){PS.note('اكتب تاريخ الميلاد كده 22/10/1994 أو السنة بس زي 1994');ins.birth.focus();return;}['address','edu','work','note'].forEach(function(k){var v=ins[k].value.trim();if(v)x[k]=v;});if(pb)x.birth=pb;if(rs.value)x.region=rs.value;if(isNew)x.new=true;
-      sv.disabled=true;PS.newPersonNo(x).then(function(n){change(function(){if(!V().np)V().np={};V().np[n]=x;});closeSheet();PS.note('اتضاف '+nm+' برقم '+ar(n)+' ✓');},function(){sv.disabled=false;});});
+      sv.disabled=true;PS.newPersonNo(x).then(function(n){change(function(){if(!V().np)V().np={};V().np[n]=x;});closeSheet();PS.note('اتضاف '+nm+' برقم '+ar((PS.dn?PS.dn(n):n))+' ✓');},function(){sv.disabled=false;});});
     setTimeout(function(){ins.name.focus()},50);return f;}
   document.getElementById('v-add').addEventListener('click',openAdd);
   document.getElementById('v-deleted').addEventListener('click',function(){if(!isLead())return;openDeleted();});
@@ -2588,7 +2589,7 @@ onReady(function(){
     var ib=document.getElementById('pp-inbox');if(ib){var AL=(PS.props&&PS.role!=='servant')?PS.props():[];ib.hidden=!AL.length;
       if(AL.length){document.getElementById('pp-sum').textContent='📥 اقتراحات الخدام ('+ar(AL.length)+')';var ul2=document.getElementById('pp-list');ul2.textContent='';
         AL.slice().sort(function(a,b){return (a.at||0)-(b.at||0)}).forEach(function(x){var q=byN[x.n];if(!q)return;var li2=el('li');var lbl=propLabel(x,q),cur=pri(q);
-          var tx=el('div','pp-tx');tx.appendChild(el('b',null,q.name+' #'+ar(q.n)));tx.appendChild(el('span',null,(x.byName||x.by)+': '+(propK(x)==='p'?(cur?PRI[cur]:'من غير تصنيف')+' ← ':'')+lbl+(x.note?' — '+x.note:'')));li2.appendChild(tx);
+          var tx=el('div','pp-tx');tx.appendChild(el('b',null,q.name+' #'+ar((PS.dn?PS.dn(q.n):q.n))));tx.appendChild(el('span',null,(x.byName||x.by)+': '+(propK(x)==='p'?(cur?PRI[cur]:'من غير تصنيف')+' ← ':'')+lbl+(x.note?' — '+x.note:'')));li2.appendChild(tx);
           var ok=el('button','pp-ok','وافق');ok.type='button';ok.addEventListener('click',function(){change(function(){propApply(x);});PS.propDel(x.id);});
           var no=el('button','pp-x','ارفض');no.type='button';no.addEventListener('click',function(){PS.propDel(x.id);});li2.appendChild(ok);li2.appendChild(no);ul2.appendChild(li2);});
         var all=el('li','pp-allrow'),ab=el('button','pp-ok','وافق على الكل');ab.type='button';ab.addEventListener('click',function(){var L=AL.filter(function(x){return byN[x.n]});change(function(){L.forEach(function(x){propApply(x);});});L.forEach(function(x){PS.propDel(x.id);});PS.note('اتطبّق '+ar(L.length)+' اقتراح ✓');});all.appendChild(ab);ul2.appendChild(all);}}
@@ -2646,7 +2647,7 @@ onReady(function(){
     // needs visiting
     var nd=P.filter(function(p){return pri(p)!==4}).map(function(p){return {p:p,s:pstat(p)}}).filter(function(x){return x.s.stk>=5}).sort(function(a,b){return b.s.stk-a.s.stk||a.p.n-b.p.n});
     var nl=document.getElementById('at-needl');nl.textContent='';document.getElementById('at-needs').hidden=!nd.length;document.getElementById('at-needn').textContent=nd.length?ar(nd.length):'';
-    nd.forEach(function(x){var c=el('div','at-hc'),tp=el('div','at-hc-top');tp.appendChild(av(x.p));var nm=el('div','nm',x.p.name);nm.appendChild(el('small',null,'#'+ar(x.p.n)));tp.appendChild(nm);
+    nd.forEach(function(x){var c=el('div','at-hc'),tp=el('div','at-hc-top');tp.appendChild(av(x.p));var nm=el('div','nm',x.p.name);nm.appendChild(el('small',null,'#'+ar((PS.dn?PS.dn(x.p.n):x.p.n))));tp.appendChild(nm);
       var r=el('div','at-mini');r.innerHTML=ringSvg(x.s.r,'var(--p3)');tp.appendChild(r);c.appendChild(tp);
       c.appendChild(el('span','tag tag-abs','غاب '+ar(x.s.stk)+' مرات ورا بعض'));c.appendChild(acts(x.p,'إزيك يا '+x.p.name.split(' ')[0]+' 🙏 وحشتنا في الاجتماع'));nl.appendChild(c);});
     // sessions
@@ -2660,11 +2661,11 @@ onReady(function(){
     nb.textContent=(has?'✏️ كمّل تسجيل حضور ':'+ تسجيل حضور ')+(cs===today()?'النهارده':'الأحد '+ar(new Date(cs+'T12:00:00').getDate())+' '+MONF[new Date(cs+'T12:00:00').getMonth()]);
     // people
     var q=norm(document.getElementById('at-pq').value),rows=P.map(function(p){return {p:p,s:pstat(p)}});
-    if(q)rows=rows.filter(function(x){return /^\d{1,3}$/.test(q)?x.p.n===+q:key(x.p).indexOf(q)>-1;});
+    if(q)rows=rows.filter(function(x){return /^\d{1,3}$/.test(q)?(PS.dn?PS.dn(x.p.n):x.p.n)===+q:key(x.p).indexOf(q)>-1;});
     rows.sort(function(a,b){if(pSort==='rate'){var ra=a.s.r==null?2:a.s.r,rb=b.s.r==null?2:b.s.r;return ra-rb||a.p.n-b.p.n;}if(pSort==='abs')return (b.s.stk-a.s.stk)||((b.s.t-b.s.y)-(a.s.t-a.s.y))||a.p.n-b.p.n;return a.p.n-b.p.n;});
     document.getElementById('at-pn').textContent='('+ar(rows.length)+')';
     var pl=document.getElementById('at-pl');pl.textContent='';
-    rows.slice(0,pLim).forEach(function(x){var li=el('li','at-pr');li.appendChild(av(x.p));var nm=el('div','nm',x.p.name);var ph=E(x.p).phone;nm.appendChild(el('small',null,ph?ph:'#'+x.p.n));li.appendChild(nm);
+    rows.slice(0,pLim).forEach(function(x){var li=el('li','at-pr');li.appendChild(av(x.p));var nm=el('div','nm',x.p.name);var ph=E(x.p).phone;nm.appendChild(el('small',null,ph?ph:'#'+ar((PS.dn?PS.dn(x.p.n):x.p.n))));li.appendChild(nm);
       var st2=el('div','at-ps');if(pri(x.p)===4){var zi=zInfo(x.p);var zt=el('span','tag tag-reg',zi.ic+' '+zi.sh);zt.title=zi.lb;st2.appendChild(zt);}else{st2.appendChild(el('span','at-pct '+pctCls(x.s.r),pctTxt(x.s.r)));
         if(x.s.t){st2.appendChild(el('span',null,'غاب '+ar(x.s.t-x.s.y)));if(x.s.stk>=2)st2.appendChild(el('span','st',ar(x.s.stk)+' متتالية'));}}
       li.appendChild(st2);li.addEventListener('click',function(){goCard(x.p);});pl.appendChild(li);});
@@ -2687,11 +2688,11 @@ onReady(function(){
     document.getElementById('att-today').hidden=attD===curS();document.getElementById('att-next').disabled=attD>=curS();document.getElementById('att-prev').disabled=attD<=FIRST;
     var el2=eligible(attD),c=el2.filter(function(p){return was(p.n,attD)}).length,all=P.filter(function(p){return was(p.n,attD)}).length,r=el2.length?c/el2.length:0;
     document.getElementById('at-ecnt').textContent=ar(all)+' من '+ar(el2.length)+' حاضر';document.getElementById('at-ring').innerHTML=ringSvg(r,'var(--gold)');
-    var t=norm(aq.value),list=P.filter(function(p){if(t&&!(/^\d{1,3}$/.test(t)?p.n===+t:key(p).indexOf(t)>-1))return false;if(edF==='on')return was(p.n,attD);if(edF)return p.gender===edF;return true;});
+    var t=norm(aq.value),list=P.filter(function(p){if(t&&!(/^\d{1,3}$/.test(t)?(PS.dn?PS.dn(p.n):p.n)===+t:key(p).indexOf(t)>-1))return false;if(edF==='on')return was(p.n,attD);if(edF)return p.gender===edF;return true;});
     var ul=document.getElementById('at-el'),top=ul.scrollTop;ul.textContent='';
     if(!list.length)ul.appendChild(el('li','at-hint',t?'مالقيتش حد بالاسم ده — لو جاي لأول مرة دوس «+ حد جاي لأول مرة» تحت':'مفيش حد هنا'));
     list.forEach(function(p){var on=was(p.n,attD),li=el('li','at-er'+(on?' on':''));li.dataset.n=p.n;li.setAttribute('role','checkbox');li.setAttribute('aria-checked',on);li.tabIndex=0;
-      li.appendChild(el('span','ck',on?'✓':''));var nm=el('span','nm',p.name);nm.appendChild(el('small',null,'#'+ar(p.n)));li.appendChild(nm);li.appendChild(av(p));
+      li.appendChild(el('span','ck',on?'✓':''));var nm=el('span','nm',p.name);nm.appendChild(el('small',null,'#'+ar((PS.dn?PS.dn(p.n):p.n))));li.appendChild(nm);li.appendChild(av(p));
       var tg=function(){if(PS.local){setAtt(p.n,!was(p.n,attD));if(t&&was(p.n,attD))aq.value='';renderEd();return;}if(!PS.guardVisit())return;
         var now=!was(p.n,attD),k=attD+'#'+p.n;if(now)A()[k]=1;else delete A()[k];PS.save();
         if(t&&now){aq.value='';renderEd();return;}paintEd();};
@@ -2713,9 +2714,9 @@ onReady(function(){
   document.getElementById('att-addx').addEventListener('click',function(){addF.hidden=true;addB.hidden=false;});
   [].slice.call(document.querySelectorAll('#att-g button')).forEach(function(b,_,all){b.addEventListener('click',function(){gsel=b.dataset.g;all.forEach(function(x){x.setAttribute('aria-pressed',x===b)});});});
   addF.addEventListener('submit',function(e){e.preventDefault();var nm=document.getElementById('att-nm').value.trim(),ph=document.getElementById('att-ph').value.trim().replace(/[٠-٩]/g,function(c){return D[c]});if(!nm)return;
-    var dup=P.filter(function(p){return norm(p.name)===norm(nm)})[0];if(dup&&!addF.dataset.ok){addF.dataset.ok='1';PS.note('فيه حد بنفس الاسم (#'+ar(dup.n)+') — لو متأكد إنه شخص تاني دوس ضيفه تاني');return;}delete addF.dataset.ok;
+    var dup=P.filter(function(p){return norm(p.name)===norm(nm)})[0];if(dup&&!addF.dataset.ok){addF.dataset.ok='1';PS.note('فيه حد بنفس الاسم (#'+ar((PS.dn?PS.dn(dup.n):dup.n))+') — لو متأكد إنه شخص تاني دوس ضيفه تاني');return;}delete addF.dataset.ok;
     var x={name:nm,phone:ph,gender:gsel,since:attD},dd=attD,sb=addF.querySelector('button[type=submit]');if(sb)sb.disabled=true;
-    PS.newPersonNo(x).then(function(n){change(function(){if(!V().np)V().np={};V().np[n]=x;A()[dd+'#'+n]=1;});PS.note('اتضاف '+nm+' برقم '+ar(n)+' وعلّمته حاضر');renderEd();}).then(function(){if(sb)sb.disabled=false;},function(){if(sb)sb.disabled=false;});
+    PS.newPersonNo(x).then(function(n){change(function(){if(!V().np)V().np={};V().np[n]=x;A()[dd+'#'+n]=1;});PS.note('اتضاف '+nm+' برقم '+ar((PS.dn?PS.dn(n):n))+' وعلّمته حاضر');renderEd();}).then(function(){if(sb)sb.disabled=false;},function(){if(sb)sb.disabled=false;});
     document.getElementById('att-nm').value='';document.getElementById('att-ph').value='';addF.hidden=true;addB.hidden=false;aq.value='';});
   // suggestions (owner only)
   function SR(){if(!V().sr)V().sr={};return V().sr;}
@@ -3033,8 +3034,8 @@ onReady(function(){
   function book(k){var bk=blKeyOf(k),be=bk&&blBlocks(bk,TRIP);if(be){openBl(bk,k);return;}var T=trip();if(seatsLeft()<=0){PS.note('الأتوبيس كمل ('+ar(T.cap)+' كرسي) — زوّد عدد الكراسي من ⚙️ لو فيه مكان');return;}
     edit(function(){T.b[k]=0;});q.value='';renderRes();PS.note('اتضاف ✓ — دوس على اسمه علشان تسجّل الفلوس');}
   function renderRes(){var ul=$('py-res');ul.textContent='';if(!data)return;var raw=q.value.trim(),t=norm(raw);if(!t)return;var T=trip();
-    var r=people().filter(function(p){return /^\d{1,3}$/.test(t)?p.n===+t:norm(p.name).indexOf(t)>-1;}).slice(0,7);
-    r.forEach(function(p){var on=(String(p.n) in T.b),bk='n'+p.n,be=!on&&blBlocks(bk,TRIP);var li=el('li','tr-res'+(on?' on':'')+(be?' bl':''));var nm=el('span','nm',p.name);nm.appendChild(el('small',null,'#'+ar(p.n)));
+    var r=people().filter(function(p){return /^\d{1,3}$/.test(t)?(PS.dn?PS.dn(p.n):p.n)===+t:norm(p.name).indexOf(t)>-1;}).slice(0,7);
+    r.forEach(function(p){var on=(String(p.n) in T.b),bk='n'+p.n,be=!on&&blBlocks(bk,TRIP);var li=el('li','tr-res'+(on?' on':'')+(be?' bl':''));var nm=el('span','nm',p.name);nm.appendChild(el('small',null,'#'+ar((PS.dn?PS.dn(p.n):p.n))));
       if(be){nm.appendChild(el('span','bl-tag','⛔ بلاك ليست'));nm.appendChild(el('em','bl-why',blShort(be)));}li.appendChild(nm);
       li.appendChild(btn('tr-resb'+(be?' bl':''),be?'ليه؟':(on?'✓ مشترك':'+ حجز'),function(){if(be){openBl(bk,String(p.n));return;}if(on){openPay(String(p.n));return;}book(String(p.n));}));ul.appendChild(li);});
     var gs=T.g||{},same=Object.keys(gs).filter(function(g){return norm(gs[g].name)===t&&(g in T.b)})[0];
@@ -3076,12 +3077,12 @@ onReady(function(){
     var grp=[['g','ضيوف ليهم اسم في الداتا'],['y','أسماء شكلها مكررة'],['gg','ضيوف مكتوبين مرتين']];
     grp.forEach(function(g){var I=L.filter(function(x){return x.t===g[0]});if(!I.length)return;b.appendChild(el('div','tc-g',g[1]+' ('+ar(I.length)+')'));
       I.forEach(function(x){var A=ent(x.a),B=ent(x.b),inB=(x.b in T.b);var c=el('div','tc-c'),pr=el('div','tc-pair');
-        var da=el('div','tc-n');da.appendChild(el('b',null,A.name));da.appendChild(el('small',null,(A.guest?'ضيف · ':'#'+ar(A.n)+' · ')+paidTxt(x.a)+seatTxt(x.a)));
-        var db=el('div','tc-n');db.appendChild(el('b',null,B.name));db.appendChild(el('small',null,(B.guest?'ضيف · ':'#'+ar(B.n)+' · ')+(inB?paidTxt(x.b)+seatTxt(x.b):'في الداتا'+(B.phone?' · '+B.phone.slice(0,4)+'•••'+B.phone.slice(-3):'')+' · مش محجوز')));
+        var da=el('div','tc-n');da.appendChild(el('b',null,A.name));da.appendChild(el('small',null,(A.guest?'ضيف · ':'#'+ar((PS.dn?PS.dn(A.n):A.n))+' · ')+paidTxt(x.a)+seatTxt(x.a)));
+        var db=el('div','tc-n');db.appendChild(el('b',null,B.name));db.appendChild(el('small',null,(B.guest?'ضيف · ':'#'+ar((PS.dn?PS.dn(B.n):B.n))+' · ')+(inB?paidTxt(x.b)+seatTxt(x.b):'في الداتا'+(B.phone?' · '+B.phone.slice(0,4)+'•••'+B.phone.slice(-3):'')+' · مش محجوز')));
         pr.appendChild(da);pr.appendChild(el('span','tc-arr',x.t==='y'?'⇄':'←'));pr.appendChild(db);c.appendChild(pr);
         c.appendChild(el('p','tc-why','💡 '+x.why));
         var bt=el('div','tc-bt');
-        bt.appendChild(btn('tc-y',x.t==='g'?'✓ ده هو، حوّله':(x.t==='y'?'✓ نفس الشخص، خلّي #'+ar(B.n):'✓ نفس الشخص، ادمجهم'),function(){edit(function(){mergeInto(x.a,x.b);});PS.note(x.t==='g'?'اتحوّل لـ«'+B.name+'» ✓'+(inB?' والفلوس اتجمعت':''):'اتدمجوا ✓ الفلوس اتجمعت');PS.sheet.redraw();}));
+        bt.appendChild(btn('tc-y',x.t==='g'?'✓ ده هو، حوّله':(x.t==='y'?'✓ نفس الشخص، خلّي #'+ar((PS.dn?PS.dn(B.n):B.n)):'✓ نفس الشخص، ادمجهم'),function(){edit(function(){mergeInto(x.a,x.b);});PS.note(x.t==='g'?'اتحوّل لـ«'+B.name+'» ✓'+(inB?' والفلوس اتجمعت':''):'اتدمجوا ✓ الفلوس اتجمعت');PS.sheet.redraw();}));
         bt.appendChild(btn('tc-n2',x.t==='y'?'لأ، دول اتنين':'لأ، ده حد تاني',function(){edit(function(){notSame(x.a,x.b);});PS.sheet.redraw();}));
         c.appendChild(bt);b.appendChild(c);});});
     if(L.some(function(x){return x.b in T.b}))b.appendChild(el('p','tc-ok','لو دمجت اتنين محجوزين: الفلوس بتتجمع، ويفضل كرسي واحد والتاني يفضى.'));}
@@ -3089,8 +3090,8 @@ onReady(function(){
   // asked before adding a guest whose name looks like someone in the data
   function askGuest(raw,C,addG){PS.sheet.open('gask',function(b){var T=trip();b.appendChild(el('h3','tc-h','⚠️ استنى، تقصد '+(C.length===1?'«'+C[0].p.name+'»؟':'حد من دول؟')));
     b.appendChild(el('p','tc-s','«'+raw+'» شبه اسم موجود في الداتا. لو هو، احجزله باسمه علشان حضوره وفلوسه يتحسبوا عليه.'));
-    C.forEach(function(c){var on=(String(c.p.n) in T.b);var r=el('div','tc-c');var n=el('div','tc-n');n.appendChild(el('b',null,c.p.name+' #'+ar(c.p.n)));n.appendChild(el('small',null,'💡 '+c.why+(on?' · محجوز بالفعل':'')));r.appendChild(n);
-      var bt=el('div','tc-bt');bt.appendChild(btn('tc-y',on?'✓ أيوه، ده هو (محجوز)':'✓ أيوه، احجز #'+ar(c.p.n),function(){PS.sheet.close();q.value='';if(on){renderRes();openPay(String(c.p.n));}else book(String(c.p.n));}));r.appendChild(bt);b.appendChild(r);});
+    C.forEach(function(c){var on=(String(c.p.n) in T.b);var r=el('div','tc-c');var n=el('div','tc-n');n.appendChild(el('b',null,c.p.name+' #'+ar((PS.dn?PS.dn(c.p.n):c.p.n))));n.appendChild(el('small',null,'💡 '+c.why+(on?' · محجوز بالفعل':'')));r.appendChild(n);
+      var bt=el('div','tc-bt');bt.appendChild(btn('tc-y',on?'✓ أيوه، ده هو (محجوز)':'✓ أيوه، احجز #'+ar((PS.dn?PS.dn(c.p.n):c.p.n)),function(){PS.sheet.close();q.value='';if(on){renderRes();openPay(String(c.p.n));}else book(String(c.p.n));}));r.appendChild(bt);b.appendChild(r);});
     var no=el('div','tc-bt');no.appendChild(btn('tc-n2','لأ، ضيفه ضيف',function(){PS.sheet.close();addG();}));b.appendChild(no);});}
   function keys(){var T=trip();return Object.keys(T.b).filter(function(k){return ent(k)});}
   function dueList(){var T=trip(),price=T.price||0;if(!price)return [];return keys().filter(function(k){return (T.b[k]||0)<price;}).map(ent).sort(function(a,b){return a.name.localeCompare(b.name,'ar')});}
@@ -3496,7 +3497,7 @@ onReady(function(){
     var sw=el('div','v-search');var si=el('input');si.type='search';si.placeholder='دوّر على شاب علشان تضيفه';si.autocomplete='off';sw.appendChild(si);if(CE)b.appendChild(sw);
     var res=el('ul','fm-res');b.appendChild(res);
     si.addEventListener('input',function(){res.textContent='';var t=norm(si.value);if(!t)return;
-      (PS.people||[]).filter(function(p){return /^\d{1,3}$/.test(t)?p.n===+t:norm(p.name).indexOf(t)>-1;}).slice(0,8).forEach(function(p){var li=el('li');var nm=el('span','nm',p.name);var o=famOf(p.n);
+      (PS.people||[]).filter(function(p){return /^\d{1,3}$/.test(t)?(PS.dn?PS.dn(p.n):p.n)===+t:norm(p.name).indexOf(t)>-1;}).slice(0,8).forEach(function(p){var li=el('li');var nm=el('span','nm',p.name);var o=famOf(p.n);
         if(o&&o!==id)nm.appendChild(el('small',null,'في '+famName(o)));li.appendChild(nm);
         if(o===id)li.appendChild(el('span','fm-in','✓ موجود'));
         else if(o&&!isOwn())li.appendChild(el('span','fm-in other','مع أسرة تانية'));
@@ -4082,15 +4083,15 @@ onReady(function(){
     c.appendChild(el('div','jr-m',[ageTxt(x.birth),x.reg||'منطقة مش محددة',x.g==='بنات'?'بنت':'ولد'].filter(Boolean).join(' · ')));
     var pm=el('div','jr-ph',digits(x.phone));c.appendChild(pm);
     if(r.n>1)c.appendChild(el('div','jr-note','بعت '+ar(r.n)+' طلبات بنفس الرقم — هيتحسبوا طلب واحد'));
-    if(x.st==='ok'){var pp=x.n?byN(x.n):null;c.appendChild(el('div','jr-mt y','✓ اتقبل'+(pp?' — #'+ar(pp.n)+' في '+famName(x.fam):'')));c.appendChild(btn('jr-del','🗑 امسح الطلب',function(){PS.jreqDel(r.id);}));return c;}
+    if(x.st==='ok'){var pp=x.n?byN(x.n):null;c.appendChild(el('div','jr-mt y','✓ اتقبل'+(pp?' — #'+ar((PS.dn?PS.dn(pp.n):pp.n))+' في '+famName(x.fam):'')));c.appendChild(btn('jr-del','🗑 امسح الطلب',function(){PS.jreqDel(r.id);}));return c;}
     if(x.st==='no'){var ac0=el('div','jr-ac');ac0.appendChild(btn('jr-a','↩︎ رجّعه للمستنية',function(){PS.jreqSet(r.id,{st:'new'});}));ac0.appendChild(btn('jr-r','🗑 امسح',function(){PS.jreqDel(r.id);}));c.appendChild(ac0);return c;}
     var m=match(r),p=m.p;
     if(p){var e=eff(p),cur=PS.famOf?PS.famOf(p.n):null;
-      if(m.k!=='maybe'){c.appendChild(el('div','jr-mt y','✓ موجود في الليستة: '+p.name+' #'+ar(p.n)+(m.k==='pick'?' (انت اخترته)':'')));
+      if(m.k!=='maybe'){c.appendChild(el('div','jr-mt y','✓ موجود في الليستة: '+p.name+' #'+ar((PS.dn?PS.dn(p.n):p.n))+(m.k==='pick'?' (انت اخترته)':'')));
         if(ph10(x.phone)!==ph10(e.phone)){var nt=el('div','jr-mt b');nt.appendChild(document.createTextNode('📱 رقم جديد: '));nt.appendChild(el('b','ltr',digits(x.phone)));nt.appendChild(document.createTextNode(' هيبقى الأساسي'+(e.phone?'، والقديم ':'')));if(e.phone)nt.appendChild(el('span','ltr',e.phone));if(e.phone)nt.appendChild(document.createTextNode(' يتحفظ تحته'));c.appendChild(nt);}
         if(cur&&cur!==x.fam)c.appendChild(el('div','jr-mt n','⚠️ هو في '+famName(cur)+' دلوقتي: لو وافقت هيتنقل لـ'+famName(x.fam)));
         else if(cur===x.fam)c.appendChild(el('div','jr-mt y','هو في الأسرة دي أصلًا — الموافقة هتحدّث بياناته بس'));}
-      else{var mb=el('div','jr-mt n');mb.appendChild(document.createTextNode('🤔 ممكن يكون '+p.name+' #'+ar(p.n)+' اللي عندنا؟ '));mb.appendChild(btn('jr-yes','أيوه هو',function(){PS.jreqSet(r.id,{pick:p.n});}));c.appendChild(mb);
+      else{var mb=el('div','jr-mt n');mb.appendChild(document.createTextNode('🤔 ممكن يكون '+p.name+' #'+ar((PS.dn?PS.dn(p.n):p.n))+' اللي عندنا؟ '));mb.appendChild(btn('jr-yes','أيوه هو',function(){PS.jreqSet(r.id,{pick:p.n});}));c.appendChild(mb);
         c.appendChild(el('div','jr-mt n','✨ لو مش هو: هيتضاف شخص جديد في الافتقاد والداتا وفي '+famName(x.fam)));}}
     else c.appendChild(el('div','jr-mt n','✨ أول مرة: مش لاقيينه في الليستة. لو وافقت هيتضاف في الافتقاد والداتا وفي '+famName(x.fam)));
     c.appendChild(btn('jr-pick',m.k==='pick'?'🔎 غيّر الشخص اللي اخترته':'🔎 موجود باسم تاني؟ اختاره من الليستة',function(){pick(r);}));
@@ -4098,8 +4099,8 @@ onReady(function(){
     ac.appendChild(btn('jr-r','ارفض',function(){reject(r);}));c.appendChild(ac);return c;}
   function pick(r){PS.sheet.open('jrpick',function(b){b.appendChild(el('h3','xs-title','مين ده في الليستة؟'));b.appendChild(el('p','ex-mt','الطلب: '+r.x.name+' · '+digits(r.x.phone)));
     var w=el('div','v-search');var q=el('input');q.type='search';q.placeholder='دوّر بالاسم أو الرقم';q.autocomplete='off';w.appendChild(q);b.appendChild(w);var ul=el('ul','jr-pl');b.appendChild(ul);
-    function draw(){ul.textContent='';var t=nrm(q.value),d=digits(q.value);var L=people().filter(function(p){if(!t)return true;var e=eff(p);return nrm(p.name).indexOf(t)>-1||(d.length>=3&&(digits(e.phone).indexOf(d)>-1))||(/^\d{1,3}$/.test(d)&&p.n===+d);}).slice(0,30);
-      L.forEach(function(p){var e=eff(p);var li=btn('jr-pi',null,function(){PS.sheet.close();PS.jreqSet(r.id,{pick:p.n});PS.note('✓ اتربط بـ'+p.name);});li.appendChild(el('b',null,p.name));li.appendChild(el('small',null,'#'+ar(p.n)+(e.phone?' · '+e.phone:'')));var x0=el('li');x0.appendChild(li);ul.appendChild(x0);});
+    function draw(){ul.textContent='';var t=nrm(q.value),d=digits(q.value);var L=people().filter(function(p){if(!t)return true;var e=eff(p);return nrm(p.name).indexOf(t)>-1||(d.length>=3&&(digits(e.phone).indexOf(d)>-1))||(/^\d{1,3}$/.test(d)&&(PS.dn?PS.dn(p.n):p.n)===+d);}).slice(0,30);
+      L.forEach(function(p){var e=eff(p);var li=btn('jr-pi',null,function(){PS.sheet.close();PS.jreqSet(r.id,{pick:p.n});PS.note('✓ اتربط بـ'+p.name);});li.appendChild(el('b',null,p.name));li.appendChild(el('small',null,'#'+ar((PS.dn?PS.dn(p.n):p.n))+(e.phone?' · '+e.phone:'')));var x0=el('li');x0.appendChild(li);ul.appendChild(x0);});
       if(r.x.pick){var cl=el('li');cl.appendChild(btn('jr-pi',null,function(){PS.sheet.close();PS.jreqSet(r.id,{pick:null});})).appendChild(el('b',null,'✕ الغي الاختيار (يتضاف شخص جديد أو بالرقم)'));ul.appendChild(cl);}}
     q.addEventListener('input',draw);var pre=nrm(r.x.name).split(' ')[0]||'';q.value=pre;draw();setTimeout(function(){q.focus()},60);});}
 
@@ -4256,7 +4257,7 @@ onReady(function(){
   // ---------- picker
   function regions(){var m={};P().forEach(function(p){var r=String(p.region||'').trim();if(r)m[r]=(m[r]||0)+1;});return Object.keys(m).sort(function(a,b){return m[b]-m[a]}).slice(0,5);}
   function shown(){var own=owners(),q=norm(fq);return P().filter(function(p){
-      if(q&&norm(p.name).indexOf(q)<0&&String(p.n)!==en(fq).trim())return false;
+      if(q&&norm(p.name).indexOf(q)<0&&String((PS.dn?PS.dn(p.n):p.n))!==en(fq).trim())return false;
       if(!flt)return true;if(flt==='abs')return V().abs&&V().abs(p)>=3;if(flt==='none')return !own[p.n];if(flt==='pri')return V().pri&&V().pri(p)==='ضروري';
       if(flt.indexOf('f:')===0)return PS.famOf&&PS.famOf(p.n)===flt.slice(2);if(flt.indexOf('r:')===0)return String(p.region||'').trim()===flt.slice(2);return true;});}
   function foot(){var f=$('dz-foot');if(!f)return;var n=selN();f.disabled=!n;f.textContent=editId?(n?'✓ احفظ التعديل ('+ar(n)+' شاب)':'علّم واحد على الأقل'):(n?'ابعت الـ'+ar(n)+' لحد ‹':'علّم على الشباب الأول');var c=$('dz-cnt');if(c)c.textContent='متعلّم '+ar(n);}
@@ -4276,7 +4277,7 @@ onReady(function(){
     drawList();window.scrollTo(0,y);}
   function drawList(){var ul=$('dz-list');if(!ul)return;ul.textContent='';var own=owners(),L=shown();var sc=$('dz-sc');if(sc)sc.textContent=ar(L.length)+' شاب · ';
     L.forEach(function(p){var r=btn('dz-p'+(sel[p.n]?' on':''),null,function(){if(sel[p.n])delete sel[p.n];else sel[p.n]=1;r.classList.toggle('on',!!sel[p.n]);ck.textContent=sel[p.n]?'✓':'';foot();});
-      var ck=el('span','dz-cb',sel[p.n]?'✓':'');r.appendChild(ck);var m=el('div','dz-pm');m.appendChild(el('b',null,p.name));m.appendChild(el('small',null,'#'+ar(p.n)+(p.region?' · '+p.region:'')));
+      var ck=el('span','dz-cb',sel[p.n]?'✓':'');r.appendChild(ck);var m=el('div','dz-pm');m.appendChild(el('b',null,p.name));m.appendChild(el('small',null,'#'+ar((PS.dn?PS.dn(p.n):p.n))+(p.region?' · '+p.region:'')));
       var dt=V().dots?V().dots(p):null;if(dt)m.appendChild(dt);r.appendChild(m);if(own[p.n]&&own[p.n].id!==editId)r.appendChild(el('span','dz-tag','مع '+first(own[p.n].to)));ul.appendChild(r);});
     if(!L.length)ul.appendChild(el('p','dz-empty','مفيش حد بالفلتر ده'));foot();}
 
@@ -4353,7 +4354,7 @@ onReady(function(){
     ac.insertBefore(btn('ed','✏️ عدّل الناس',function(){startEdit(id);}),ac.firstChild);var del=btn('del','🗑 امسح',function(){if(!del.dataset.arm){del.dataset.arm='1';del.textContent='متأكد؟ دوس تاني';return;}PS.sheet.close();PS.distDel(id).catch(saveErr);note('اتمسح');});ac.appendChild(del);b.appendChild(ac);
     if(d.sa&&d.way==='link'){var t=d.sa.toMillis?d.sa.toMillis():(d.sa.seconds?d.sa.seconds*1000:+d.sa);if(t)b.appendChild(el('p','dz-hint','آخر مرة علّم: '+ago(t)));}
     Object.keys(d.p||{}).sort(function(a,b){return a-b}).forEach(function(n){var x=d.p[n],st=(d.st||{})[n]||{};var c=el('div','dz-pc'+((st.c==='y'||st.v==='y')?' done':''));
-      var hd=el('div','dz-pch');var hb=el('div');hb.appendChild(el('b',null,x.name));hb.appendChild(el('small',null,'#'+ar(n)+(x.phone?' · '+x.phone:'')));hd.appendChild(hb);var rx=btn('dz-rx','✕ شيله',function(){if(!rx.dataset.arm){rx.dataset.arm='1';rx.textContent='متأكد؟';return;}rmOne(id,n);});hd.appendChild(rx);c.appendChild(hd);
+      var hd=el('div','dz-pch');var hb=el('div');hb.appendChild(el('b',null,x.name));hb.appendChild(el('small',null,'#'+ar((PS.dn?PS.dn(n):n))+(x.phone?' · '+x.phone:'')));hd.appendChild(hb);var rx=btn('dz-rx','✕ شيله',function(){if(!rx.dataset.arm){rx.dataset.arm='1';rx.textContent='متأكد؟';return;}rmOne(id,n);});hd.appendChild(rx);c.appendChild(hd);
       ['c','v','j'].forEach(function(k){var row=el('div','dz-q3');STC[k].forEach(function(o){var on=st[k]===o[0];row.appendChild(btn(on?'on '+k+o[0]:'',o[1],function(){var nv=stNext(st,k,on?null:o[0]);nv.by='app';PS.distSt(id,n,nv).catch(saveErr);PS.sheet.redraw();}));});c.appendChild(row);});
       if(st.t)c.appendChild(el('p','dz-nt','📝 '+st.t));b.appendChild(c);});}
 
@@ -4396,14 +4397,14 @@ onReady(function(){
   PS.shareFile=shareFile;
   var YN={y:'✓',n:'✕'},CL={y:'✓ كلّمه',n:'مردّش',w:'الرقم غلط'},JL={y:'هييجي',m:'مش عارف',n:'مش هييجي'};
   function distRows(ps,ns,st){var R=[['#','الاسم','التليفون','العنوان','المنطقة','السن','الأسرة','آخر مرة جه','كلّمته؟','زُرته؟','هييجي؟','ملاحظات']];
-    ps.forEach(function(x,i){var s=(st||{})[ns[i]]||{};R.push([+ns[i],x.name,x.phone||'',x.addr||'',x.region||'',x.age?+x.age:'',x.fam||'',x.last?dm(x.last):'',CL[s.c]||'',s.v==='y'?'✓':'',JL[s.j]||'',s.t||'']);});return R;}
+    ps.forEach(function(x,i){var s=(st||{})[ns[i]]||{};R.push([(PS.dn?PS.dn(+ns[i]):+ns[i]),x.name,x.phone||'',x.addr||'',x.region||'',x.age?+x.age:'',x.fam||'',x.last?dm(x.last):'',CL[s.c]||'',s.v==='y'?'✓':'',JL[s.j]||'',s.t||'']);});return R;}
 
   // ---------- export everything (owners)
   function exportAll(){if(!isOwn()){note('ده لأمناء الاجتماع بس');return;}var L=P().slice().sort(function(a,b){return a.n-b.n}),own=owners(),ss=V().sessions?V().sessions():[];
     var A=[['#','الاسم','النوع','التليفون','رقم تاني','العنوان','المنطقة','تاريخ الميلاد','السن','التعليم','العمل','الأسرة','التقييم','آخر زيارة','حضر','آخر مرة جه','غايب كام مرة ورا بعض','مع مين (توزيع)','ملاحظات']];
-    L.forEach(function(p){var e=E(p),age=V().age?V().age(p):'',ab=V().abs?V().abs(p):'';A.push([p.n,p.name,p.gender||'',e.phone||'',e.phone2||'',e.address||'',p.region||'',e.birth||'',(age>0&&age<100)?age:'',e.edu||'',e.work||'',famOf(p.n),V().pri?V().pri(p):'',V().vis&&V().vis(p)?dm(V().vis(p)):'',attTxt(p),lastSeen(p)?dm(lastSeen(p)):'',ab||ab===0?ab:'',own[p.n]?own[p.n].to:'',e.note||'']);});
+    L.forEach(function(p){var e=E(p),age=V().age?V().age(p):'',ab=V().abs?V().abs(p):'';A.push([(PS.dn?PS.dn(p.n):p.n),p.name,p.gender||'',e.phone||'',e.phone2||'',e.address||'',p.region||'',e.birth||'',(age>0&&age<100)?age:'',e.edu||'',e.work||'',famOf(p.n),V().pri?V().pri(p):'',V().vis&&V().vis(p)?dm(V().vis(p)):'',attTxt(p),lastSeen(p)?dm(lastSeen(p)):'',ab||ab===0?ab:'',own[p.n]?own[p.n].to:'',e.note||'']);});
     var B=[['#','الاسم'].concat(ss.map(dm)).concat(['حضر'])];
-    L.forEach(function(p){var r=[p.n,p.name],a=0;ss.forEach(function(d){if(p.since&&d<p.since){r.push('—');return;}if(V().was(p.n,d)){r.push('✓');a++;}else{var w=V().why?V().why(p.n,d):'';r.push(w?'✕ '+w:'✕');}});r.push(a);B.push(r);});
+    L.forEach(function(p){var r=[(PS.dn?PS.dn(p.n):p.n),p.name],a=0;ss.forEach(function(d){if(p.since&&d<p.since){r.push('—');return;}if(V().was(p.n,d)){r.push('✓');a++;}else{var w=V().why?V().why(p.n,d):'';r.push(w?'✕ '+w:'✕');}});r.push(a);B.push(r);});
     var C=[['خادم الافتقاد','رقمه','اتبعت','بعته','الطريقة','#','الشاب','التليفون','كلّمه؟','زاره؟','هييجي؟','ملاحظة']];
     docs().forEach(function(d){Object.keys(d.p||{}).sort(function(a,b){return a-b}).forEach(function(n){var x=d.p[n],s=(d.st||{})[n]||{};var dt=new Date(d.at||0);C.push([d.to||'',d.toPh||'',dt.getFullYear()+'-'+('0'+(dt.getMonth()+1)).slice(-2)+'-'+('0'+dt.getDate()).slice(-2),d.byName||'',(WAY[d.way]||WAY.txt)[1],+n,x.name,x.phone||'',CL[s.c]||'',s.v==='y'?'✓':'',JL[s.j]||'',s.t||'']);});});
     var nm='abu-sefein-youth-'+ymd(new Date())+'.xlsx';
@@ -4539,7 +4540,7 @@ onReady(function(){
     var s=je?(je.k==='v'?'زاره ':'كلّمه ')+(je.who||'—')+' '+DAYN[pd(je.day).getDay()]+(je.j?' · '+JL[je.j]:''):'';if(je&&je.t)s+=' · 📝 '+je.t;
     return {n:p.n,nm:je&&je.nm,ok:ok===undefined?(Z.rec?was(p.n,Z.S):null):ok,sub:s};});}
   function openPerson(n){PS.sheet.open('cxp:'+n,function(b){var p=V().byN&&V().byN(+n);if(!p){b.appendChild(el('p','cx-none','الشاب ده مش في الليستة دلوقتي.'));return;}
-    var h=el('div','cx-ph');h.appendChild(el('h3',null,p.name));var e=V().E?V().E(p):{};h.appendChild(el('small',null,'#'+ar(p.n)+(e.phone?' · '+e.phone:'')+(p.region?' · '+p.region:'')));b.appendChild(h);
+    var h=el('div','cx-ph');h.appendChild(el('h3',null,p.name));var e=V().E?V().E(p):{};h.appendChild(el('small',null,'#'+ar((PS.dn?PS.dn(p.n):p.n))+(e.phone?' · '+e.phone:'')+(p.region?' · '+p.region:'')));b.appendChild(h);
     if(e.phone){var ac=el('div','cx-pa');var c=el('a',null,'📞 اتصال');c.href='tel:'+e.phone;ac.appendChild(c);var w=el('a','wa','واتساب');w.href='https://wa.me/'+intl(e.phone);w.target='_blank';w.rel='noopener';ac.appendChild(w);b.appendChild(ac);}
     var dt=V().dots?V().dots(p):null;if(dt){var dw=el('div','cx-pd');dw.appendChild(el('span',null,'الحضور:'));dw.appendChild(dt);b.appendChild(dw);}
     if(PS.cxCard)b.appendChild(PS.cxCard(p));
@@ -4981,7 +4982,7 @@ onReady(function(){
       var d=m==='lo'?(a.r-b.r)||(a.y-b.y):(b.r-a.r)||(b.y-a.y);return d||a.p.n-b.p.n;});
     var PRC={1:['ملتزم','p1'],2:['متوسط','p2'],3:['محتاج زيارة','p3']},full=list.length,more=!f&&!showAll&&full>25;if(more)list=list.slice(0,25);
     list.forEach(function(x){var li=el('li','ds-p'),b=el('button');b.type='button';b.setAttribute('aria-expanded',openN===x.p.n);
-      var nm=el('span','nm',x.p.name);nm.appendChild(el('small',null,'#'+ar(x.p.n)));if(PRC[x.pri])nm.appendChild(el('span','ds-tag '+PRC[x.pri][1],PRC[x.pri][0]));if(x.tr.length)nm.appendChild(el('span',null,'🚌'));
+      var nm=el('span','nm',x.p.name);nm.appendChild(el('small',null,'#'+ar((PS.dn?PS.dn(x.p.n):x.p.n))));if(PRC[x.pri])nm.appendChild(el('span','ds-tag '+PRC[x.pri][1],PRC[x.pri][0]));if(x.tr.length)nm.appendChild(el('span',null,'🚌'));
       b.appendChild(nm);b.appendChild(el('span','rt',x.hs.length?ar(x.y)+' من '+ar(x.hs.length)+' · '+ar(Math.round(x.r*100))+'٪':'—'));
       var bar=el('div','ds-bar'),fi=el('i');fi.style.width=Math.round(x.r*100)+'%';fi.style.background=x.r>0.5?'var(--p1)':(x.r>=0.3?'var(--p2)':'var(--p3)');bar.appendChild(fi);b.appendChild(bar);
       b.addEventListener('click',function(){openN=openN===x.p.n?null:x.p.n;renderPpl(last);});li.appendChild(b);
