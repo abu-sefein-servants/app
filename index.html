@@ -105,6 +105,12 @@ body.locked>*:not(#gate):not(script):not(style){display:none!important}
 .cf-cmp{display:flex;flex-direction:column;gap:6px;align-items:flex-start;background:var(--card);border-radius:14px;padding:10px 12px;margin-top:10px;font-size:.8rem}.cf-cmp b{font:700 .9rem var(--display)}.cf-cmp span{color:var(--muted);line-height:1.6}
 .cf-ed{margin-top:10px;background:var(--card);border-radius:14px;padding:8px 12px}.cf-ed summary{cursor:pointer;font:600 .85rem var(--display);padding:4px 0}.cf-ed[open] summary{margin-bottom:8px}
 .cf-msg{white-space:pre-line;background:var(--card);border-radius:12px;padding:10px;font-size:.82rem;line-height:1.7;margin-bottom:8px}
+
+.cf-full.alt{background:var(--card);color:var(--brand)}
+.cf-ov{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 56px) 12px calc(env(safe-area-inset-bottom,0px) + 40px)}
+.cf-ov img{max-width:100%;max-height:100%;object-fit:contain;border-radius:10px}
+.cf-ov-x{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:12px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:20px;cursor:pointer}
+.cf-ov-t{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:0;right:0;text-align:center;color:#bbb;font-size:12px}
 </style>
 </head>
 <body class="locked">
@@ -5586,6 +5592,7 @@ var CF=(function(){
     var A=rows(),act=A.filter(function(x){return !x.b.x});root.textContent='';
     var lk=el('div','cf-link');var lt=el('div');lt.appendChild(el('b',null,'🔗 لينك الحجز'));lt.appendChild(el('small',null,'ابعته على جروب الشباب'));lk.appendChild(lt);
     lk.appendChild(bt('cf-mini','انسخ',function(){copy(URL_);}));var sh=el('a','cf-mini wa','واتساب');sh.href='https://wa.me/?text='+encodeURIComponent('⛱️ '+C.TITLE+' · '+C.WHEN+'\nاحجز من هنا واختار طريقة الدفع اللي تناسبك:\n'+URL_);sh.target='_blank';sh.rel='noopener';lk.appendChild(sh);root.appendChild(lk);
+    var mb=el('a','cf-full alt','➕ احجز لحد بنفسك');mb.href=URL_+'?by=1';mb.target='_blank';mb.rel='noopener';root.appendChild(mb);
     var dep=act.filter(function(x){return x.r.dep}),ok=A.filter(function(x){return x.seat==='ok'}).length,wait=A.filter(function(x){return x.seat==='wait'}).length,late=act.filter(function(x){return stOf(x)==='late'}),pend=act.filter(function(x){return !x.r.dep});
     var k=el('div','cf-k');[[act.length,'حجزوا',''],[dep.length,'دفعوا المقدم','g'],[Math.max(0,C.CAP-ok),'كرسي فاضي من '+ar(C.CAP),'y'],[late.length,'متأخرين في قسط','r']].forEach(function(z){var d=el('div',z[2]);d.appendChild(el('b',null,ar(z[0])));d.appendChild(el('span',null,z[1]));k.appendChild(d);});root.appendChild(k);
     if(wait)root.appendChild(el('p','cf-wait','🕐 '+ar(wait)+' في قائمة الانتظار (دفعوا المقدم بعد ما الكراسي خلصت)'));
@@ -5629,7 +5636,7 @@ var CF=(function(){
     var info=[CF.C.K[b.k==='g'?'g':'s'],planName(b.plan),'حجز '+CF.dm(r.bd)+(r.early?'':' (بعد ٦ ديسمبر)')];if(b.w&&b.w!=='a')info.push('مع '+(b.wn||C.W[b.w]));bx.appendChild(el('p','cf-sub',info.join(' · ')));
     var stt={pend:['o','⏳ مستني المقدم'],wait:['b','🕐 في قائمة الانتظار'],late:['r','متأخر '+money(r.late)],ok:['g','✓ كرسي '+ar(x.sn||'')],done:['g','✓ خلّص الدفع'],x:['x','الحجز ملغي']}[s];bx.appendChild(el('span','cf-tg big '+stt[0],stt[1]));
     var cq=el('div','cf-row');if(b.ph){var c=el('a','cf-btn','📞 '+b.ph);c.href='tel:'+b.ph;cq.appendChild(c);var w=el('a','cf-btn wa','📲 فكّره');w.href='https://wa.me/'+intl(b.ph)+'?text='+encodeURIComponent(msg(x));w.target='_blank';w.rel='noopener';cq.appendChild(w);}bx.appendChild(cq);
-    if(b.shot){var sh=el('div','cf-shot');var im=el('img');im.src=b.shot;im.alt='صورة التحويل';im.addEventListener('click',function(){var wv=window.open();if(wv){wv.document.write('<img src="'+b.shot+'" style="max-width:100%">');}});sh.appendChild(im);sh.appendChild(el('span',null,'📷 صورة التحويل اللي بعتها'+(b.sat?' · '+ago(CF.ms(b.sat)):'')));bx.appendChild(sh);}
+    if(b.shot){var sh=el('div','cf-shot');var im=el('img');im.src=b.shot;im.alt='صورة التحويل';im.addEventListener('click',function(){lightbox(b.shot);});sh.appendChild(im);sh.appendChild(el('span',null,'📷 صورة التحويل اللي بعتها'+(b.sat?' · '+ago(CF.ms(b.sat)):'')));bx.appendChild(sh);}
     if(!b.x){var pm=el('div','cf-pm');[['c','💵 كاش'],['i','📱 إنستاباي']].forEach(function(z){var mb=bt(payM===z[0]?'on':'',z[1],function(){payM=z[0];PS.sheet.redraw();});pm.appendChild(mb);});
       if(!r.dep){bx.appendChild(el('div','cf-lb','المقدم وصل؟'));bx.appendChild(pm);bx.appendChild(bt('cf-full gold','✓ استلمت المقدم '+ar(C.DEP),function(){addPay(x,C.DEP,true);}));}
       else{bx.appendChild(el('div','cf-lb','سجّل دفعة'+(r.dueNow>0?' · عليه دلوقتي '+money(r.dueNow):'')));bx.appendChild(pm);var qk=el('div','cf-row');
@@ -5658,6 +5665,8 @@ var CF=(function(){
     ed.appendChild(bt('cf-btn','🔗 انسخ لينك حجزه',function(){copy(plink(id));}));
     var xb=bt('cf-btn red',b.x?'↩︎ رجّع الحجز':'إلغاء الحجز',function(){if(!b.x&&xb.dataset.a!=='1'){xb.dataset.a='1';xb.textContent='متأكد؟ دوس تاني';return;}upd(id,b.x?{x:firebase.firestore.FieldValue.delete()}:{x:Date.now()},b.x?'رجع الحجز':'اتلغى الحجز');});ed.appendChild(xb);bx.appendChild(ed);}
   function matches(id){var b=D[id],nw=CF.norm(b.wn),nn=CF.norm(b.n);if(!nw)return [];var w=nw.split(' ');return Object.keys(D).filter(function(z){if(z===id||D[z].x)return false;var o=D[z],on=CF.norm(o.n),ow=CF.norm(o.wn);if(on===nw)return true;if(w.length>=2&&on.indexOf(w[0]+' '+w[1])===0)return true;if(ow&&ow.split(' ').slice(0,2).join(' ')===nn.split(' ').slice(0,2).join(' '))return true;return false;}).slice(0,4);}
+  function lightbox(src){var ov=el('div','cf-ov');var im=el('img');im.src=src;im.alt='صورة التحويل';ov.appendChild(im);var x=bt('cf-ov-x','✕',null);x.setAttribute('aria-label','قفل');ov.appendChild(x);
+    ov.appendChild(el('div','cf-ov-t','دوس في أي حتة عشان تقفل'));function close(){ov.remove();document.removeEventListener('keydown',k);}function k(e){if(e.key==='Escape')close();}ov.addEventListener('click',close);document.addEventListener('keydown',k);document.body.appendChild(ov);}
   function addPay(x,v,isDep){var L2=(x.b.pays||[]).slice(),p={a:v,m:payM,at:Date.now()};if(isDep)p.dep=1;L2.push(p);var u={pays:L2};var s=0;L2.forEach(function(y){s+=+y.a||0});if(s>=C.DEP&&!x.b.dat)u.dat=Date.now();upd(x.id,u,'اتسجّل '+money(v)+' جنيه '+(payM==='i'?'إنستاباي':'كاش')+' ✓');}
   PS.confRender=render;
   document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('[data-go="conf"]');if(t)setTimeout(render,40);});

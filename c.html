@@ -140,7 +140,7 @@ var CF=(function(){
   function en(v){return String(v||'').replace(/[٠-٩]/g,function(c){return '٠١٢٣٤٥٦٧٨٩'.indexOf(c)}).replace(/[۰-۹]/g,function(c){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(c)});}
   var db=null;try{firebase.initializeApp(CFG);db=firebase.firestore();}catch(e){}
   var app=$('app'),pub={};
-  var tok=(new URLSearchParams(location.search)).get('t')||'';
+  var QS=new URLSearchParams(location.search),tok=QS.get('t')||'',BY=QS.get('by')==='1';
   function seatsTxt(){var s=$('seats');if(pub.left==null){s.hidden=true;return;}s.hidden=false;s.textContent=pub.left>0?'فاضل '+ar(pub.left)+' كرسي من '+ar(C.CAP):'الكراسي خلصت · فيه قائمة انتظار';}
   if(db)db.collection('confpub').doc('main').get().then(function(d){pub=(d.exists&&d.data())||{};seatsTxt();if(!tok&&F.step)drawForm();},function(){});
   function copy(t,ok){var done=function(){alert(ok||'اتنسخ ✓')};try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){prompt('انسخ:',t)});return;}}catch(e){}prompt('انسخ:',t);}
@@ -150,7 +150,8 @@ var CF=(function(){
   var F={step:1,n:'',ph:'',k:'',w:'',wn:'',plan:'',late:'spread'};
   function bd(){return CF.today();}
   function drawForm(){app.textContent='';
-    var prev=null;try{prev=localStorage.getItem('conf_t');}catch(e){}
+    var prev=null;if(!BY){try{prev=localStorage.getItem('conf_t');}catch(e){}}
+    if(BY){var bn=el('div','card cmp','✍️ بتحجز لحد تاني: اكتب بياناته هو، واختار الخطة اللي اتفقتوا عليها.');app.appendChild(bn);}
     if(prev){var pc=el('div','card');pc.appendChild(el('div','cmp','انت حجزت قبل كده من الموبايل ده.'));var a=el('a','btn alt','افتح حجزي ‹');a.href='?t='+prev;pc.appendChild(a);app.appendChild(pc);}
     if(bd()>C.END){var cl=el('div','card');cl.appendChild(el('div','cmp','الحجز قفل. لو محتاج حاجة كلّم أبانوب.'));app.appendChild(cl);return;}
     if(F.step===1)step1();else step2();}
@@ -186,7 +187,7 @@ var CF=(function(){
     var er=el('div','err');c.appendChild(er);
     var go=bt('btn','✓ احجز',function(){if(!F.plan){er.textContent='اختار طريقة الدفع';return;}if(!db){er.textContent='مفيش اتصال — جرّب تاني';return;}
       go.disabled=true;go.textContent='لحظة…';var id=rid(),o={n:F.n,ph:F.ph,k:F.k,w:F.w,plan:F.plan,late:F.late,at:firebase.firestore.FieldValue.serverTimestamp(),v:1};if(F.w!=='a')o.wn=F.wn;
-      db.collection('conf').doc(id).set(o).then(function(){try{localStorage.setItem('conf_t',id);}catch(e){}location.replace('?t='+id+'&new=1');},function(){go.disabled=false;go.textContent='✓ احجز';er.textContent='محصلش — اتأكد من النت وجرّب تاني';});});
+      db.collection('conf').doc(id).set(o).then(function(){if(!BY){try{localStorage.setItem('conf_t',id);}catch(e){}}location.replace('?t='+id+'&new=1'+(BY?'&by=1':''));},function(){go.disabled=false;go.textContent='✓ احجز';er.textContent='محصلش — اتأكد من النت وجرّب تاني';});});
     c.appendChild(go);c.appendChild(bt('btn alt','› رجوع',function(){F.step=1;drawForm();}));app.appendChild(c);}
   function rid(){var a='abcdefghijkmnpqrstuvwxyz23456789',s='',r=new Uint8Array(22);(window.crypto||{getRandomValues:function(x){for(var i=0;i<x.length;i++)x[i]=Math.random()*256;return x}}).getRandomValues(r);for(var i=0;i<r.length;i++)s+=a[r[i]%a.length];return s;}
 
@@ -195,6 +196,9 @@ var CF=(function(){
     if(!db){app.textContent='';app.appendChild(el('div','card cmp','مفيش اتصال — جرّب تاني'));return;}
     db.collection('conf').doc(tok).onSnapshot(function(d){if(!d.exists){app.textContent='';var c=el('div','card cmp','اللينك ده مش موجود. اتأكد إنك فاتح اللينك كله زي ما اتبعتلك.');app.appendChild(c);return;}drawView(d.data());},function(){app.textContent='';app.appendChild(el('div','card cmp','مقدرناش نفتح الحجز — جرّب تاني'));});}
   function drawView(b){app.textContent='';var r=CF.calc(b,{disc:b.dsc||0}),isNew=/[?&]new=1/.test(location.search);
+    if(BY){var bc=el('div','card');bc.appendChild(el('div','cmp',isNew?'✓ اتسجّل حجز «'+b.n+'». ابعتله لينك حجزه عشان يتابع أقساطه منه:':'حجز «'+b.n+'» — ابعتله لينك حجزه:'));
+      var wl=el('a','btn wa','📲 ابعت اللينك لـ'+String(b.n).split(' ')[0]+' على واتساب');var ph=String(b.ph||'').replace(/\D/g,'');if(/^0\d{10}$/.test(ph))ph='2'+ph;wl.href='https://wa.me/'+ph+'?text='+encodeURIComponent('أهلاً '+String(b.n).split(' ')[0]+' 👋\nحجزك في '+C.TITLE+' ('+C.WHEN+') اتسجّل ✓\nمن اللينك ده تتابع أقساطك واللي دفعته:\n'+myLink(tok));wl.target='_blank';wl.rel='noopener';bc.appendChild(wl);
+      bc.appendChild(bt('btn alt','🔗 انسخ لينكه',function(){copy(myLink(tok),'اتنسخ اللينك ✓');}));var nb=el('a','btn alt','➕ احجز لحد تاني');nb.href='?by=1';bc.appendChild(nb);app.appendChild(bc);}
     if(b.x){var cx=el('div','card');cx.appendChild(el('div','ok')).appendChild(el('b',null,'الحجز ده اتلغى'));cx.appendChild(el('div','cmp','لو ده غلط كلّم أبانوب.'));app.appendChild(cx);return;}
     var top=el('div','card');var ok=el('div','ok');if(isNew){ok.appendChild(el('div','big','🎉'));ok.appendChild(el('b',null,'اتسجّلت يا '+String(b.n).split(' ')[0]+'!'));}else ok.appendChild(el('b',null,b.n));
     var stt=!r.dep?['w','⏳ مستني المقدم']:(b.seat==='wait'?['b','🕐 في قائمة الانتظار']:(r.done?['g','✓ خلّصت الدفع']:['g','✓ كرسيك متثبّت']));ok.appendChild(el('span','st '+stt[0],stt[1]));top.appendChild(ok);
@@ -219,6 +223,7 @@ var CF=(function(){
     if(b.w&&b.w!=='a'&&!b.dsc)sc.appendChild(el('div','hint','🎁 '+C.WD[b.w]+' '+ar(C.DISC[b.w])+' جنيه هيتشال من آخر قسط أول ما '+(b.wn||'')+' يحجز ويدفع المقدم.'));
     if(b.dsc)sc.appendChild(el('div','hint','✓ '+(C.WD[b.w]||'الخصم')+' اتحسب: −'+ar(b.dsc)+' من آخر قسط'));
     app.appendChild(sc);
+    if(BY)return;
     var lk=el('div','card');lk.appendChild(el('div','cmp',isNew?'🔖 احفظ اللينك ده — منه تتابع أقساطك واللي دفعته في أي وقت.':'الأقساط بتتدفع في الاجتماع يوم الأحد، أو إنستاباي على '+C.PAYTO+'.'));
     lk.appendChild(bt('btn alt','🔗 انسخ لينك حجزي',function(){copy(myLink(tok),'اتنسخ اللينك ✓ احفظه عندك');}));
     var wa=el('a','btn wa','📲 ابعته لنفسك على واتساب');wa.href='https://wa.me/?text='+encodeURIComponent('حجزي في '+C.TITLE+' ⛱️\n'+myLink(tok));wa.target='_blank';wa.rel='noopener';lk.appendChild(wa);app.appendChild(lk);}
