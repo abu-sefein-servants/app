@@ -90,7 +90,7 @@ var CF=(function(){
     if(plan==='eid')return weeks().map(function(d){return [d,(s?70:100)+(d==='2027-01-10'?400:0)]});
     if(plan==='mon')return [['2026-12-06',s?400:500],['2027-01-03',s?400:500],['2027-01-24',s?300:400]];
     return [];}
-  function planDesc(plan,k){var s=k!=='g';return {cash:'مرة واحدة · قبل ٦ ديسمبر خصم ١٠٠ زيادة',
+  function planDesc(plan,k,bd){var s=k!=='g';return {cash:(bd&&bd>C.EARLY)?'المبلغ كله مرة واحدة · من غير مقدم':'المبلغ كله لحد ٦ ديسمبر بخصم ١٠٠ زيادة (٣٠٠ مقدم والباقي لحد ٦ ديسمبر) · بعدها مفيش خصم',
     '2w':ar(C.DEP)+' مقدم + ٤ أقساط × '+ar(s?275:350),'1w':ar(C.DEP)+' + ١٠ × '+ar(s?110:140),
     eid:ar(C.DEP)+' + ٤٠٠ يوم ١٠ يناير + ١٠ × '+ar(s?70:100),mon:ar(C.DEP)+' + '+(s?'٤٠٠ + ٤٠٠ + ٣٠٠':'٥٠٠ + ٥٠٠ + ٤٠٠'),
     pig:ar(C.DEP)+' وبعدها أي مبلغ كل أسبوع لحد ٢٤ يناير'}[plan]||'';}
@@ -100,18 +100,20 @@ var CF=(function(){
     var pays=(b.pays||[]).map(function(p){return {a:+p.a||0,at:ms(p.at),m:p.m||'',dep:!!p.dep}}).sort(function(a,c){return a.at-c.at});
     var paid=0;pays.forEach(function(p){paid+=p.a});
     var it=base(plan,k).map(function(x){return {d:x[0],a:x[1]}}),note=[],missed=0,missedN=0;
-    if(plan==='cash'){if(!early)it=[{d:nextSun(addD(bd,1)),a:it[0].a}];}
+    var lateCash=plan==='cash'&&!early;
+    if(plan==='cash'){}
     else{var rem=it.filter(function(x){return x.d>=bd}),gone=it.filter(function(x){return x.d<bd});
       gone.forEach(function(x){missed+=x.a});missedN=gone.length;
       if(!rem.length)rem=[{d:nextSun(addD(bd,1)),a:0}];
       if(missed){if(b.late==='now'){rem[0].a+=missed;}else{var per=round5(missed/rem.length),left=missed-per*rem.length;rem.forEach(function(x){x.a+=per});rem[rem.length-1].a+=left;}}
       it=rem;}
-    var fee=early?0:100;if(fee){it[it.length-1].a+=fee;}
+    var fee=(early||lateCash)?0:100;if(fee){it[it.length-1].a+=fee;}
     // cash extra discount: booked early and fully paid by the end of 6 Dec (or 6 Dec not over yet)
     var cashD=0;if(plan==='cash'&&early){var full=(C.DEP+it[0].a)-100-(o.disc||0),by=0;pays.forEach(function(p){if(isoOf(p.at)<=C.EARLY)by+=p.a});
       if(T<=C.EARLY||by>=full){cashD=100;it[0].a-=100;}}
+    var earlyLost=false;if(plan==='cash'&&early&&!cashD){it[0].a+=100;earlyLost=true;}if(lateCash)it[0].a+=100;
     var disc=o.disc||0,dl=disc;for(var i=it.length-1;i>=0&&dl>0;i--){var t=Math.min(dl,it[i].a);it[i].a-=t;dl-=t;}
-    var items=[{d:bd,a:C.DEP,dep:1}].concat(it.filter(function(x){return x.a>0}));
+    var items=lateCash?[{d:bd,a:C.DEP+it[0].a,dep:1,full:1}]:[{d:bd,a:C.DEP,dep:1}].concat(it.filter(function(x){return x.a>0}));var need=items[0].a;
     var total=0;items.forEach(function(x){total+=x.a});
     // allocate payments in order
     var left=paid;items.forEach(function(x){var t=Math.min(left,x.a);x.p=t;left-=t;x.done=t>=x.a;});
@@ -122,7 +124,7 @@ var CF=(function(){
     if(plan==='pig'){var refPast=0,rr=calc({k:k,plan:'1w',late:'spread',at:b.at,pays:[]},{today:T,disc:disc});rr.items.forEach(function(x){if(!x.dep&&x.d<T)refPast+=x.a;});lateAmt=Math.max(0,refPast-Math.max(0,paid-C.DEP));}
     else{items.forEach(function(x){if(!x.dep&&x.d<T&&!x.done){lateItems.push(x);lateAmt+=x.a-x.p;}});}
     var next=null;for(var j=0;j<items.length;j++){if(!items[j].done&&(items[j].d>=T||items[j].dep)){next=items[j];break;}}
-    return {items:items,total:total,paid:paid,left:Math.max(0,total-paid),dueNow:Math.max(0,dueNow-paid),late:lateAmt,lateItems:lateItems,next:next,early:early,fee:fee,cashD:cashD,disc:disc,missed:missed,missedN:missedN,bd:bd,dep:paid>=C.DEP||!!b.dat,done:paid>=total&&total>0,pays:pays};}
+    return {items:items,total:total,paid:paid,left:Math.max(0,total-paid),dueNow:Math.max(0,dueNow-paid),late:lateAmt,lateItems:lateItems,next:next,early:early,fee:fee,cashD:cashD,disc:disc,missed:missed,missedN:missedN,bd:bd,dep:paid>=need||!!b.dat,need:need,lateCash:lateCash,earlyLost:earlyLost,done:paid>=total&&total>0,pays:pays};}
   function missedFor(plan,k,bd){if(plan==='cash'||plan==='pig')return {n:0,a:0};var L=base(plan,k).filter(function(x){return x[0]<bd}),a=0;L.forEach(function(x){a+=x[1]});return {n:L.length,a:a};}
   function priceFor(plan,k,bd,disc){var r=calc({k:k,plan:plan,late:'spread',at:pd(bd).getTime(),pays:[]},{today:bd,disc:disc||0});return r.total;}
   function norm(t){return String(t||'').replace(/[أإآا]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/[ًٌٍَُِّْـ]/g,'').replace(/\s+/g,' ').trim();}
@@ -173,7 +175,7 @@ var CF=(function(){
   function step2(){var c=el('div','card'),d=bd(),early=d<=C.EARLY,disc=F.w&&F.w!=='a'?C.DISC[F.w]:0;
     var hd=el('label','lb',early?'اختار طريقة الدفع · سعر الحجز المبكر لحد ٦ ديسمبر':'اختار طريقة الدفع');c.appendChild(hd);
     C.PLANS.forEach(function(x){var pr=CF.priceFor(x[0],F.k,d,0);var b=bt('pl'+(F.plan===x[0]?' on':''),null,function(){F.plan=x[0];drawForm();});
-      var t=el('div');t.appendChild(el('b',null,x[1]));t.appendChild(el('small',null,CF.planDesc(x[0],F.k)));b.appendChild(t);var p=el('span','pr',money(pr));b.appendChild(p);c.appendChild(b);});
+      var t=el('div');t.appendChild(el('b',null,x[1]));t.appendChild(el('small',null,CF.planDesc(x[0],F.k,d)));b.appendChild(t);var p=el('span','pr',money(pr));b.appendChild(p);c.appendChild(b);});
     if(F.plan){var mf=CF.missedFor(F.plan,F.k,d);
       if(mf.n){c.appendChild(el('label','lb','فاتك '+ar(mf.n)+(mf.n===1?' قسط':' أقساط')+' ('+money(mf.a)+' جنيه) — تحب تدفعهم إزاي؟'));var rd=el('div','radio');
         [['spread','وزّعهم على الأقساط اللي جاية','كل قسط يزيد شوية'],['now','ادفعهم مع أول قسط','وبعدها الأقساط بقيمتها العادية']].forEach(function(x){var b=bt(F.late===x[0]?'on':'',x[1],function(){F.late=x[0];drawForm();});b.appendChild(el('small',null,x[2]));rd.appendChild(b);});c.appendChild(rd);}
@@ -183,7 +185,7 @@ var CF=(function(){
       row(C.K[F.k]+(early?' · حجز مبكر':''),money(r.total+r.cashD-r.fee));if(r.fee)row('حجز بعد ٦ ديسمبر','+ '+ar(r.fee));if(r.cashD)row('كاش قبل ٦ ديسمبر','− '+ar(r.cashD),'g');
       if(disc)row(C.WD[F.w]+' (لما '+({f:'صاحبك',e:'خطيبك/خطيبتك',b:'أخوك/أختك'})[F.w]+' يحجز)','− '+ar(disc),'g');
       row('الإجمالي',money(r.total-disc)+' جنيه','t');c.appendChild(s);
-      c.appendChild(el('label','lb','مواعيد الدفع'));var sch=el('div');r.items.forEach(function(x,i){var it=el('div','sc');it.appendChild(el('i',null,ar(i+1)));var sp=el('span',null,x.dep?'المقدم':(x.pig?'الباقي على مراحل':'الأحد '+CF.dm(x.d)));if(x.dep)sp.appendChild(el('small',null,'عشان كرسيك يتثبّت'));if(x.pig)sp.appendChild(el('small',null,'أي مبلغ كل أحد لحد ٢٤ يناير'));it.appendChild(sp);it.appendChild(el('b',null,money(x.a)));sch.appendChild(it);});c.appendChild(sch);}
+      c.appendChild(el('label','lb','مواعيد الدفع'));var sch=el('div');r.items.forEach(function(x,i){var it=el('div','sc');it.appendChild(el('i',null,ar(i+1)));var sp=el('span',null,x.full?'المبلغ كله مرة واحدة':(x.dep?'المقدم':(x.pig?'الباقي على مراحل':'الأحد '+CF.dm(x.d))));if(x.dep)sp.appendChild(el('small',null,'عشان كرسيك يتثبّت'));if(x.pig)sp.appendChild(el('small',null,'أي مبلغ كل أحد لحد ٢٤ يناير'));it.appendChild(sp);it.appendChild(el('b',null,money(x.a)));sch.appendChild(it);});c.appendChild(sch);}
     var er=el('div','err');c.appendChild(er);
     var go=bt('btn','✓ احجز',function(){if(!F.plan){er.textContent='اختار طريقة الدفع';return;}if(!db){er.textContent='مفيش اتصال — جرّب تاني';return;}
       go.disabled=true;go.textContent='لحظة…';var id=rid(),o={n:F.n,ph:F.ph,k:F.k,w:F.w,plan:F.plan,late:F.late,at:firebase.firestore.FieldValue.serverTimestamp(),v:1};if(F.w!=='a')o.wn=F.wn;
@@ -201,13 +203,13 @@ var CF=(function(){
       bc.appendChild(bt('btn alt','🔗 انسخ لينكه',function(){copy(myLink(tok),'اتنسخ اللينك ✓');}));var nb=el('a','btn alt','➕ احجز لحد تاني');nb.href='?by=1';bc.appendChild(nb);app.appendChild(bc);}
     if(b.x){var cx=el('div','card');cx.appendChild(el('div','ok')).appendChild(el('b',null,'الحجز ده اتلغى'));cx.appendChild(el('div','cmp','لو ده غلط كلّم أبانوب.'));app.appendChild(cx);return;}
     var top=el('div','card');var ok=el('div','ok');if(isNew){ok.appendChild(el('div','big','🎉'));ok.appendChild(el('b',null,'اتسجّلت يا '+String(b.n).split(' ')[0]+'!'));}else ok.appendChild(el('b',null,b.n));
-    var stt=!r.dep?['w','⏳ مستني المقدم']:(b.seat==='wait'?['b','🕐 في قائمة الانتظار']:(r.done?['g','✓ خلّصت الدفع']:['g','✓ كرسيك متثبّت']));ok.appendChild(el('span','st '+stt[0],stt[1]));top.appendChild(ok);
+    var stt=!r.dep?['w',r.lateCash?'⏳ مستني الفلوس':'⏳ مستني المقدم']:(b.seat==='wait'?['b','🕐 في قائمة الانتظار']:(r.done?['g','✓ خلّصت الدفع']:['g','✓ كرسيك متثبّت']));ok.appendChild(el('span','st '+stt[0],stt[1]));top.appendChild(ok);
     top.appendChild(el('div','cmp',C.K[b.k==='g'?'g':'s']+' · '+(C.PLANS.filter(function(x){return x[0]===b.plan})[0]||['',''])[1]+(b.w&&b.w!=='a'?' · مع '+(b.wn||C.W[b.w]):'')));
     if(r.dep){var bar=el('div','bar'),bi=el('i');bi.style.width=Math.min(100,r.paid/r.total*100)+'%';bar.appendChild(bi);top.appendChild(bar);
       var sm=el('div','sum');[['اتدفع',money(r.paid),'g'],['فاضل',money(r.left),''],['الإجمالي',money(r.total)+' جنيه','t']].forEach(function(x){var rr=el('div','r'+(x[2]?' '+x[2]:''));rr.appendChild(el('span',null,x[0]));rr.appendChild(el('span',null,x[1]));sm.appendChild(rr);});top.appendChild(sm);}
     if(b.seat==='wait')top.appendChild(el('div','hint mu','الكراسي الـ'+ar(C.CAP)+' اتملت قبل ما مقدمك يوصل. انت في قائمة الانتظار، وأول ما كرسي يفضى هنكلّمك.'));
     app.appendChild(top);
-    if(!r.dep){var pc=el('div','pay');pc.appendChild(el('b',null,'ادفع المقدم '+ar(C.DEP)+' جنيه عشان كرسيك يتثبّت'));
+    if(!r.dep){var pc=el('div','pay');pc.appendChild(el('b',null,r.lateCash?'ادفع المبلغ كله '+money(r.need)+' جنيه مرة واحدة عشان كرسيك يتثبّت':'ادفع المقدم '+ar(C.DEP)+' جنيه عشان كرسيك يتثبّت'));
       var nm=el('div','num');nm.appendChild(el('span',null,C.PAYTO));nm.appendChild(bt('','انسخ',function(){copy(C.PAYTO,'اتنسخ الرقم ✓');}));pc.appendChild(nm);
       pc.appendChild(el('p',null,'حوّل على إنستاباي على الرقم ده، أو ادفعه كاش لأبانوب يوم الأحد في الاجتماع. الحجز بيتثبّت لما أبانوب يأكّد إن الفلوس وصلت.'));
       var up=el('label','up');var fi=el('input');fi.type='file';fi.accept='image/*';fi.hidden=true;up.appendChild(fi);
@@ -216,7 +218,7 @@ var CF=(function(){
       pc.appendChild(up);var wrap=el('div','card');wrap.style.padding='0';wrap.style.background='none';wrap.appendChild(pc);app.appendChild(wrap);}
     var sc=el('div','card');sc.appendChild(el('label','lb','مواعيد الدفع'));
     r.items.forEach(function(x,i){var late=!x.done&&!x.dep&&x.d<CF.today()&&!x.pig,nx=r.next===x;var it=el('div','sc'+(x.done?' ok':'')+(late?' late':'')+(nx&&!x.done?' nx':''));
-      it.appendChild(el('i',null,x.done?'✓':(late?'!':ar(i+1))));var sp=el('span',null,x.dep?'المقدم':(x.pig?'الباقي على مراحل':'الأحد '+CF.dm(x.d)));
+      it.appendChild(el('i',null,x.done?'✓':(late?'!':ar(i+1))));var sp=el('span',null,x.full?'المبلغ كله':(x.dep?'المقدم':(x.pig?'الباقي على مراحل':'الأحد '+CF.dm(x.d))));
       var sub=x.done?'اتدفع':(late?'متأخر'+(x.p?' · دفعت '+money(x.p)+' منه':''):(x.pig?'أي مبلغ كل أحد · لحد ٢٤ يناير'+(x.p?' · دفعت '+money(x.p):''):(nx?'القسط الجاي':'')+(x.p?' · دفعت '+money(x.p)+' منه':'')));
       if(i===r.items.length-1&&!x.dep&&(r.disc||r.fee))sub+=(sub?' · ':'')+(r.disc?'بعد '+(C.WD[b.w]||'الخصم'):'')+(r.fee?(r.disc?' و':'')+'فيه ١٠٠ الحجز المتأخر':'');
       if(sub)sp.appendChild(el('small',null,sub));it.appendChild(sp);it.appendChild(el('b',null,money(x.a)));sc.appendChild(it);});
