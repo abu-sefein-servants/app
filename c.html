@@ -67,7 +67,7 @@ input:focus{border-color:#7a3df0}input.bad{border-color:#e0473f}
 var CF=(function(){
   var C={START:'2026-11-22',EARLY:'2026-12-06',END:'2027-01-24',CAP:50,DEP:300,PAYTO:'01201346441',
     TITLE:'مؤتمر إسكندرية',WHEN:'السبت ٦ – الاثنين ٨ فبراير ٢٠٢٧',
-    BASE:{s:1500,g:1800},DISC:{a:0,f:50,e:100,b:100},
+    BASE:{s:1500,g:1800},WIN:7,DISC:{a:0,f:50,e:100,b:100},
     W:{a:'لوحدي',f:'صاحبي',e:'خطيبي / خطيبتي',b:'أخويا / أختي'},WD:{f:'خصم صاحب',e:'خصم خطيب/خطيبة',b:'خصم إخوات'},WO:{f:'صاحبه',e:'خطيبه/خطيبته',b:'أخوه/أخته'},
     K:{s:'طالب',g:'خريج'},
     PLANS:[['cash','💵 كاش'],['2w','📅 كل أسبوعين'],['1w','🗓️ كل أسبوع'],['eid','🎁 العيدية'],['mon','🗂️ الشهرية'],['pig','🐷 الحصّالة']]};
@@ -128,7 +128,8 @@ var CF=(function(){
   function missedFor(plan,k,bd){if(plan==='cash'||plan==='pig')return {n:0,a:0};var L=base(plan,k).filter(function(x){return x[0]<bd}),a=0;L.forEach(function(x){a+=x[1]});return {n:L.length,a:a};}
   function priceFor(plan,k,bd,disc){var r=calc({k:k,plan:plan,late:'spread',at:pd(bd).getTime(),pays:[]},{today:bd,disc:disc||0});return r.total;}
   function norm(t){return String(t||'').replace(/[أإآا]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/[ًٌٍَُِّْـ]/g,'').replace(/\s+/g,' ').trim();}
-  return {C:C,ar:ar,money:money,dm:dm,iso:iso,pd:pd,today:today,isoOf:isoOf,ms:ms,calc:calc,planDesc:planDesc,missedFor:missedFor,priceFor:priceFor,norm:norm,nextSun:nextSun,addD:addD};
+  function winEnd(at){var d=new Date(ms(at)||Date.now());d.setDate(d.getDate()+C.WIN);return iso(d);}
+  return {winEnd:winEnd,C:C,ar:ar,money:money,dm:dm,iso:iso,pd:pd,today:today,isoOf:isoOf,ms:ms,calc:calc,planDesc:planDesc,missedFor:missedFor,priceFor:priceFor,norm:norm,nextSun:nextSun,addD:addD};
 })();
 
 </script>
@@ -163,7 +164,7 @@ var CF=(function(){
     c.appendChild(el('label','lb','انت'));var kc=el('div','chips');[['s','🎓 طالب'],['g','💼 خريج']].forEach(function(x){var b=bt(F.k===x[0]?'on':'',x[1],function(){F.n=n.value;F.ph=p.value;F.k=x[0];drawForm();});kc.appendChild(b);});c.appendChild(kc);
     c.appendChild(el('label','lb','جاي مع مين؟'));var wc=el('div','chips');['a','f','e','b'].forEach(function(k){var b=bt(F.w===k?'on':'',C.W[k],function(){F.n=n.value;F.ph=p.value;F.w=k;drawForm();});wc.appendChild(b);});c.appendChild(wc);
     var wn=null;if(F.w&&F.w!=='a'){wn=el('input');wn.id='f-wn';wn.style.marginTop='8px';wn.value=F.wn;wn.maxLength=60;wn.placeholder='اسم '+({f:'صاحبك',e:'خطيبك/خطيبتك',b:'أخوك/أختك'})[F.w]+' بالكامل';c.appendChild(wn);
-      c.appendChild(el('div','hint','🎁 '+C.WD[F.w]+' '+ar(C.DISC[F.w])+' جنيه ليك وله، بيتشال من آخر قسط — أول ما '+({f:'صاحبك',e:'خطيبك/خطيبتك',b:'أخوك/أختك'})[F.w]+' يحجز ويدفع المقدم.'));}
+      c.appendChild(el('div','hint','🎁 '+C.WD[F.w]+' '+ar(C.DISC[F.w])+' جنيه ليك وله، بس لما '+({f:'صاحبك',e:'خطيبك/خطيبتك',b:'أخوك/أختك'})[F.w]+' يحجز هو كمان خلال أسبوع من حجزك ويدفع المقدم — وبيتشال من آخر قسط.'));}
     var er=el('div','err');c.appendChild(er);
     c.appendChild(bt('btn','التالي: اختار طريقة الدفع ‹',function(){F.n=n.value.trim().replace(/\s+/g,' ');F.ph=en(p.value).replace(/\D/g,'');if(wn)F.wn=wn.value.trim().replace(/\s+/g,' ');
       if(F.n.split(' ').length<2){er.textContent='اكتب اسمك التلاتي';n.classList.add('bad');n.focus();return;}
@@ -183,8 +184,8 @@ var CF=(function(){
       var s=el('div','sum');s.style.marginTop='12px';
       function row(a,b,cl){var x=el('div','r'+(cl?' '+cl:''));x.appendChild(el('span',null,a));x.appendChild(el('span',null,b));s.appendChild(x);}
       row(C.K[F.k]+(early?' · حجز مبكر':''),money(r.total+r.cashD-r.fee));if(r.fee)row('حجز بعد ٦ ديسمبر','+ '+ar(r.fee));if(r.cashD)row('كاش قبل ٦ ديسمبر','− '+ar(r.cashD),'g');
-      if(disc)row(C.WD[F.w]+' (لما '+({f:'صاحبك',e:'خطيبك/خطيبتك',b:'أخوك/أختك'})[F.w]+' يحجز)','− '+ar(disc),'g');
-      row('الإجمالي',money(r.total-disc)+' جنيه','t');c.appendChild(s);
+      row('الإجمالي',money(r.total)+' جنيه','t');c.appendChild(s);
+      if(disc)c.appendChild(el('div','hint','🎁 لو '+({f:'صاحبك',e:'خطيبك/خطيبتك',b:'أخوك/أختك'})[F.w]+' حجز لحد '+CF.dm(CF.winEnd(Date.now()))+' (أسبوع من النهاردة) ودفع المقدم، هينزل '+ar(disc)+' جنيه '+C.WD[F.w]+' من آخر قسط ليك وله. بعد كده، أو لو ماحجزش ودفع، مفيش خصم.'));
       c.appendChild(el('label','lb','مواعيد الدفع'));var sch=el('div');r.items.forEach(function(x,i){var it=el('div','sc');it.appendChild(el('i',null,ar(i+1)));var sp=el('span',null,x.full?'المبلغ كله مرة واحدة':(x.dep?'المقدم':(x.pig?'الباقي على مراحل':'الأحد '+CF.dm(x.d))));if(x.dep)sp.appendChild(el('small',null,'عشان كرسيك يتثبّت'));if(x.pig)sp.appendChild(el('small',null,'أي مبلغ كل أحد لحد ٢٤ يناير'));it.appendChild(sp);it.appendChild(el('b',null,money(x.a)));sch.appendChild(it);});c.appendChild(sch);}
     var er=el('div','err');c.appendChild(er);
     var go=bt('btn','✓ احجز',function(){if(!F.plan){er.textContent='اختار طريقة الدفع';return;}if(!db){er.textContent='مفيش اتصال — جرّب تاني';return;}
@@ -222,7 +223,7 @@ var CF=(function(){
       var sub=x.done?'اتدفع':(late?'متأخر'+(x.p?' · دفعت '+money(x.p)+' منه':''):(x.pig?'أي مبلغ كل أحد · لحد ٢٤ يناير'+(x.p?' · دفعت '+money(x.p):''):(nx?'القسط الجاي':'')+(x.p?' · دفعت '+money(x.p)+' منه':'')));
       if(i===r.items.length-1&&!x.dep&&(r.disc||r.fee))sub+=(sub?' · ':'')+(r.disc?'بعد '+(C.WD[b.w]||'الخصم'):'')+(r.fee?(r.disc?' و':'')+'فيه ١٠٠ الحجز المتأخر':'');
       if(sub)sp.appendChild(el('small',null,sub));it.appendChild(sp);it.appendChild(el('b',null,money(x.a)));sc.appendChild(it);});
-    if(b.w&&b.w!=='a'&&!b.dsc)sc.appendChild(el('div','hint','🎁 '+C.WD[b.w]+' '+ar(C.DISC[b.w])+' جنيه هيتشال من آخر قسط أول ما '+(b.wn||'')+' يحجز ويدفع المقدم.'));
+    if(b.w&&b.w!=='a'&&!b.dsc){var we=CF.winEnd(b.at);if(b.dsx||(CF.today()>we&&!b.lk))sc.appendChild(el('div','hint mu','⌛ '+C.WD[b.w]+' كان لازم '+(b.wn||'')+' يحجز لحد '+CF.dm(we)+' (أسبوع من حجزك)، فالخصم مش هيتحسب.'));else sc.appendChild(el('div','hint','🎁 '+C.WD[b.w]+' '+ar(C.DISC[b.w])+' جنيه بيتحسب بس لما '+(b.wn||'')+' يحجز لحد '+CF.dm(we)+' (أسبوع من حجزك) ويدفع المقدم، وساعتها بيتشال من آخر قسط. لحد كده لسه متحسبش.'));}
     if(b.dsc)sc.appendChild(el('div','hint','✓ '+(C.WD[b.w]||'الخصم')+' اتحسب: −'+ar(b.dsc)+' من آخر قسط'));
     app.appendChild(sc);
     if(BY)return;

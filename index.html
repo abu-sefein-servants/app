@@ -5495,7 +5495,7 @@ onReady(function(){
 var CF=(function(){
   var C={START:'2026-11-22',EARLY:'2026-12-06',END:'2027-01-24',CAP:50,DEP:300,PAYTO:'01201346441',
     TITLE:'مؤتمر إسكندرية',WHEN:'السبت ٦ – الاثنين ٨ فبراير ٢٠٢٧',
-    BASE:{s:1500,g:1800},DISC:{a:0,f:50,e:100,b:100},
+    BASE:{s:1500,g:1800},WIN:7,DISC:{a:0,f:50,e:100,b:100},
     W:{a:'لوحدي',f:'صاحبي',e:'خطيبي / خطيبتي',b:'أخويا / أختي'},WD:{f:'خصم صاحب',e:'خصم خطيب/خطيبة',b:'خصم إخوات'},WO:{f:'صاحبه',e:'خطيبه/خطيبته',b:'أخوه/أخته'},
     K:{s:'طالب',g:'خريج'},
     PLANS:[['cash','💵 كاش'],['2w','📅 كل أسبوعين'],['1w','🗓️ كل أسبوع'],['eid','🎁 العيدية'],['mon','🗂️ الشهرية'],['pig','🐷 الحصّالة']]};
@@ -5556,7 +5556,8 @@ var CF=(function(){
   function missedFor(plan,k,bd){if(plan==='cash'||plan==='pig')return {n:0,a:0};var L=base(plan,k).filter(function(x){return x[0]<bd}),a=0;L.forEach(function(x){a+=x[1]});return {n:L.length,a:a};}
   function priceFor(plan,k,bd,disc){var r=calc({k:k,plan:plan,late:'spread',at:pd(bd).getTime(),pays:[]},{today:bd,disc:disc||0});return r.total;}
   function norm(t){return String(t||'').replace(/[أإآا]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/[ًٌٍَُِّْـ]/g,'').replace(/\s+/g,' ').trim();}
-  return {C:C,ar:ar,money:money,dm:dm,iso:iso,pd:pd,today:today,isoOf:isoOf,ms:ms,calc:calc,planDesc:planDesc,missedFor:missedFor,priceFor:priceFor,norm:norm,nextSun:nextSun,addD:addD};
+  function winEnd(at){var d=new Date(ms(at)||Date.now());d.setDate(d.getDate()+C.WIN);return iso(d);}
+  return {winEnd:winEnd,C:C,ar:ar,money:money,dm:dm,iso:iso,pd:pd,today:today,isoOf:isoOf,ms:ms,calc:calc,planDesc:planDesc,missedFor:missedFor,priceFor:priceFor,norm:norm,nextSun:nextSun,addD:addD};
 })();
 
 </script>
@@ -5589,7 +5590,9 @@ var CF=(function(){
   try{firebase.auth().onAuthStateChanged(function(){tile();start();});}catch(e){}
   // ---------- derived
   function L(){return Object.keys(D).map(function(id){var b=D[id];return {id:id,b:b};});}
-  function discOf(x){var b=x.b;if(!b.lk||b.x)return 0;var o=D[b.lk];if(!o||o.x)return 0;if(!depOf(b)||!depOf(o))return 0;return Math.max(C.DISC[b.w]||0,C.DISC[o.w]||0);}
+  function gapDays(b,o){return Math.abs(CF.ms(b.at)-CF.ms(o.at))/864e5;}
+  function winGone(b){return CF.today()>CF.winEnd(b.at);}
+  function discOf(x){var b=x.b;if(!b.lk||b.x)return 0;var o=D[b.lk];if(!o||o.x)return 0;if(gapDays(b,o)>C.WIN)return 0;if(!depOf(b)||!depOf(o))return 0;return Math.max(C.DISC[b.w]||0,C.DISC[o.w]||0);}
   function needOf(b){return CF.calc(b,{disc:(b.w&&b.w!=='a')?(C.DISC[b.w]||0):0}).need;}
   function depOf(b){var p=0;(b.pays||[]).forEach(function(x){p+=+x.a||0});return p>=needOf(b)||!!b.dat;}
   function datOf(b){if(b.dat)return CF.ms(b.dat);var s=0,t=0,nd=needOf(b);(b.pays||[]).slice().sort(function(a,c){return CF.ms(a.at)-CF.ms(c.at)}).some(function(x){s+=+x.a||0;if(s>=nd){t=CF.ms(x.at);return true;}return false;});return t;}
@@ -5598,12 +5601,13 @@ var CF=(function(){
     A.forEach(function(x){if(!x.seat)x.seat='';});return A;}
   var syT=null,lastPub='';
   function sync(){clearTimeout(syT);syT=setTimeout(function(){if(!boss())return;var A=rows(),bt_=db().batch(),n=0;
-    A.forEach(function(x){var b=x.b,u={},d=discOf(x);if((b.dsc||0)!==d)u.dsc=d;if((b.seat||'')!==x.seat)u.seat=x.seat;if(x.r.dep&&!b.dat){var t=datOf(b);if(t)u.dat=t;}if(Object.keys(u).length){bt_.update(ref(x.id),u);n++;}});
+    A.forEach(function(x){var b=x.b,u={},d=discOf(x);if((b.dsc||0)!==d)u.dsc=d;var dx=(b.w&&b.w!=='a'&&!d&&!b.x&&discDead(x))?1:0;if((b.dsx||0)!==dx)u.dsx=dx?1:firebase.firestore.FieldValue.delete();if((b.seat||'')!==x.seat)u.seat=x.seat;if(x.r.dep&&!b.dat){var t=datOf(b);if(t)u.dat=t;}if(Object.keys(u).length){bt_.update(ref(x.id),u);n++;}});
     var ok=A.filter(function(x){return x.seat==='ok'}).length,w=A.filter(function(x){return x.seat==='wait'}).length,pub={left:Math.max(0,C.CAP-ok),wait:w};var js=JSON.stringify(pub);
     if(js!==lastPub){lastPub=js;pub.at=Date.now();bt_.set(db().collection('confpub').doc('main'),pub);n++;}
     if(n)bt_.commit().catch(function(){lastPub='';});},400);}
   function stOf(x){var b=x.b,r=x.r;if(b.x)return 'x';if(!r.dep)return 'pend';if(x.seat==='wait')return 'wait';if(r.done)return 'done';if(r.late>0)return 'late';return 'ok';}
-  function pendDisc(x){return !x.b.x&&x.b.w&&x.b.w!=='a'&&!discOf(x);}
+  function discDead(x){var b=x.b,o=b.lk&&D[b.lk];if(o)return gapDays(b,o)>C.WIN||!!o.x;return winGone(b);}
+  function pendDisc(x){return !x.b.x&&x.b.w&&x.b.w!=='a'&&!discOf(x)&&!discDead(x);}
   // ---------- page
   function render(){tile();var root=$('cf-root');if(!root)return;if(!boss()){root.textContent='';return;}var pan=$('p-conf');if(pan&&pan.hidden)return;
     var A=rows(),act=A.filter(function(x){return !x.b.x});root.textContent='';var sn0=seen();setTimeout(function(){setSeen();badge();},1500);
@@ -5650,7 +5654,7 @@ var CF=(function(){
   function cashNote(x){var r=x.r;if(x.b.plan!=='cash'||r.done||!r.cashD||CF.today()>C.EARLY)return '';return 'ادفعهم لحد الأحد '+CF.dm(C.EARLY)+' عشان الخصمين يفضلوا محسوبين (بعدها الخصمين بيتشالوا والإجمالي يبقى '+money(r.total+200)+').\n';}
   function confMsg(x){var b=x.b,r=x.r,f=String(b.n).split(' ')[0];var t='أهلاً '+f+' 👋\nتم تأكيد حجزك في '+C.TITLE+' ⛱️ ('+C.WHEN+') ✓\n';
     t+='حسابك: '+priceTxt(x)+'\nاستلمنا منك '+money(r.paid)+(r.done?' جنيه — كده خلّصت الدفع كله 🎉\n':' جنيه، وفاضل عليك '+money(r.left)+' جنيه.\n');
-    if(!r.dsc&&!r.disc&&b.w&&b.w!=='a')t+='ولما '+(b.wn?String(b.wn).split(' ')[0]:C.WO[b.w])+' يحجز ويدفع المقدم، هينزل '+ar(C.DISC[b.w])+' جنيه '+C.WD[b.w]+(b.plan==='cash'?' من الباقي':' من آخر قسط')+'.\n';
+    if(!r.disc&&b.w&&b.w!=='a'&&!discDead(x))t+='ولما '+(b.wn?String(b.wn).split(' ')[0]:C.WO[b.w])+' يحجز (لحد '+CF.dm(CF.winEnd(b.at))+') ويدفع المقدم، هينزل '+ar(C.DISC[b.w])+' جنيه '+C.WD[b.w]+(b.plan==='cash'?' من الباقي':' من آخر قسط')+'.\n';
     t+=x.seat==='wait'?'الكراسي الـ'+ar(C.CAP)+' اتملت قبل ما المقدم يوصل، فانت دلوقتي في قائمة الانتظار، وهنكلّمك أول ما كرسي يفضى.\n':'كرسيك في الأتوبيس اتثبّت 🚌\n';
     var cn=cashNote(x);if(cn)t+=cn;else if(!r.done&&r.next){t+=r.next.pig?'وبعد كده تقدر تدفع أي مبلغ كل أحد لحد ٢٤ يناير (فاضل '+money(r.left)+' جنيه).\n':'القسط الجاي: '+money(r.next.a-(r.next.p||0))+' جنيه يوم الأحد '+CF.dm(r.next.d)+'.\n';}
     t+='تفاصيل حجزك ومواعيد أقساطك: '+plink(x.id);return t;}
@@ -5687,9 +5691,9 @@ var CF=(function(){
       var d=bt('','✕',function(){if(!d.classList.contains('arm')){d.classList.add('arm');d.textContent='امسحها؟';return;}var L2=(b.pays||[]).slice();L2.splice(z.i,1);var u={pays:L2};var s2=0;L2.forEach(function(y){s2+=+y.a||0});if(s2<r.need)u.dat=firebase.firestore.FieldValue.delete();upd(id,u,'اتمسحت الدفعة');});rw.appendChild(d);lg.appendChild(rw);});bx.appendChild(lg);bx.appendChild(el('p','cf-hint','سجّلتها كاش وهي إنستاباي (أو العكس)؟ دوس على الطريقة جنب الدفعة وهتتغيّر.'));}
     // companion
     if(b.w&&b.w!=='a'&&!b.x){var cp=el('div','cf-cmp');cp.appendChild(el('b',null,'🎁 '+C.WD[b.w]+' · '+(b.wn||'')));
-      if(b.lk&&D[b.lk]){var o=D[b.lk];var d0=discOf(x);cp.appendChild(el('span',null,'🔗 مربوط بـ «'+o.n+'» · '+(d0?'✓ الخصم اتحسب (−'+ar(d0)+')':'⏳ الخصم هيتحسب لما الاتنين يدفعوا المقدم')));
+      if(b.lk&&D[b.lk]){var o=D[b.lk];var d0=discOf(x);var gp=Math.round(gapDays(b,o));cp.appendChild(el('span',null,'🔗 مربوط بـ «'+o.n+'» · '+(gp>C.WIN?'✕ مفيش خصم: حجزوا بفرق '+ar(gp)+' يوم (أكتر من أسبوع)':(d0?'✓ الخصم اتحسب (−'+ar(d0)+')':'⏳ الخصم هيتحسب لما الاتنين يدفعوا المقدم'))));
         cp.appendChild(bt('cf-mini','فك الربط',function(){var bb=db().batch();bb.update(ref(id),{lk:firebase.firestore.FieldValue.delete()});if(D[b.lk]&&D[b.lk].lk===id)bb.update(ref(b.lk),{lk:firebase.firestore.FieldValue.delete()});bb.commit().then(function(){note('اتفك الربط');});}));}
-      else{var cand=matches(id);if(cand.length){cp.appendChild(el('span',null,'ده هو؟ اربطهم عشان الخصم يتحسب للاتنين:'));cand.forEach(function(cid){var o2=D[cid];cp.appendChild(bt('cf-mini gold','🔗 '+o2.n+' ('+String(o2.ph||'').slice(-4)+')',function(){var bb=db().batch();bb.update(ref(id),{lk:cid});bb.update(ref(cid),{lk:id});bb.commit().then(function(){note('اتربطوا ✓');});}));});}
+      else{if(winGone(b))cp.appendChild(el('span',null,'⌛ عدّى أسبوع من حجزه ('+CF.dm(CF.winEnd(b.at))+') ومحدش اتربط بيه — مفيش خصم. لو ربطتهم دلوقتي الخصم برضو مش هيتحسب.'));var cand=matches(id);if(cand.length){cp.appendChild(el('span',null,'ده هو؟ اربطهم عشان الخصم يتحسب للاتنين:'));cand.forEach(function(cid){var o2=D[cid];cp.appendChild(bt('cf-mini gold','🔗 '+o2.n+' ('+String(o2.ph||'').slice(-4)+')',function(){var bb=db().batch();bb.update(ref(id),{lk:cid});bb.update(ref(cid),{lk:id});bb.commit().then(function(){note('اتربطوا ✓');});}));});}
         else cp.appendChild(el('span',null,'⏳ مفيش حد بالاسم ده حاجز لسه. أول ما يحجز هيظهر هنا تربطهم.'));
         var all=bt('cf-mini','اختار من كل الحاجزين',function(){PS.sheet.open('cfpick:'+id,function(b2){b2.appendChild(el('h3','xs-title','مين '+C.WO[b.w]+'؟'));Object.keys(D).filter(function(z){return z!==id&&!D[z].x}).sort(function(a,c){return String(D[a].n).localeCompare(String(D[c].n),'ar')}).forEach(function(z){b2.appendChild(bt('cf-it',D[z].n,function(){var bb=db().batch();bb.update(ref(id),{lk:z});bb.update(ref(z),{lk:id});bb.commit().then(function(){note('اتربطوا ✓');openCard(id);});}));});});});cp.appendChild(all);}
       bx.appendChild(cp);}
