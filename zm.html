@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>متابعة مسابقة زكريا — خدام أبو سيفين</title>
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;600;700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1d1150;--card:#2a1d6b;--edge:rgba(255,255,255,.12);--gold:#ffd98a;--dim:rgba(255,255,255,.7);--ok:#8fd19e;--no:#ff9b8a}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(90% 60% at 50% 0%,#3b2c86,#1d1150 60%,#140b33) fixed;color:#fff;font-family:Alexandria,sans-serif;min-height:100vh;padding:env(safe-area-inset-top,0) 0 40px}
+.w{max-width:620px;margin:0 auto;padding:18px 14px}
+h1{font-family:"Aref Ruqaa",serif;color:var(--gold);font-size:30px;margin:4px 0 2px}
+.sub{color:var(--dim);font-size:13px;line-height:1.7;margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--edge);border-radius:18px;padding:14px;margin-bottom:12px}
+.sel{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px}
+.sel button{font:inherit;font-size:14px;white-space:nowrap;padding:9px 14px;min-height:44px;border-radius:999px;border:1px solid var(--edge);background:transparent;color:#fff}
+.sel button.on{background:var(--gold);color:#2a1660;font-weight:700;border-color:var(--gold)}
+.fh{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700;font-size:17px}
+.fh span{font-weight:400;font-size:13px;color:var(--gold)}
+.bar{height:8px;border-radius:8px;background:rgba(255,255,255,.12);margin:10px 0}
+.bar i{display:block;height:8px;border-radius:8px;background:var(--gold)}
+.lst{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.lst b{font-weight:400;font-size:13px;padding:5px 10px;border-radius:999px;border:1px solid var(--edge)}
+.lst.no b{border-color:rgba(255,155,138,.5);color:var(--no)}
+.lst.ok b{border-color:rgba(143,209,158,.45);color:var(--ok)}
+.lbl{font-size:12px;color:var(--dim);margin-top:10px}
+.msg{text-align:center;padding:40px 10px;color:var(--dim)}
+a{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="w" id="root"><p class="msg">بيحمّل…</p></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* متابعة مسابقة زكريا للخدام: مين لعب ومين لأ في كل أسرة — من غير ولا سؤال ولا إجابة */
+(function(){
+var CFG = {"apiKey": "AIzaSyCI2Joji2q_SrU1-TtRBEc1ZhgtbQNz95E", "authDomain": "abu-sefein-youth.firebaseapp.com", "projectId": "abu-sefein-youth", "storageBucket": "abu-sefein-youth.firebasestorage.app", "messagingSenderId": "884482612914", "appId": "1:884482612914:web:c5ec6c6eafacb26f7933ab"};
+var FAM = { f1:"أسرة ١", f2:"أسرة ٢", f3:"أسرة ٣", x:"مش في أسرة من التلاتة" };
+var root = document.getElementById("root"), db, data = null, pick = null;
+function ar(n){ return String(n).replace(/\d/g, function(d){ return "٠١٢٣٤٥٦٧٨٩"[d]; }); }
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+function ms(t){ return t && t.toMillis ? t.toMillis() : +t; }
+function nm(ch){ return ch === "t" ? "التجريبية" : "زكريا " + ar(ch); }
+function msg(t){ root.innerHTML = '<p class="msg">' + t + '</p>'; }
+
+firebase.initializeApp(CFG);
+db = firebase.firestore();
+firebase.auth().onAuthStateChanged(function(u){
+  if(!u){ msg('ادخل أبلكيشن الخدام الأول وسجّل دخول، وبعدين افتح الصفحة دي تاني.<br><br><a href="./">افتح أبلكيشن الخدام</a>'); return; }
+  db.collection("users").doc(u.email.toLowerCase()).get().then(function(d){
+    if(!d.exists && u.email.toLowerCase() !== "abanoublouis1@gmail.com"){ msg("الصفحة دي للخدام بس."); return; }
+    load();
+  }).catch(function(){ msg("الصفحة دي للخدام بس."); });
+});
+function load(){
+  Promise.all([
+    db.collection("gcfg").doc("zseason").get(),
+    db.collection("gplayers").get(),
+    db.collection("zruns").get()
+  ]).then(function(r){
+    var cfg = (r[0].exists && r[0].data().ch) || {}, players = {}, runs = {};
+    r[1].forEach(function(d){ players[d.id] = d.data(); });
+    r[2].forEach(function(d){ runs[d.id] = d.data(); });
+    data = { cfg:cfg, players:players, runs:runs };
+    var now = Date.now(), chs = Object.keys(cfg).filter(function(k){ return cfg[k].o && ms(cfg[k].o) <= now; })
+      .sort(function(a, b){ return ms(cfg[a].o) - ms(cfg[b].o); });
+    if(!pick) pick = chs.filter(function(k){ return ms(cfg[k].c) >= now; })[0] || chs[chs.length - 1];
+    draw(chs);
+  }).catch(function(e){ msg(e && e.code === "permission-denied" ? "Firebase رافض — كلّم أبانوب." : "مفيش نت. جرّب تاني."); });
+}
+function draw(chs){
+  if(!chs.length){ msg("المسابقة لسه مبدأتش. أول جولة: زكريا ١ يوم الثلاثاء ١ ديسمبر."); return; }
+  var c = data.cfg[pick], open = ms(c.c) >= Date.now();
+  var fams = ["f1","f2","f3","x"].map(function(f){
+    var ppl = Object.keys(data.players).filter(function(u){ return (data.players[u].fm || "") === f; });
+    var done = [], half = [], none = [];
+    ppl.forEach(function(u){
+      var r = data.runs[u + "_" + pick], n = data.players[u].n || "لاعب";
+      if(r && r.done) done.push(n); else if(r) half.push(n); else none.push(n);
+    });
+    return { f:f, all:ppl.length, done:done, half:half, none:none };
+  });
+  var noFam = Object.keys(data.players).filter(function(u){ return !data.players[u].fm; }).map(function(u){ return data.players[u].n || "لاعب"; });
+  function chips(a, cls){ return a.length ? '<div class="lst ' + cls + '">' + a.sort().map(function(n){ return "<b>" + esc(n) + "</b>"; }).join("") + "</div>" : ""; }
+  root.innerHTML =
+    '<h1>متابعة المسابقة</h1><p class="sub">مين لعب ومين لسه في كل أسرة، عشان تفكّروا اللي ملعبش. الصفحة دي مفيهاش أسئلة ولا إجابات.</p>' +
+    '<div class="sel">' + chs.map(function(k){ return '<button data-k="' + k + '" class="' + (k === pick ? "on" : "") + '">' + nm(k) + "</button>"; }).join("") + "</div>" +
+    '<p class="sub">' + nm(pick) + (open ? " مفتوحة لحد " : " قفلت ") + new Date(ms(c.c)).toLocaleString("ar-EG", { weekday:"long", day:"numeric", month:"long", hour:"numeric", minute:"2-digit" }) + "</p>" +
+    fams.filter(function(x){ return x.all; }).map(function(x){
+      var pct = x.all ? Math.round(x.done.length / x.all * 100) : 0;
+      return '<div class="card"><div class="fh">' + FAM[x.f] + "<span>" + ar(x.done.length) + " من " + ar(x.all) + " خلصوا</span></div>" +
+        '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
+        (x.none.length ? '<div class="lbl">لسه ملعبوش (' + ar(x.none.length) + ")</div>" + chips(x.none, "no") : "") +
+        (x.half.length ? '<div class="lbl">بدأوا ومكمّلوش (' + ar(x.half.length) + ")</div>" + chips(x.half, "no") : "") +
+        (x.done.length ? '<div class="lbl">خلصوا (' + ar(x.done.length) + ")</div>" + chips(x.done, "ok") : "") + "</div>";
+    }).join("") +
+    (noFam.length ? '<div class="card"><div class="fh">لسه مختاروش أسرة<span>' + ar(noFam.length) + "</span></div>" + chips(noFam, "") + "</div>" : "") +
+    '<p class="sub" style="text-align:center"><a href="./">رجوع لأبلكيشن الخدام</a></p>';
+  root.querySelectorAll(".sel button").forEach(function(b){ b.onclick = function(){ pick = b.dataset.k; draw(chs); }; });
+}
+})();
+</script>
+</body>
+</html>
