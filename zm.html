@@ -69,6 +69,7 @@ var root = document.getElementById("root"), db, me, data = null, pick = null, ta
 if(/[?&]embed=1/.test(location.search)) document.body.classList.add("emb");
 function ar(n){ return String(n).replace(/\d/g, function(d){ return "٠١٢٣٤٥٦٧٨٩"[d]; }); }
 function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+var LATE = 600000;
 function ms(t){ return t && t.toMillis ? t.toMillis() : +t; }
 function nm(ch){ return ch === "t" ? "التجريبية" : "زكريا " + ar(ch); }
 function msg(t){ root.innerHTML = '<h1>متابعة المسابقة</h1><p class="msg">' + t + "</p>"; }
@@ -121,8 +122,8 @@ function load(){
     var now = Date.now();
     data.chs = Object.keys(cfg).filter(function(k){ return cfg[k].o && ms(cfg[k].o) <= now; })
       .sort(function(a, b){ return ms(cfg[a].o) - ms(cfg[b].o); });
-    data.shut = data.chs.filter(function(k){ return ms(cfg[k].c) < now; });
-    if(!pick) pick = data.chs.filter(function(k){ return ms(cfg[k].c) >= now; })[0] || data.chs[data.chs.length - 1];
+    data.shut = data.chs.filter(function(k){ return ms(cfg[k].c) + LATE < now; });
+    if(!pick) pick = data.chs.filter(function(k){ return ms(cfg[k].c) + LATE >= now; })[0] || data.chs[data.chs.length - 1];
     var n = data.shut.length;
     if(!n){ draw(); return; }
     data.shut.forEach(function(ch){
@@ -168,18 +169,21 @@ function draw(){
     var noFam = U.filter(function(u){ return !data.players[u].fm; });
     if(noFam.length) body += '<div class="card"><div class="fh">سجّلوا ولسه مختاروش أسرة<span>' + ar(noFam.length) + '</span></div><div class="ppl">' + noFam.map(function(u){ return person(u, ""); }).join("") + "</div></div>";
   } else if(tab === "rank"){
+    /* مشاركة الأسر: كل لاعب بدأ جولة = مشاركة لأسرته (الجولة التجريبية مش بتتحسب) */
+    var RC = data.chs.filter(function(ch){ return ch !== "t"; });
+    var part = ["f1","f2","f3"].map(function(f){
+      var m = U.filter(function(u){ return data.players[u].fm === f; }), n = 0;
+      m.forEach(function(u){ RC.forEach(function(ch){ if(data.runs[u + "_" + ch]) n++; }); });
+      return { f:f, m:m.length, n:n };
+    }).sort(function(a, b){ return b.n - a.n; });
+    body = '<h3>مشاركة الأسر — هدية للأمناء</h3><p class="sub">كل واحد يلعب جولة يزوّد أسرته مشاركة. الجولة المفتوحة بتتحسب على طول.</p>' +
+      '<div class="card">' + (RC.length ? part.map(function(x, i){ return '<div class="row"><b>' + ar(i + 1) + ". " + FAM[x.f] + " <small>" + ar(x.m) + " مسجّلين</small></b><i>" + ar(x.n) + " مشاركة</i></div>"; }).join("") : '<div class="row"><b>لسه مفيش جولة اتفتحت</b></div>') + "</div>";
     var L = data.shut.filter(function(ch){ return ch !== "t"; }); if(!L.length && data.shut.length) L = data.shut.slice();
-    if(!L.length) body = '<div class="card">الترتيب بيظهر بعد ما أول جولة تقفل.</div>';
+    if(!L.length) body += '<h3>الترتيب الفردي</h3><div class="card">الترتيب بيظهر بعد ما أول جولة تقفل.</div>';
     else {
       var rows = U.map(function(u){ var p = 0, t = 0, n = 0; L.forEach(function(ch){ var s = score(u, ch); if(s){ p += s.p; t += s.t; n++; } }); return { u:u, p:p, t:t, n:n }; })
         .filter(function(x){ return x.n; }).sort(function(a, b){ return b.p - a.p || a.t - b.t; });
-      var fams = ["f1","f2","f3"].map(function(f){
-        var m = U.filter(function(u){ return data.players[u].fm === f; });
-        var s = rows.filter(function(x){ return data.players[x.u].fm === f; }).reduce(function(a, x){ return a + x.p; }, 0);
-        return { f:f, m:m.length, avg: m.length ? Math.round(s / m.length * 10) / 10 : 0 };
-      }).sort(function(a, b){ return b.avg - a.avg; });
-      body = '<p class="sub">محسوب على ' + L.map(nm).join("، ") + ". الأسر بمتوسط نقط الفرد، والتعادل بيتحسم بالوقت.</p>" +
-        '<div class="card">' + fams.map(function(x, i){ return '<div class="row"><b>' + ar(i + 1) + ". " + FAM[x.f] + " <small>" + ar(x.m) + " فرد</small></b><i>" + ar(x.avg) + " للفرد</i></div>"; }).join("") + "</div>" +
+      body += '<h3>الترتيب الفردي</h3><p class="sub">محسوب على ' + L.map(nm).join("، ") + ". التعادل بيتحسم بالوقت الأقل.</p>" +
         '<div class="card">' + rows.map(function(x, i){ var P = data.players[x.u]; return '<div class="row"><b>' + ar(i + 1) + ". " + esc(P.n) + " <small>" + (FAM[P.fm] && P.fm !== "x" ? FAM[P.fm] : "") + "</small></b><i>" + ar(x.p) + " <small>(" + ar(x.t) + " ث)</small></i></div>"; }).join("") + "</div>";
     }
   } else {
